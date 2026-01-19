@@ -1,223 +1,320 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PRAGA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praga</title>
+    <link rel="icon" href="biohazard-sign.png" type="image/png">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #ff1744; --blue: #00e5ff; --gold: #ffd700; --green: #00e676; --dark: #050505;
+            --glass: rgba(10, 10, 10, 0.98); --border: rgba(255, 255, 255, 0.15);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        body { font-family: 'Rajdhani', sans-serif; background: var(--dark); color: #FFF; overflow: hidden; height: 100vh; }
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+        /* --- TELAS (SPA) --- */
+        .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; }
+        .screen.active { display: flex; }
+        #startMenu { background: radial-gradient(circle at center, #ff1744 0%, #4a0000 60%, #000 100%); }
+        #setupFlow { background: #000; overflow-y: auto; padding: 40px 0; }
 
-<style>
-:root{
-  --red:#ff1744;--blue:#00e5ff;--gold:#ffd700;--green:#00e676;--dark:#050505;
-  --glass:rgba(10,10,10,.95);--border:rgba(255,255,255,.12);
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Rajdhani;background:#000;color:#fff;overflow:hidden}
+        /* --- UI GERAL --- */
+        .glass { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 12px; }
+        .btn-main { background: #FFF; color: #800000; border: none; padding: 12px 25px; font-size: 1.3rem; font-weight: 800; border-radius: 6px; cursor: pointer; transition: 0.3s; margin: 8px; text-transform: uppercase; width: 260px; box-shadow: 0 4px 0 #CCC; }
+        .btn-main:hover { background: var(--red); color: #FFF; transform: scale(1.03); box-shadow: 0 4px 0 #900; }
+        
+        .btn-gear { background: none; border: none; color: #FFF; font-size: 2rem; cursor: pointer; transition: 0.3s; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
+        .btn-gear:hover { transform: rotate(90deg); color: var(--red); }
 
-.screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column}
-.screen.active{display:flex}
+        /* --- TOOLTIPS (DICAS FLUTUANTES) --- */
+        .dashed-info {
+            position: relative;
+            border-bottom: 1.5px dashed rgba(255, 255, 255, 0.6);
+            cursor: help;
+            color: #FFF; /* Alto Contraste */
+        }
+        .dashed-info::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 130%; left: 50%; transform: translateX(-50%);
+            background: #000; border: 1px solid var(--border); color: #FFF;
+            padding: 12px 18px; border-radius: 8px; font-size: 0.9rem; font-family: 'Rajdhani';
+            white-space: normal; width: 220px; text-align: center;
+            opacity: 0; visibility: hidden; transition: 0.2s ease;
+            z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        .dashed-info:hover::after { opacity: 1; visibility: visible; bottom: 145%; }
 
-.glass{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:12px}
+        /* --- SETUP CARDS --- */
+        .setup-card { width: 92%; max-width: 780px; padding: 40px; text-align: center; display: none; }
+        .setup-card.active { display: block; animation: slideIn 0.4s ease; }
+        @keyframes slideIn { from { opacity:0; transform: scale(0.95); } to { opacity:1; transform: scale(1); } }
+        
+        .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; margin: 35px 0; }
+        .opt-box { padding: 25px; border: 1px solid #333; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,0.03); transition: 0.2s; color: #DDD; }
+        .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.2); color: #FFF; }
+        
+        .gene-slots { display: flex; justify-content: center; gap: 12px; margin: 35px 0; }
+        .slot { width: 60px; height: 60px; border: 2px dashed #555; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #888; font-weight: 800; }
+        .slot.filled { border-color: var(--gold); background: rgba(255,215,0,0.1); color: var(--gold); border-style: solid; box-shadow: 0 0 15px rgba(255,215,0,0.2); }
 
-.btn-main{
-  background:#fff;color:#800;border:none;padding:15px 30px;
-  font-size:1.2rem;font-weight:800;border-radius:8px;
-  cursor:pointer;margin:8px;width:260px;
-}
-.btn-main:hover{background:var(--red);color:#fff}
+        /* --- GAME HUD --- */
+        #mainGame { width: 100%; height: 100vh; display: none; }
+        #map { width: 100%; height: 100vh; z-index: 1; filter: saturate(0.9) brightness(0.9); }
+        .hud { position: fixed; z-index: 1000; pointer-events: none; }
+        .hud * { pointer-events: auto; }
+        .top-hud { top: 12px; width: 96%; left: 2%; height: 55px; display: flex; align-items: center; padding: 0 25px; justify-content: space-between; }
+        .bottom-hud { bottom: 12px; width: 96%; left: 2%; height: 150px; display: flex; align-items: center; justify-content: space-between; padding: 0 35px; }
 
-#startMenu{background:radial-gradient(circle,#ff1744 0%,#600000 50%,#000 100%)}
-#selectionFlow{background:#000;overflow-y:auto;padding:40px 0}
+        /* BARRAS DE STATUS */
+        .bars-panel { flex: 1; margin: 0 45px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .bar-wrap { display: flex; flex-direction: column; }
+        .bar-label { font-size: 0.7rem; color: #FFF; text-transform: uppercase; margin-bottom: 4px; font-weight: 800; letter-spacing: 1.5px; text-shadow: 1px 1px 2px #000; }
+        .bar-bg { width: 100%; height: 10px; background: #000; border-radius: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        .bar-fill { height: 100%; width: 0%; transition: width 0.8s ease-out; }
 
-.setup-card{width:90%;max-width:800px;padding:40px;text-align:center;display:none}
-.setup-card.active{display:block}
+        /* --- OVERLAYS --- */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.94); z-index: 9000; display: none; align-items: center; justify-content: center; }
+        .modal-card { width: 600px; padding: 45px; position: relative; border: 1px solid var(--border); box-shadow: 0 0 100px #000; }
+        .btn-x { position: absolute; top: 20px; right: 25px; background: none; border: none; color: #777; font-size: 2.2rem; cursor: pointer; transition: 0.2s; }
+        .btn-x:hover { color: #FFF; transform: scale(1.1); }
 
-.grid-select{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin:25px 0}
-.opt-box{padding:20px;border:1px solid #333;border-radius:8px;cursor:pointer}
-.opt-box.selected{border-color:var(--red);background:rgba(255,23,68,.15)}
+        /* BOTÕES HEURÍSTICOS */
+        .config-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .btn-toggle { width: 140px; padding: 12px; border-radius: 8px; font-weight: 900; cursor: pointer; border: 2px solid rgba(255,255,255,0.15); font-size: 1rem; transition: 0.2s; }
+        .btn-on { background: #1B5E20; color: #FFF; border-color: #4CAF50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.4); }
+        .btn-off { background: #B71C1C; color: #FFF; border-color: #EF5350; box-shadow: 0 0 15px rgba(239, 83, 80, 0.4); }
 
-#mainGame{display:none}
-#map{width:100%;height:100vh}
-
-.top-hud,.bottom-hud{
-  position:fixed;left:2%;width:96%;z-index:1000;
-  display:flex;align-items:center;padding:10px 20px
-}
-.top-hud{top:10px;height:50px}
-.bottom-hud{bottom:10px;height:140px;justify-content:space-between}
-
-.bar-bg{height:10px;background:#111;border-radius:5px;overflow:hidden}
-.bar-fill{height:100%;width:0;transition:.3s}
-
-#ticker{flex:1;color:#ccc;font-size:.85rem;white-space:nowrap;overflow:hidden}
-#ticker span{display:inline-block;animation:ticker 20s linear infinite}
-@keyframes ticker{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
-
-.popup{
-  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:380px;padding:30px;z-index:5000;display:none
-}
-</style>
+        /* POPUP PAÍS */
+        .tactical-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; padding: 35px; z-index: 8000; display: none; border: 2px solid var(--blue); background: rgba(0, 10, 20, 0.98); box-shadow: 0 0 50px rgba(0,229,255,0.2); }
+    </style>
 </head>
-
 <body>
 
-<!-- MENU -->
-<div id="startMenu" class="screen active">
-  <div style="font-family:Orbitron;font-size:4.5rem;letter-spacing:12px">PRAGA</div>
-  <button class="btn-main" onclick="initSetup()">Iniciar</button>
-</div>
-
-<!-- SETUP -->
-<div id="selectionFlow" class="screen">
-  <div id="setupType" class="glass setup-card active">
-    <h2 style="color:var(--red);font-family:Orbitron">AGENTE</h2>
-    <div class="grid-select">
-      <div class="opt-box" onclick="setVar('pathogen','Bactéria',this)">Bactéria</div>
-      <div class="opt-box" onclick="setVar('pathogen','Vírus',this)">Vírus</div>
+    <div id="startMenu" class="screen active">
+        <div style="position: absolute; top: 25px; right: 25px; z-index: 10;">
+            <button class="btn-gear" onclick="openSettings('menu')">⚙️</button>
+        </div>
+        <div class="bio-logo" style="font-family: Orbitron; font-size: 5.5rem; letter-spacing: 15px; text-shadow: 0 0 35px var(--red); margin-bottom: 55px;">PRAGA</div>
+        <button class="btn-main" onclick="initSetup()">Iniciar</button>
+        <button class="btn-main" onclick="openModal('tutorialModal')">Tutorial</button>
+        <button class="btn-main" onclick="alert('Histórico de Extinções indisponível')">Conquistas</button>
     </div>
-    <button class="btn-main" onclick="nextStep('setupName')">Próximo</button>
-  </div>
 
-  <div id="setupName" class="glass setup-card">
-    <h2 style="color:var(--blue);font-family:Orbitron">NOME</h2>
-    <input id="nameIn" placeholder="PRAGA-X"
-      style="width:100%;padding:20px;font-size:2rem;text-align:center">
-    <button class="btn-main" onclick="startGame()">Iniciar Simulação</button>
-  </div>
-</div>
+    <div id="selectionFlow" class="screen">
+        <button class="btn-x" style="position: fixed; top:25px; right:25px; z-index:100;" onclick="location.reload()">✕</button>
+        
+        <div id="setupType" class="glass setup-card active">
+            <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 12px; font-size: 2.2rem;">IDENTIFICAR AGENTE</h2>
+            <div class="grid-select">
+                <div class="opt-box" onclick="setVar('type', 'Bactéria', this)">🦠 BACTÉRIA<br><small style="color:#AAA">Versátil e resiliente.</small></div>
+                <div class="opt-box" onclick="setVar('type', 'Vírus', this)">🧬 VÍRUS<br><small style="color:#AAA">Mutação em cascata.</small></div>
+                <div class="opt-box" onclick="setVar('type', 'Fungo', this)">🍄 FUNGO<br><small style="color:#AAA">Resistência extrema.</small></div>
+                <div class="opt-box" onclick="setVar('type', 'Príon', this)">💎 PRÍON<br><small style="color:#AAA">Morte silenciosa.</small></div>
+            </div>
+            <button class="btn-main" style="width: 100%;" onclick="nextStep('setupDiff')">Confirmar</button>
+        </div>
 
-<!-- GAME -->
-<div id="mainGame">
-  <div id="map"></div>
+        <div id="setupDiff" class="glass setup-card">
+            <h2 style="color: var(--gold); font-family: Orbitron; font-size: 2.2rem;">AMEAÇA GLOBAL</h2>
+            <div class="grid-select">
+                <div class="opt-box" onclick="setVar('diff', 'Casual', this)"><span style="color: var(--green);">CASUAL</span><br><small style="color:#AAA">População descuidada.</small></div>
+                <div class="opt-box" onclick="setVar('diff', 'Normal', this)"><span style="color: var(--gold);">NORMAL</span><br><small style="color:#AAA">Resposta padrão.</small></div>
+                <div class="opt-box" onclick="setVar('diff', 'Brutal', this)"><span style="color: var(--red);">BRUTAL</span><br><small style="color:#AAA">Ciência agressiva.</small></div>
+            </div>
+            <button class="btn-main" style="width: 100%;" onclick="nextStep('setupName')">Confirmar</button>
+        </div>
 
-  <div class="glass top-hud">
-    <div id="ticker"><span id="news">SISTEMA BIOTÁTICO ONLINE.</span></div>
-    <button class="btn-main" style="width:60px" onclick="setSpeed(1)">x1</button>
-    <button class="btn-main" style="width:60px" onclick="setSpeed(3)">x3</button>
-  </div>
+        <div id="setupName" class="glass setup-card">
+            <h2 style="color: var(--blue); font-family: Orbitron; font-size: 2.2rem;">NOMEAR PATÓGENO</h2>
+            <input type="text" id="nameIn" placeholder="NOME..." maxlength="18" style="width: 100%; padding: 25px; background: rgba(0,0,0,0.6); border: 2px solid #444; color: #FFF; text-align: center; font-size: 2.5rem; margin: 45px 0; font-family: Rajdhani; letter-spacing: 4px; border-radius: 10px;">
+            <button class="btn-main" style="width: 100%;" onclick="nextStep('setupGenes')">Registrar</button>
+        </div>
 
-  <div class="glass bottom-hud">
-    <div style="flex:1">
-      <div>Infectados</div>
-      <div class="bar-bg"><div id="bInf" class="bar-fill" style="background:var(--red)"></div></div>
+        <div id="setupGenes" class="glass setup-card">
+            <h2 style="color: var(--green); font-family: Orbitron; font-size: 2.2rem;">CÓDIGO GENÉTICO</h2>
+            <div class="gene-slots">
+                <div class="slot" id="slot-t1">TRANS</div><div class="slot" id="slot-t2">TRANS</div><div class="slot" id="slot-t3">TRANS</div>
+                <div class="slot" id="slot-s1">SINT</div><div class="slot" id="slot-r1">RES</div>
+            </div>
+            <div class="grid-select" id="genePool" style="max-height: 220px; overflow-y: auto; padding-right: 8px;">
+                <div class="opt-box" onclick="addGene(this, 'Ar I', 'trans')">💨 Mutação Aérea I</div>
+                <div class="opt-box" onclick="addGene(this, 'Água I', 'trans')">💧 Transmissão Hídrica I</div>
+                <div class="opt-box" onclick="addGene(this, 'Aves I', 'trans')">🐦 Vetor Aviário I</div>
+                <div class="opt-box" onclick="addGene(this, 'Tosse', 'sint')">😷 Sintoma: Tosse</div>
+                <div class="opt-box" onclick="addGene(this, 'Calor I', 'res')">🔥 Resistência Térmica I</div>
+            </div>
+            <button class="btn-main" style="width: 100%; margin-top: 25px; background: var(--green); color: #000;" onclick="startGame()">INICIAR SIMULAÇÃO</button>
+        </div>
     </div>
-    <div style="margin-left:30px;text-align:right">
-      <div style="color:var(--gold);font-size:2.5rem" id="mut">10</div>
-      <small>Mutagenicidade</small>
+
+    <div id="mainGame">
+        <div id="map"></div>
+        
+        <div class="hud glass top-hud">
+            <div style="display: flex; align-items: center;">
+                 <span style="color: var(--red); font-weight: 800; margin-right: 18px; font-size: 0.85rem; font-family: Orbitron; letter-spacing: 2px;">NOTÍCIAS</span>
+                <marquee id="ticker" style="width: 450px; color: #FFF; font-weight: 700; font-size: 1rem;">SISTEMA BIO-TACTICAL ONLINE. AGUARDANDO IDENTIFICAÇÃO DO PACIENTE ZERO...</marquee>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 25px;">
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-main" style="width: 55px; padding: 10px; font-size: 0.8rem; margin:0;" onclick="setSpeed(1)">x1</button>
+                    <button class="btn-main" style="width: 55px; padding: 10px; font-size: 0.8rem; margin:0;" onclick="setSpeed(3)">x3</button>
+                </div>
+                <button class="btn-gear" onclick="openSettings('game')">⚙️</button>
+            </div>
+        </div>
+
+        <div class="hud glass bottom-hud">
+            <button class="btn-main" style="width: 250px; font-size: 1rem;" onclick="alert('Status da Enfermidade')">Status da Enfermidade</button>
+            
+            <div class="bars-panel">
+                <div class="bar-wrap"><span class="bar-label" id="l-inf">Infectados: 0</span><div class="bar-bg"><div id="b-inf" class="bar-fill" style="background: var(--red);"></div></div></div>
+                <div class="bar-wrap"><span class="bar-label" id="l-mort">Mortos: 0</span><div class="bar-bg"><div id="b-mort" class="bar-fill" style="background: #555;"></div></div></div>
+                <div class="bar-wrap"><span class="bar-label" id="l-cura">Progresso da Cura: 0%</span><div class="bar-bg"><div id="b-cura" class="bar-fill" style="background: var(--blue);"></div></div></div>
+                <div class="bar-wrap"><span class="bar-label" id="l-vac">Progresso da Vacina: 0%</span><div class="bar-bg"><div id="b-vac" class="bar-fill" style="background: var(--green);"></div></div></div>
+            </div>
+
+            <div style="text-align: right; min-width: 150px;">
+                <span id="mutVal" style="color: var(--gold); font-size: 3.2rem; font-weight: bold; line-height: 0.9;">10</span>
+                <div style="font-size: 0.75rem; color: var(--gold); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Mutagenicidade</div>
+            </div>
+            <button class="btn-main" style="width: 140px; font-size: 1rem; background: var(--blue); color: #000;" onclick="alert('Estatísticas Mundiais')">Mundo</button>
+        </div>
     </div>
-  </div>
-</div>
 
-<!-- POPUP PAÍS -->
-<div id="countryPopup" class="glass popup">
-  <h2 id="popCountry" style="color:var(--blue);font-family:Orbitron"></h2>
-  <p id="popData" style="margin:15px 0;color:#ccc"></p>
-  <button class="btn-main" onclick="confirmOutbreak()">Iniciar surto</button>
-</div>
+    <div id="tutorialModal" class="overlay">
+        <div class="glass modal-card">
+            <button class="btn-x" onclick="closeModal()">✕</button>
+            <h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px; letter-spacing: 2px;">MANUAL TÁTICO</h2>
+            <div style="text-align: left; line-height: 1.8; color: #FFF; font-size: 1.15rem;">
+                <p>• <b>Inserção:</b> Clique em um país no mapa global para liberar o Agente Patogênico.</p>
+                <p>• <b>Recurso Genético:</b> Acumule 1 ponto de Mutagenicidade a cada <b>100.000</b> novos infectados ($10^5$).</p>
+                <p>• <b>Resposta Global:</b> A Cura visa tratar os infectados; a Vacina visa imunizar os saudáveis.</p>
+                <p>• <b>Adaptação:</b> Evoluir a praga força a comunidade científica a reiniciar pesquisas, atrasando a cura.</p>
+            </div>
+        </div>
+    </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-/* ======= ESTADO ======= */
-const WORLD_POP = 8000000000;
-let loopId=null;
+    <div id="settingsModal" class="overlay">
+        <div class="glass modal-card" style="width: 480px; text-align: center;">
+            <button class="btn-x" onclick="closeModal()">✕</button>
+            <h2 style="margin-bottom: 45px; font-family: Orbitron; letter-spacing: 3px; font-size: 1.8rem;">COMANDO CENTRAL</h2>
+            
+            <div class="config-row">
+                <span class="dashed-info" data-tooltip="Habilita ou desabilita a música de fundo do jogo">ÁUDIO GLOBAL</span>
+                <button id="s-sound" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button>
+            </div>
+            <div class="config-row">
+                <span class="dashed-info" data-tooltip="Habilita ou desabilita os efeitos sonoros de caos generalizado">EFEITOS DO CAOS INSTAURADO</span>
+                <button id="s-sfx" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button>
+            </div>
+            
+            <div id="inGameControls" style="display: none; margin-top: 35px; border-top: 1px solid var(--border); padding-top: 35px;">
+                <button class="btn-main" style="width: 100%; margin: 12px 0;" onclick="togglePause()">PAUSAR / RETOMAR</button>
+                <button class="btn-main" style="width: 100%; background: #333; color: #AAA; margin: 12px 0; box-shadow: 0 4px 0 #111;" onclick="location.reload()">ABANDONAR</button>
+            </div>
+        </div>
+    </div>
 
-const game={
-  active:false,started:false,speed:1,
-  name:'',pathogen:'',
-  mut:10,tally:10,
-  infected:0,healthy:WORLD_POP,
-  selectedCountry:null
-};
+    <div id="countryPopup" class="glass tactical-popup">
+        <button class="btn-x" style="top:10px; right:15px; font-size: 1.6rem;" onclick="this.parentElement.style.display='none'">✕</button>
+        <h2 id="popCountry" style="color: var(--blue); font-family: Orbitron; margin-bottom: 15px; letter-spacing: 1px;">IDENTIFICANDO...</h2>
+        <div id="popData" style="color: #FFF; margin-bottom: 30px; line-height: 1.6; font-size: 1.15rem; font-weight: 600;">Aguardando sinal orbital...</div>
+        <button id="btnInfect" class="btn-main" style="width: 100%; background: var(--red); color: #FFF;" onclick="confirmOutbreak()">EXECUTAR SURTO INICIAL</button>
+    </div>
 
-/* ======= SPA ======= */
-function initSetup(){
-  startMenu.classList.remove('active');
-  selectionFlow.classList.add('active');
-}
-function setVar(k,v,el){
-  game[k]=v;
-  el.parentElement.querySelectorAll('.opt-box').forEach(o=>o.classList.remove('selected'));
-  el.classList.add('selected');
-}
-function nextStep(id){
-  document.querySelectorAll('.setup-card').forEach(c=>c.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const WORLD_POP = 8000000000;
+        let game = { active: false, started: false, speed: 1, name: '', type: '', diff: '', mut: 10, tally: 10, h: WORLD_POP, i: 0, d: 0, c: 0, v: 0, curaProg: 0, vacinaProg: 0, spreadRate: 1.18, country: '' };
 
-/* ======= MAPA ======= */
-let map,countryLayer;
+        function initSetup() { document.getElementById('startMenu').classList.remove('active'); document.getElementById('selectionFlow').classList.add('active'); }
+        function setVar(key, val, el) { game[key] = val; el.parentElement.querySelectorAll('.opt-box').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
+        function nextStep(id) { document.querySelectorAll('.setup-card').forEach(c => c.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        function addGene(el, name, type) {
+            el.classList.toggle('selected');
+            const slotId = type === 'trans' ? 'slot-t' : type === 'sint' ? 'slot-s' : 'slot-r';
+            const empty = Array.from(document.querySelectorAll(`[id^="${slotId}"]`)).find(s => !s.classList.contains('filled'));
+            if(empty) { empty.innerText = name.split(' ')[0]; empty.classList.add('filled'); }
+        }
 
-const countriesGeoJSON={
-"type":"FeatureCollection",
-"features":[
-{"type":"Feature","properties":{"name":"Brasil","pop":214000000},"geometry":{"type":"Polygon","coordinates":[[[-74,-34],[-34,-34],[-34,6],[-74,6],[-74,-34]]]}},
-{"type":"Feature","properties":{"name":"EUA","pop":331000000},"geometry":{"type":"Polygon","coordinates":[[[-125,25],[-66,25],[-66,49],[-125,49],[-125,25]]]}},
-{"type":"Feature","properties":{"name":"China","pop":1440000000},"geometry":{"type":"Polygon","coordinates":[[[73,18],[135,18],[135,53],[73,53],[73,18]]]}}
-]};
+        function startGame() {
+            game.name = document.getElementById('nameIn').value || "PRAGA-0";
+            document.getElementById('selectionFlow').classList.remove('active');
+            document.getElementById('mainGame').style.display = 'block';
+            initMap();
+        }
 
-function startGame(){
-  game.name=nameIn.value||'PRAGA-X';
-  selectionFlow.classList.remove('active');
-  mainGame.style.display='block';
-  initMap();
-}
+        function openSettings(context) {
+            const controls = document.getElementById('inGameControls');
+            if(context === 'game') { controls.style.display = 'block'; if(game.active) togglePause(); } else { controls.style.display = 'none'; }
+            openModal('settingsModal');
+        }
+        function togglePause() { game.active = !game.active; }
 
-function initMap(){
-  map=L.map('map',{center:[15,0],zoom:2.3,zoomControl:false});
-  countryLayer=L.geoJSON(countriesGeoJSON,{
-    style:()=>({color:'#555',weight:1,fillColor:'#111',fillOpacity:.6}),
-    onEachFeature:(f,l)=>{
-      l.on('click',()=>{
-        if(game.started) return;
-        game.selectedCountry=f;
-        popCountry.innerText=f.properties.name.toUpperCase();
-        popData.innerHTML=`População: ${f.properties.pop.toLocaleString()}`;
-        countryPopup.style.display='block';
-        l.setStyle({fillColor:var(--red)});
-      });
-    }
-  }).addTo(map);
-}
+        let map;
+        function initMap() {
+            if (map) return;
+            map = L.map('map', { center: [20, 0], zoom: 2.5, zoomControl: false, attributionControl: false });
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+            map.on('click', async (e) => {
+                if(game.started) return;
+                const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${e.latlng.lat}&longitude=${e.latlng.lng}&localityLanguage=pt`);
+                const data = await res.json();
+                game.country = data.countryName || "Território Neutro";
+                document.getElementById('popCountry').innerText = game.country.toUpperCase();
+                document.getElementById('popData').innerHTML = `Continente: ${data.continent}<br>Status: Saudável<br>Defesa: ${game.diff}`;
+                document.getElementById('countryPopup').style.display = 'block';
+            });
+        }
 
-function confirmOutbreak(){
-  game.started=true;
-  game.active=true;
-  game.infected=1;
-  game.healthy--;
-  news.innerText=`CASO ZERO CONFIRMADO EM ${game.selectedCountry.properties.name.toUpperCase()}`;
-  countryPopup.style.display='none';
-  startLoop();
-}
+        function confirmOutbreak() {
+            game.started = true; game.active = true; game.i = 1; game.h--;
+            document.getElementById('countryPopup').style.display = 'none';
+            document.getElementById('ticker').innerText = `PACIENTE ZERO LOCALIZADO EM: ${game.country.toUpperCase()}. PROTOCOLO ${game.name.toUpperCase()} INICIADO.`;
+            runLoop();
+        }
 
-/* ======= SIMULAÇÃO ======= */
-function setSpeed(s){game.speed=s}
+        function setSpeed(s) { game.speed = s; }
+        function runLoop() {
+            setInterval(() => {
+                if(!game.active) return;
+                for(let k=0; k<game.speed; k++) {
+                    let spread = Math.ceil(game.i * (game.spreadRate - 1));
+                    if(game.i < game.h) { game.i += spread; game.h -= spread; }
+                    
+                    // NOVA LÓGICA: 1 Ponto a cada 100.000 infectados
+                    let calc = Math.floor(game.i / 100000) + 10;
+                    if(calc > game.tally) { game.mut += (calc - game.tally); game.tally = calc; }
+                    
+                    if(game.i > 1000000) { game.curaProg += (game.i / WORLD_POP) * 10; game.vacinaProg += (game.i / WORLD_POP) * 5; }
+                }
+                updateUI();
+            }, 1000);
+        }
 
-function startLoop(){
-  if(loopId) return;
-  loopId=setInterval(()=>{
-    if(!game.active) return;
-    for(let i=0;i<game.speed;i++){
-      let spread=Math.min(game.infected*0.05,game.healthy);
-      game.infected+=spread;
-      game.healthy-=spread;
+        function updateUI() {
+            document.getElementById('mutVal').innerText = game.mut;
+            document.getElementById('l-inf').innerText = `Infectados: ${game.i.toLocaleString()}`;
+            document.getElementById('b-inf').style.width = (game.i / WORLD_POP * 100) + "%";
+            if(game.curaProg >= 100) { document.getElementById('l-cura').innerText = "Curados: " + game.i.toLocaleString(); document.getElementById('b-cura').style.width = "100%"; }
+            else { document.getElementById('l-cura').innerText = `Progresso Cura: ${game.curaProg.toFixed(1)}%`; document.getElementById('b-cura').style.width = game.curaProg + "%"; }
+            if(game.vacinaProg >= 100) { document.getElementById('l-vac').innerText = "Vacinados: " + game.h.toLocaleString(); document.getElementById('b-vac').style.width = "100%"; }
+            else { document.getElementById('l-vac').innerText = `Progresso Vacina: ${game.vacinaProg.toFixed(1)}%`; document.getElementById('b-vac').style.width = game.vacinaProg + "%"; }
+        }
 
-      let calc=Math.floor(game.infected/1000)+10;
-      if(calc>game.tally){
-        game.mut+=calc-game.tally;
-        game.tally=calc;
-      }
-    }
-    updateUI();
-  },500);
-}
-
-function updateUI(){
-  bInf.style.width=(game.infected/WORLD_POP*100)+'%';
-  mut.innerText=Math.floor(game.mut);
-}
-</script>
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); if(game.started && !game.active) game.active = true; }
+        function toggleH(btn) {
+            const on = btn.classList.contains('on');
+            btn.classList.toggle('on', !on); btn.classList.toggle('off', on);
+            btn.innerText = on ? "DESLIGADO" : "LIGADO";
+        }
+    </script>
 </body>
 </html>
