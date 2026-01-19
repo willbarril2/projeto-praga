@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandemic Strategy Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Fundo com mapa-múndi */
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #8b0000 0%, #dc143c 25%, #ff1744 50%, #c41e3a 75%, #8b0000 100%);
+            overflow: hidden;
+        }
+
+        .background::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><path d="M100 200 Q150 150 200 200 L250 180 L300 220 L350 200 L400 240 L450 220 L500 200 L550 180 L600 200 L650 220 L700 200 L750 180 L800 200 L850 220 L900 200 L950 180 L1000 200 L1050 220 L1100 200" fill="none" stroke="rgba(139,0,0,0.3)" stroke-width="2"/><circle cx="200" cy="150" r="3" fill="rgba(139,0,0,0.5)"/><circle cx="400" cy="180" r="3" fill="rgba(139,0,0,0.5)"/><circle cx="600" cy="200" r="3" fill="rgba(139,0,0,0.5)"/><circle cx="800" cy="160" r="3" fill="rgba(139,0,0,0.5)"/><circle cx="1000" cy="190" r="3" fill="rgba(139,0,0,0.5)"/></svg>');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.2;
+            animation: mapPulse 8s ease-in-out infinite;
+        }
+
+        /* Ícone de vírus no centro */
+        .virus-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(600px, 80vw);
+            height: min(600px, 80vw);
+            opacity: 0.15;
+            z-index: 1;
+        }
+
+        .virus-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, rgba(255, 100, 100, 0.3) 0%, rgba(139, 0, 0, 0.2) 100%);
+            border-radius: 50%;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .spike {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 35%;
+            background: linear-gradient(to bottom, rgba(255, 50, 50, 0.4), transparent);
+            border-radius: 50% 50% 0 0;
+            transform-origin: bottom center;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        @keyframes mapPulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Container principal */
+        .container {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Botão de configurações */
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(90deg) scale(1.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .settings-icon {
+            width: 35px;
+            height: 35px;
+            fill: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Menu de botões */
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .menu-button {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px 40px;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: bold;
+            color: #8b0000;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border: 4px solid #d0d0d0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.3),
+                inset 0 -3px 10px rgba(0, 0, 0, 0.1),
+                inset 0 3px 10px rgba(255, 255, 255, 0.8);
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .menu-button:hover::before {
+            left: 100%;
+        }
+
+        .menu-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 
+                0 12px 30px rgba(0, 0, 0, 0.4),
+                inset 0 -3px 10px rgba(0, 0, 0, 0.15),
+                inset 0 3px 15px rgba(255, 255, 255, 0.9);
+            border-color: #ff4444;
+            color: #a00000;
+        }
+
+        .menu-button:active {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 
+                0 5px 15px rgba(0, 0, 0, 0.3),
+                inset 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .settings-btn {
+                width: 50px;
+                height: 50px;
+                top: 15px;
+                left: 15px;
+            }
+
+            .settings-icon {
+                width: 28px;
+                height: 28px;
+            }
+
+            .menu {
+                gap: 20px;
+            }
+
+            .menu-button {
+                padding: 18px 30px;
+                border-width: 3px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .settings-btn {
+                width: 45px;
+                height: 45px;
+                top: 10px;
+                left: 10px;
+            }
+
+            .menu {
+                gap: 15px;
+            }
+
+            .menu-button {
+                padding: 15px 25px;
+            }
+        }
+
+        /* Hexágonos decorativos */
+        .hex-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            background-image: repeating-linear-gradient(
+                60deg,
+                transparent,
+                transparent 50px,
+                rgba(139, 0, 0, 0.3) 50px,
+                rgba(139, 0, 0, 0.3) 51px
+            );
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Fundo -->
+    <div class="background">
+        <div class="hex-pattern"></div>
+    </div>
+
+    <!-- Ícone de vírus central -->
+    <div class="virus-icon" id="virusIcon">
+        <div class="virus-core"></div>
+    </div>
+
+    <!-- Container principal -->
+    <div class="container">
+        <!-- Botão de configurações -->
+        <button class="settings-btn" onclick="openSettings()">
+            <svg class="settings-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+            </svg>
+        </button>
+
+        <!-- Menu principal -->
+        <div class="menu">
+            <button class="menu-button" onclick="startGame()">Jogar</button>
+            <button class="menu-button" onclick="showTutorial()">Como Jogar</button>
+            <button class="menu-button" onclick="showAchievements()">Conquistas</button>
+        </div>
+    </div>
+
+    <script>
+        // Criar espículas do vírus dinamicamente
+        const virusIcon = document.getElementById('virusIcon');
+        const numberOfSpikes = 24;
+
+        for (let i = 0; i < numberOfSpikes; i++) {
+            const spike = document.createElement('div');
+            spike.className = 'spike';
+            const angle = (360 / numberOfSpikes) * i;
+            spike.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`;
+            virusIcon.appendChild(spike);
+        }
+
+        // Funções de navegação
+        function startGame() {
+            alert('Iniciando jogo... (próxima tela a ser desenvolvida)');
+            // Aqui você navegará para a tela de jogo
+        }
+
+        function showTutorial() {
+            alert('Abrindo tutorial... (próxima tela a ser desenvolvida)');
+            // Aqui você navegará para a tela de tutorial
+        }
+
+        function showAchievements() {
+            alert('Abrindo conquistas... (próxima tela a ser desenvolvida)');
+            // Aqui você navegará para a tela de conquistas
+        }
+
+        function openSettings() {
+            alert('Abrindo configurações... (próxima tela a ser desenvolvida)');
+            // Aqui você navegará para a tela de configurações
+        }
+    </script>
+</body>
+</html>
