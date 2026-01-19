@@ -3,221 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plague Evolution 2026 - Estrategista Ambiental</title>
+    <title>Praga</title>
+    
+    <link rel="icon" href="biohazard-sign.png" type="image/png">
+    <link rel="apple-touch-icon" href="biohazard-sign.png">
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --red: #ff1744; --blue: #00e5ff; --gold: #ffd700; --purple: #9c27b0; --yellow: #ffeb3b;
-            --glass: rgba(10, 10, 10, 0.92); --border: rgba(255, 255, 255, 0.1);
+            --red: #ff1744; --blue: #00e5ff; --gold: #ffd700; --dark: #080808;
+            --glass: rgba(10, 10, 10, 0.94); --border: rgba(255, 255, 255, 0.1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Rajdhani', sans-serif; background: #000; color: white; overflow: hidden; height: 100vh; }
+        body { font-family: 'Rajdhani', sans-serif; background: var(--dark); color: white; overflow: hidden; height: 100vh; }
 
-        /* MAPA FUNDO */
-        #map { width: 100%; height: 100vh; z-index: 1; filter: brightness(0.6) saturate(0.8); }
+        /* --- TELA INICIAL (MENU) --- */
+        #startMenu {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #ff1744 0%, #600000 50%, #000 100%);
+            z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
+        }
 
-        /* INTERFACE GLASSMORPHISM */
-        .glass { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 12px; }
+        .menu-bg-effect {
+            position: absolute; width: 100%; height: 100%; opacity: 0.1;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="50,1 95,25 95,75 50,99 5,75 5,25" fill="none" stroke="white" stroke-width="1"/></svg>');
+            background-size: 80px 80px; z-index: -1;
+        }
 
-        /* HUD SUPERIOR & INFERIOR */
-        .hud { position: fixed; z-index: 1000; pointer-events: none; }
-        .hud button, .hud .interact { pointer-events: auto; }
+        .bio-logo {
+            font-family: 'Orbitron', sans-serif; font-size: 4rem; font-weight: 900;
+            text-shadow: 0 0 20px rgba(0,0,0,0.5); margin-bottom: 50px; text-align: center;
+        }
 
-        .top-hud { top: 15px; left: 50%; transform: translateX(-50%); width: 95%; height: 45px; display: flex; align-items: center; padding: 0 15px; }
-        .bottom-hud { bottom: 15px; left: 50%; transform: translateX(-50%); width: 95%; height: 90px; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; }
+        .menu-buttons { display: flex; flex-direction: column; gap: 20px; width: 320px; }
+        .btn-menu {
+            background: white; color: #800000; border: none; padding: 18px;
+            font-size: 1.5rem; font-weight: 800; border-radius: 8px; cursor: pointer;
+            transition: 0.3s; text-transform: uppercase; text-align: center;
+            box-shadow: 0 8px 0 #ccc;
+        }
+        .btn-menu:hover { transform: translateY(-4px); box-shadow: 0 12px 20px rgba(0,0,0,0.4); background: var(--red); color: white; }
 
-        /* BARRAS DE STATUS (Baseadas nos prints de 2026) */
-        .bars-container { flex: 1; margin: 0 30px; display: flex; flex-direction: column; gap: 8px; }
-        .bar-group { display: flex; align-items: center; gap: 10px; }
-        .bar-label { font-size: 0.65rem; color: #888; text-transform: uppercase; width: 80px; }
-        .bar-bg { flex: 1; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
-        .bar-fill { height: 100%; transition: width 1s ease-in-out; }
+        /* --- GAMEPLAY HUD --- */
+        #map { width: 100%; height: 100vh; z-index: 1; filter: brightness(0.4) saturate(0.5); }
+        .hud-glass { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 10px; }
+        .game-ui { position: fixed; z-index: 1000; pointer-events: none; }
+        .game-ui * { pointer-events: auto; }
+        .top-news { top: 15px; left: 50%; transform: translateX(-50%); width: 94%; height: 45px; display: flex; align-items: center; padding: 0 20px; }
+        .bottom-console { bottom: 15px; left: 50%; transform: translateX(-50%); width: 94%; height: 85px; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; }
 
-        /* TELAS OVERLAY (Sistema SPA) */
-        .overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.96); z-index: 2000; display: none; 
-            flex-direction: column; padding: 30px; animation: fadeIn 0.3s ease;
+        /* BARRAS DE STATUS */
+        .status-bars { flex: 1; margin: 0 40px; display: flex; flex-direction: column; gap: 10px; }
+        .bar-container { display: flex; align-items: center; gap: 15px; }
+        .bar-label { font-size: 0.7rem; color: #666; width: 70px; text-transform: uppercase; }
+        .bar-rail { flex: 1; height: 6px; background: #111; border-radius: 3px; overflow: hidden; }
+        .bar-fill { height: 100%; transition: width 1s; }
+
+        /* --- OVERLAYS --- */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.98); z-index: 2000; display: none;
+            flex-direction: column; padding: 30px; animation: overlayIn 0.4s ease;
         }
         .overlay.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(1.02); } to { opacity: 1; transform: scale(1); } }
+        @keyframes overlayIn { from { opacity: 0; transform: scale(1.05); } to { opacity: 1; transform: scale(1); } }
 
-        /* MENU DE ABAS */
-        .tab-nav { display: flex; gap: 5px; margin-bottom: 25px; border-bottom: 2px solid var(--border); }
-        .tab { 
-            padding: 15px 30px; cursor: pointer; color: #555; font-weight: 700; text-transform: uppercase; 
-            transition: 0.3s; border-radius: 8px 8px 0 0;
+        .tab-system { display: flex; gap: 10px; border-bottom: 2px solid var(--border); margin-bottom: 30px; }
+        .tab-trigger { padding: 15px 35px; cursor: pointer; color: #444; font-weight: 800; text-transform: uppercase; transition: 0.3s; }
+        .tab-trigger.active { color: white; border-bottom: 4px solid var(--red); background: rgba(255,23,68,0.05); }
+
+        /* GRADE NEURAL */
+        .neural-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 20px; 
+            max-width: 1000px; margin: auto;
         }
-        .tab.active { color: white; background: rgba(255,23,68,0.15); border-bottom: 3px solid var(--red); }
-        .tab.active.blue { background: rgba(0,229,255,0.15); border-bottom: 3px solid var(--blue); }
-
-        /* GRADE HEXAGONAL (Evolução) */
-        .hex-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(85px, 1fr)); gap: 20px; max-width: 900px; margin: auto; padding: 20px; }
-        .hex { 
-            width: 85px; height: 85px; background: #111; border: 2px solid #333; cursor: pointer; transition: 0.3s;
+        .node {
+            width: 90px; height: 90px; background: #0c0c0c; border: 2px solid #222;
             clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-            display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+            display: flex; align-items: center; justify-content: center; font-size: 2rem;
+            cursor: pointer; transition: 0.4s;
         }
-        .hex:hover { border-color: var(--red); box-shadow: 0 0 20px var(--red); transform: scale(1.1); }
-        .hex.unlocked { background: var(--red); color: black; border-color: white; }
+        .node:hover { border-color: var(--red); background: #1a0000; box-shadow: 0 0 25px var(--red); }
 
-        /* POPUP PAÍS (Brasil Info) */
-        .country-card { 
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            width: 380px; padding: 30px; z-index: 3000; display: none; 
+        /* POPUP BRASIL */
+        .tactical-popup {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 400px; padding: 35px; z-index: 3000; display: none;
         }
 
-        /* BOTÕES */
-        .btn { background: white; color: black; border: none; padding: 12px 25px; border-radius: 6px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .btn-close { position: absolute; top: 25px; right: 25px; background: none; border: none; color: #666; font-size: 2rem; cursor: pointer; }
-        .btn-close:hover { color: white; }
-
-        /* MANUAL CARDS */
-        .manual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 800px; margin: 50px auto; }
-        .card { padding: 40px; text-align: center; cursor: pointer; transition: 0.3s; background: rgba(255,255,255,0.03); }
-        .card:hover { border-color: var(--red); background: rgba(255, 23, 68, 0.1); }
+        .btn-action { background: var(--red); color: white; border: none; padding: 12px 25px; border-radius: 4px; font-weight: 800; cursor: pointer; }
+        .btn-close { position: absolute; top: 25px; right: 25px; background: none; border: none; color: #555; font-size: 2.5rem; cursor: pointer; }
 
     </style>
 </head>
 <body>
 
+    <div id="startMenu">
+        <div class="menu-bg-effect"></div>
+        <div class="bio-logo">PRAGA<br><span style="font-size: 1.5rem; color: #fff; letter-spacing: 5px;">ESTRATÉGIA GLOBAL</span></div>
+        <div class="menu-buttons">
+            <button class="btn-menu" onclick="startGame()">Iniciar</button>
+            <button class="btn-menu" onclick="openOverlay('manual')">Tutorial</button>
+            <button class="btn-menu" style="background: #222; color: #666; box-shadow: 0 8px 0 #000;">Extras</button>
+        </div>
+    </div>
+
     <div id="map"></div>
 
-    <div class="hud glass top-hud">
-        <button class="btn" style="padding: 4px 12px; font-size: 0.7rem; background: var(--red); color: white;" onclick="openOverlay('news')">NOTÍCIAS</button>
-        <marquee id="ticker" style="flex:1; padding: 0 20px; font-weight: 600; font-size: 0.95rem; color: #ddd;">
-            BRASIL: GOVERNO CAIU | PESQUISA DA CURA ATINGE 84% | OMS EMITE ALERTA DE EXTINÇÃO | CLIMA QUENTE ACELERA SURTO TROPICAL
-        </marquee>
-        <button onclick="openOverlay('settings')" style="background:none; border:none; cursor:pointer; font-size:1.4rem;">⚙️</button>
+    <div class="game-ui hud-glass top-news">
+        <span style="color: var(--red); font-weight: 800; margin-right: 15px;">NOTÍCIAS</span>
+        <marquee style="flex:1; color: #ccc;" id="tickerText">SISTEMA ATIVO | MONITORANDO BIOSFERA | CURA EM 0%...</marquee>
+        <button onclick="location.reload()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer; margin-left:20px;">⚙️</button>
     </div>
 
-    <div class="hud glass bottom-hud">
-        <button class="btn" onclick="openOverlay('disease')">DOENÇA</button>
-        
-        <div class="bars-container">
-            <div class="bar-group">
+    <div class="game-ui hud-glass bottom-console">
+        <button class="btn-action" onclick="openOverlay('evolution')">DOENÇA</button>
+        <div class="status-bars">
+            <div class="bar-container">
                 <span class="bar-label">Infectados</span>
-                <div class="bar-bg"><div class="bar-fill" style="width: 75%; background: var(--red);"></div></div>
+                <div class="bar-rail"><div class="bar-fill" id="infBar" style="width: 5%; background: var(--red);"></div></div>
             </div>
-            <div class="bar-group">
+            <div class="bar-container">
                 <span class="bar-label">Cura</span>
-                <div class="bar-bg"><div class="bar-fill" style="width: 84%; background: var(--blue);"></div></div>
+                <div class="bar-rail"><div class="bar-fill" style="width: 0%; background: var(--blue);"></div></div>
             </div>
         </div>
-
-        <div style="text-align: right; margin-right: 20px;">
-            <span style="color: var(--gold); font-size: 1.8rem; font-weight: 700; display: block; line-height: 1;">7</span>
-            <span style="font-size: 0.65rem; color: var(--gold); font-weight: bold;">PONTOS DNA</span>
+        <div style="text-align: right; min-width: 80px;">
+            <span style="color: var(--gold); font-size: 2rem; font-weight: bold;" id="dnaCounter">10</span>
+            <div style="font-size: 0.7rem; color: var(--gold);">DNA</div>
         </div>
-        <button class="btn" style="background: var(--blue);" onclick="openOverlay('world')">MUNDO</button>
+        <button class="btn-action" style="background: var(--blue); margin-left: 20px;" onclick="openOverlay('world')">MUNDO</button>
     </div>
 
-    <div id="disease" class="overlay">
+    <div id="evolution" class="overlay">
         <button class="btn-close" onclick="closeAll()">✕</button>
-        <div class="tab-nav">
-            <div class="tab active" onclick="loadTab('trans')">Transmissão</div>
-            <div class="tab" onclick="loadTab('sint')">Sintomas</div>
-            <div class="tab" onclick="loadTab('hab')">Habilidades</div>
+        <div class="tab-system">
+            <div class="tab-trigger active" onclick="loadEvolution('trans')">Transmissão</div>
+            <div class="tab-trigger" onclick="loadEvolution('sint')">Sintomas</div>
         </div>
-        <div class="hex-grid" id="evolutionGrid"></div>
-        <div class="glass" style="margin-top: auto; padding: 25px; display: flex; justify-content: space-between; align-items: center;">
-            <div id="nodeInfo">Selecione um sintoma ou vetor para evoluir</div>
-            <button class="btn" style="background: var(--red); color: white;">Evoluir</button>
-        </div>
+        <div class="neural-grid" id="nodeGrid"></div>
     </div>
 
     <div id="world" class="overlay">
         <button class="btn-close" onclick="closeAll()">✕</button>
-        <div class="tab-nav">
-            <div class="tab active blue" onclick="loadTab('res')">Resumo</div>
-            <div class="tab blue" onclick="loadTab('cure')">Cura</div>
-            <div class="tab blue" onclick="loadTab('data')">Dados Mundiais</div>
-        </div>
-        <div style="flex:1; display: flex; gap: 30px;">
-            <div class="glass" style="flex:1; padding: 20px;">
-                <h3 style="color: var(--blue);">Humanidade à beira da extinção</h3>
-                <p style="margin-top: 20px; font-size: 1.2rem;">Mortos: 7.927.115.027</p>
-                <p style="color: var(--red);">Infectados: 199.975</p>
-            </div>
-            <div class="glass" style="flex:1.5; padding: 20px; position: relative;">
-                <h4>Gráfico de Tendência</h4>
-                <div style="position: absolute; bottom: 20px; width: 90%; height: 60%; background: linear-gradient(transparent, rgba(0,229,255,0.1)); border-bottom: 2px solid #333;"></div>
-            </div>
-        </div>
+        <h2 style="color: var(--blue); margin-bottom: 30px;">DADOS MUNDIAIS</h2>
+        <p style="font-size: 2rem;">População: 8.000.000.000</p>
     </div>
 
-    <div id="brasilPopup" class="glass country-card">
-        <button class="btn-close" style="top:10px; right:10px; font-size: 1.2rem;" onclick="this.parentElement.style.display='none'">✕</button>
+    <div id="brasilInfo" class="hud-glass tactical-popup">
+        <button class="btn-close" style="top:10px; right:15px; font-size: 1.5rem;" onclick="this.parentElement.style.display='none'">✕</button>
         <h2 style="color: var(--blue); margin-bottom: 15px;">BRASIL</h2>
-        <p style="color: #ccc; line-height: 1.6; font-size: 1.1rem;">
-            Um país rural. Tem um clima tipicamente quente, úmido.<br>
-            Continente: América do Sul.
-        </p>
+        <p style="color: #ccc; line-height: 1.6;">Um país rural. Clima quente e úmido. <br>América do Sul.</p>
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #333;">
-        <p><b>Status:</b> <span style="color: var(--red);">Não existe mais</span></p>
-        <p><b>Mortos:</b> 221.372.956</p>
-    </div>
-
-    <div id="manual" class="overlay">
-        <button class="btn-close" onclick="closeAll()">✕</button>
-        <h1 style="text-align: center;">CENTRAL DE COMANDO</h1>
-        <div class="manual-grid">
-            <div class="glass card">
-                <div style="font-size: 4rem; margin-bottom: 10px;">🎓</div>
-                <h2>TUTORIAL</h2>
-                <p style="color: #777; margin-top: 10px;">Aprenda a infectar o mundo passo a passo.</p>
-            </div>
-            <div class="glass card">
-                <div style="font-size: 4rem; margin-bottom: 10px;">📖</div>
-                <h2>MANUAL</h2>
-                <p style="color: #777; margin-top: 10px;">Consulte mecânicas detalhadas e estratégias.</p>
-            </div>
-        </div>
+        <p><b>STATUS:</b> <span style="color: #00ff00;">SAUDÁVEL</span></p>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // CONFIGURAÇÃO DO MAPA (Tático Dark)
-        const map = L.map('map', { center: [-15, -50], zoom: 3, zoomControl: false, attributionControl: false });
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+        function startGame() {
+            document.getElementById('startMenu').style.transform = 'translateY(-100%)';
+            setTimeout(() => { initMap(); }, 800);
+        }
 
-        // SISTEMA DE TELAS (SPA)
         function openOverlay(id) {
             closeAll();
             document.getElementById(id).classList.add('active');
-            if(id === 'disease') loadTab('trans');
+            if(id === 'evolution') loadEvolution('trans');
         }
 
-        function closeAll() {
-            document.querySelectorAll('.overlay').forEach(o => o.classList.remove('active'));
+        function closeAll() { document.querySelectorAll('.overlay').forEach(o => o.classList.remove('active')); }
+
+        let map;
+        function initMap() {
+            if (map) return;
+            map = L.map('map', { center: [0, 0], zoom: 2.5, zoomControl: false, attributionControl: false });
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+            map.on('click', () => { document.getElementById('brasilInfo').style.display = 'block'; });
         }
 
-        // GERADOR DE GRADE HEXAGONAL (Evolução)
-        function loadTab(type) {
-            const grid = document.getElementById('evolutionGrid');
+        const icons = { trans: ['🐦', '🐀', '🦟', '💧', '💨'], sint: ['🤒', '🤧', '🤢', '🤮', '💀'] };
+        function loadEvolution(type) {
+            const grid = document.getElementById('nodeGrid');
             grid.innerHTML = '';
-            const count = type === 'trans' ? 12 : 15;
-            const icons = type === 'trans' ? ['🐦', '🐀', '🦟', '💧', '💨'] : ['🤒', '🤧', '🤢', '🤮', '💀'];
-
-            for(let i=0; i<count; i++) {
-                const hex = document.createElement('div');
-                hex.className = 'hex';
-                hex.innerHTML = icons[i % icons.length];
-                hex.onclick = () => {
-                    hex.classList.toggle('unlocked');
-                    document.getElementById('nodeInfo').innerHTML = `<b>Traço ${i+1}:</b> Aumenta a contaminação em ambientes áridos e aviões.`;
-                };
-                grid.appendChild(hex);
-            }
+            icons[type].forEach(icon => {
+                const node = document.createElement('div');
+                node.className = 'node';
+                node.innerHTML = icon;
+                grid.appendChild(node);
+            });
         }
-
-        // TRIGGER INFO PAÍS (Brasil)
-        map.on('click', () => {
-            document.getElementById('brasilPopup').style.display = 'block';
-        });
-
     </script>
 </body>
 </html>
