@@ -10,220 +10,224 @@
     <style>
         :root {
             --red: #ff1744; --blue: #00e5ff; --gold: #ffd700; --green: #00e676; --dark: #050505;
-            --glass: rgba(12, 12, 12, 0.98); --border: rgba(255, 255, 255, 0.1);
+            --glass: rgba(10, 10, 10, 0.96); --border: rgba(255, 255, 255, 0.1);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         body { font-family: 'Rajdhani', sans-serif; background: var(--dark); color: white; overflow: hidden; height: 100vh; }
 
-        /* --- TELAS PRINCIPAIS --- */
-        .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        /* --- TELAS DE ESTADO (SPA) --- */
+        .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; transition: 0.5s; }
         .screen.active { display: flex; }
         #startMenu { background: radial-gradient(circle, #ff1744 0%, #600000 50%, #000 100%); }
-        #selectionFlow { background: #000; overflow-y: auto; padding: 40px 0; }
-        
-        /* --- COMPONENTES DE UI --- */
-        .glass { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 12px; }
-        .btn-main { background: white; color: #800000; border: none; padding: 15px 30px; font-size: 1.3rem; font-weight: 800; border-radius: 8px; cursor: pointer; transition: 0.3s; width: 260px; margin: 8px; text-transform: uppercase; }
-        .btn-main:hover { background: var(--red); color: white; transform: scale(1.02); }
-        .btn-close { background: none; border: none; color: white; font-size: 1.8rem; cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10; }
+        #setupFlow { background: #000; }
 
-        /* --- SELEÇÃO SEQUENCIAL --- */
-        .setup-card { width: 90%; max-width: 800px; padding: 40px; text-align: center; margin: auto; display: none; }
+        /* --- COMPONENTES UI --- */
+        .glass { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 12px; }
+        .btn-main { background: white; color: #800000; border: none; padding: 12px 25px; font-size: 1.2rem; font-weight: 800; border-radius: 6px; cursor: pointer; transition: 0.3s; margin: 5px; text-transform: uppercase; }
+        .btn-main:hover { background: var(--red); color: white; transform: scale(1.05); }
+        .btn-toggle { width: 100px; padding: 8px; border-radius: 4px; font-weight: 900; cursor: pointer; border: none; }
+        .btn-on { background: var(--green); color: black; }
+        .btn-off { background: var(--red); color: white; }
+
+        /* --- SETUP SEQUENCIAL --- */
+        .setup-card { width: 90%; max-width: 750px; padding: 30px; text-align: center; display: none; }
         .setup-card.active { display: block; }
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 25px 0; }
-        .card-item { padding: 20px; border: 1px solid #333; border-radius: 8px; cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.02); }
-        .card-item:hover, .card-item.selected { border-color: var(--red); background: rgba(255,23,68,0.1); }
-        .card-item.locked { opacity: 0.4; cursor: not-allowed; border-style: dashed; }
+        .option-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 20px 0; }
+        .opt-item { padding: 15px; border: 1px solid #333; border-radius: 8px; cursor: pointer; background: rgba(255,255,255,0.02); }
+        .opt-item:hover, .opt-item.selected { border-color: var(--red); background: rgba(255,23,68,0.1); }
         
-        /* CÓDIGO GENÉTICO SLOTS */
-        .gene-slots { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
-        .slot { width: 55px; height: 55px; border: 2px dashed #444; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; color: #555; }
-        .slot.active-slot { border-color: var(--gold); background: rgba(255,215,0,0.05); color: var(--gold); border-style: solid; }
+        /* GENE SLOTS (5 TOTAL) */
+        .gene-slots { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+        .slot { width: 50px; height: 50px; border: 2px dashed #444; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #666; font-weight: bold; }
+        .slot.filled { border-style: solid; border-color: var(--gold); color: var(--gold); background: rgba(255,215,0,0.1); }
 
         /* --- GAMEPLAY HUD --- */
-        #mainGame { width: 100%; height: 100vh; display: none; }
         #map { width: 100%; height: 100vh; z-index: 1; }
-        .top-hud { position: fixed; top: 10px; width: 96%; left: 2%; height: 45px; display: flex; align-items: center; padding: 0 20px; z-index: 1000; }
-        .bottom-hud { position: fixed; bottom: 10px; width: 96%; left: 2%; height: 130px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; z-index: 1000; }
+        .hud { position: fixed; z-index: 1000; pointer-events: none; }
+        .hud * { pointer-events: auto; }
+        
+        .top-hud { top: 10px; width: 96%; left: 2%; height: 45px; display: flex; align-items: center; padding: 0 20px; }
+        .bottom-hud { bottom: 10px; width: 96%; left: 2%; height: 140px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; }
 
         /* BARRAS LÓGICAS */
-        .bars-container { flex: 1; margin: 0 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .bars-grid { flex: 1; margin: 0 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .bar-wrap { display: flex; flex-direction: column; }
         .bar-label { font-size: 0.65rem; color: #888; text-transform: uppercase; margin-bottom: 2px; font-weight: 700; }
         .bar-bg { width: 100%; height: 8px; background: #111; border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
-        .bar-fill { height: 100%; width: 0%; transition: width 1s linear; }
+        .bar-fill { height: 100%; width: 0%; transition: width 0.3s linear; }
 
-        /* MODAIS SUSPENSOS */
-        .suspended-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9000; display: none; align-items: center; justify-content: center; }
-        .modal-body { width: 550px; padding: 35px; position: relative; border: 1px solid var(--border); box-shadow: 0 0 60px rgba(0,0,0,1); }
+        /* SPEED CONTROLS */
+        .speed-ctrl { display: flex; gap: 5px; margin-left: 15px; }
+        .btn-speed { background: #222; border: 1px solid #444; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; }
+        .btn-speed.active { background: var(--red); border-color: white; }
 
-        /* CONFIGURAÇÕES HEURÍSTICAS */
-        .config-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-        .btn-toggle { width: 130px; padding: 12px; border: none; border-radius: 6px; font-weight: 900; cursor: pointer; transition: 0.3s; }
-        .btn-toggle.on { background: #2e7d32; color: #afffaf; border: 2px solid #4caf50; }
-        .btn-toggle.off { background: #c62828; color: #ffbcbc; border: 2px solid #ef5350; }
+        /* MODAIS SUSPENSOS (TUTORIAL/OPÇÕES) */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9000; display: none; align-items: center; justify-content: center; }
+        .modal-body { width: 500px; padding: 35px; position: relative; border: 1px solid var(--border); box-shadow: 0 0 60px #000; }
+        .btn-x { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #666; font-size: 2rem; cursor: pointer; transition: 0.2s; }
+        .btn-x:hover { color: white; transform: scale(1.1); }
 
-        /* POPUP TÁTICO PAÍS */
-        .popup-card { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 380px; padding: 30px; z-index: 8000; display: none; border: 2px solid var(--blue); }
+        /* POPUP PAÍS */
+        .tactical-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 380px; padding: 30px; z-index: 8000; display: none; border: 2px solid var(--blue); }
     </style>
 </head>
 <body>
 
     <div id="startMenu" class="screen active">
-        <div class="bio-logo" style="font-family: Orbitron; font-size: 5rem; letter-spacing: 12px;">PRAGA</div>
-        <button class="btn-main" onclick="initSetup()">Iniciar</button>
+        <div class="bio-logo" style="font-family: Orbitron; font-size: 5rem; letter-spacing: 15px;">PRAGA</div>
+        <button class="btn-main" onclick="startSetup()">Iniciar</button>
         <button class="btn-main" onclick="openModal('tutorialModal')">Tutorial</button>
-        <button class="btn-main" onclick="alert('Conquistas bloqueadas')">Conquistas</button>
+        <button class="btn-main" onclick="alert('Conquistas: 0/100')">Conquistas</button>
     </div>
 
-    <div id="selectionFlow" class="screen">
-        
+    <div id="setupFlow" class="screen">
         <div id="setupType" class="glass setup-card active">
-            <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 10px;">SELECIONAR TIPO DE PESTE</h2>
-            <div class="grid-cards">
-                <div class="card-item" onclick="setGameValue('type', 'Bactéria', this)">🦠 Bactéria<br><small style="color:#666">Causa comum, potencial ilimitado.</small></div>
-                <div class="card-item" onclick="setGameValue('type', 'Vírus', this)">🧬 Vírus<br><small style="color:#666">Mutação rápida, difícil de controlar.</small></div>
-                <div class="card-item locked">🍄 Fungo<br><small style="color:#666">Bloqueado</small></div>
-                <div class="card-item locked">💎 Príon<br><small style="color:#666">Bloqueado</small></div>
+            <h2 style="color: var(--red); font-family: Orbitron;">SELECIONAR PATÓGENO</h2>
+            <div class="option-grid">
+                <div class="opt-item" onclick="setSetup('pathogen', 'Bactéria', this)">🦠 BACTÉRIA</div>
+                <div class="opt-item" onclick="setSetup('pathogen', 'Vírus', this)">🧬 VÍRUS</div>
+                <div class="opt-item" onclick="setSetup('pathogen', 'Fungo', this)">🍄 FUNGO</div>
+                <div class="opt-item" onclick="setSetup('pathogen', 'Príon', this)">💎 PRÍON</div>
             </div>
-            <button class="btn-main" onclick="nextSetup('setupDiff')">Próximo</button>
+            <button class="btn-main" onclick="nextPhase('setupDiff')">PRÓXIMO</button>
         </div>
 
         <div id="setupDiff" class="glass setup-card">
-            <h2 style="color: var(--gold); font-family: Orbitron; margin-bottom: 10px;">DIFICULDADE DO JOGO</h2>
-            <div class="grid-cards">
-                <div class="card-item" onclick="setGameValue('diff', 'Casual', this)"><b>Casual</b><br><small style="color:#666">Doentes recebem abraços.</small></div>
-                <div class="card-item" onclick="setGameValue('diff', 'Normal', this)"><b>Normal</b><br><small style="color:#666">Médicos trabalham 3 dias/semana.</small></div>
-                <div class="card-item" onclick="setGameValue('diff', 'Brutal', this)"><b>Brutal</b><br><small style="color:#666">Médicos nunca vão para casa.</small></div>
+            <h2 style="color: var(--gold); font-family: Orbitron;">DIFICULDADE</h2>
+            <div class="option-grid">
+                <div class="opt-item" onclick="setSetup('diff', 'Casual', this)">CASUAL</div>
+                <div class="opt-item" onclick="setSetup('diff', 'Normal', this)">NORMAL</div>
+                <div class="opt-item" onclick="setSetup('diff', 'Brutal', this)">BRUTAL</div>
             </div>
-            <button class="btn-main" onclick="nextSetup('setupName')">Próximo</button>
+            <button class="btn-main" onclick="nextPhase('setupName')">PRÓXIMO</button>
         </div>
 
         <div id="setupName" class="glass setup-card">
             <h2 style="color: var(--blue); font-family: Orbitron;">NOMEAR ENFERMIDADE</h2>
-            <input type="text" id="plagueNameInput" placeholder="NOME..." style="width: 100%; padding: 20px; background: #111; border: 1px solid #333; color: white; text-align: center; font-size: 2rem; margin: 30px 0; font-family: Rajdhani;">
-            <button class="btn-main" onclick="nextSetup('setupGenes')">Próximo</button>
+            <input type="text" id="nameIn" placeholder="NOME DA PRAGA..." style="width: 100%; padding: 20px; background: #111; border: 1px solid #333; color: white; text-align: center; font-size: 2rem; margin: 30px 0; font-family: Rajdhani;">
+            <button class="btn-main" onclick="nextPhase('setupGenes')">PRÓXIMO</button>
         </div>
 
         <div id="setupGenes" class="glass setup-card">
-            <h2 style="color: var(--green); font-family: Orbitron;">MODIFICAR CÓDIGO GENÉTICO</h2>
+            <h2 style="color: var(--green); font-family: Orbitron;">CÓDIGO GENÉTICO INICIAL</h2>
             <div class="gene-slots">
-                <div class="slot" title="Transmissão">T</div><div class="slot">T</div><div class="slot">T</div>
-                <div class="slot" title="Sintoma">S</div><div class="slot" title="Resistência">R</div>
+                <div class="slot" id="s-t1">TRANS</div><div class="slot" id="s-t2">TRANS</div><div class="slot" id="s-t3">TRANS</div>
+                <div class="slot" id="s-s1">SINT</div><div class="slot" id="s-r1">RES</div>
             </div>
-            <div class="grid-cards" style="height: 150px; overflow-y: auto;">
-                <div class="card-item" onclick="toggleGene(this)">Mutação Aérea</div>
-                <div class="card-item" onclick="toggleGene(this)">Resistência Térmica</div>
-                <div class="card-item" onclick="toggleGene(this)">Sintoma Tosse</div>
-            </div>
-            <button class="btn-main" style="width:100%" onclick="startGame()">Começar</button>
+            <div class="option-grid" id="genePool" style="max-height: 180px; overflow-y: auto;">
+                </div>
+            <button class="btn-main" style="width: 100%" onclick="startGame()">INICIAR SIMULAÇÃO</button>
         </div>
     </div>
 
-    <div id="mainGame">
+    <div id="gameScreen" style="display: none;">
         <div id="map"></div>
         
         <div class="hud glass top-hud">
             <span style="color: var(--red); font-weight: 800; margin-right: 15px; font-size: 0.8rem;">NOTÍCIAS</span>
-            <marquee id="newsTicker">SISTEMA PRAGA INICIADO. ESCOLHA O PAÍS PARA O SURTO INICIAL...</marquee>
-            <button onclick="openModal('settingsModal')" style="background:none; border:none; color:white; font-size:1.6rem; cursor:pointer; margin-left:20px;">⚙️</button>
+            <marquee id="ticker">SISTEMA ONLINE. SELECIONE UM PAÍS PARA O SURTO INICIAL...</marquee>
+            
+            <div class="speed-ctrl">
+                <button class="btn-speed active" onclick="setSpeed(1, this)">x1</button>
+                <button class="btn-speed" onclick="setSpeed(2, this)">x2</button>
+                <button class="btn-speed" onclick="setSpeed(5, this)">x5</button>
+            </div>
+            
+            <button onclick="openModal('settingsModal')" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer; margin-left:15px;">⚙️</button>
         </div>
 
         <div class="hud glass bottom-hud">
             <button class="btn-main" style="width: 220px; font-size: 0.85rem;" onclick="alert('Menu de Evolução')">Status da Enfermidade</button>
             
-            <div class="bars-container">
-                <div class="bar-wrap">
-                    <span class="bar-label" id="lblInf">Infectados: 0</span>
-                    <div class="bar-bg"><div id="barInf" class="bar-fill" style="background: var(--red);"></div></div>
-                </div>
-                <div class="bar-wrap">
-                    <span class="bar-label" id="lblMort">Mortos: 0</span>
-                    <div class="bar-bg"><div id="barMort" class="bar-fill" style="background: #444;"></div></div>
-                </div>
-                <div class="bar-wrap">
-                    <span class="bar-label" id="lblCura">Progresso da Cura: 0%</span>
-                    <div class="bar-bg"><div id="barCura" class="bar-fill" style="background: var(--blue);"></div></div>
-                </div>
-                <div class="bar-wrap">
-                    <span class="bar-label" id="lblVac">Progresso da Vacina: 0%</span>
-                    <div class="bar-bg"><div id="barVac" class="bar-fill" style="background: var(--green);"></div></div>
-                </div>
+            <div class="bars-grid">
+                <div class="bar-wrap"><span class="bar-label" id="l-inf">Infectados: 0</span><div class="bar-bg"><div id="b-inf" class="bar-fill" style="background: var(--red);"></div></div></div>
+                <div class="bar-wrap"><span class="bar-label" id="l-mort">Mortos: 0</span><div class="bar-bg"><div id="b-mort" class="bar-fill" style="background: #444;"></div></div></div>
+                <div class="bar-wrap"><span class="bar-label" id="l-cura">Progresso da Cura: 0%</span><div class="bar-bg"><div id="b-cura" class="bar-fill" style="background: var(--blue);"></div></div></div>
+                <div class="bar-wrap"><span class="bar-label" id="l-vac">Progresso da Vacina: 0%</span><div class="bar-bg"><div id="b-vac" class="bar-fill" style="background: var(--green);"></div></div></div>
             </div>
 
-            <div style="text-align: right; min-width: 140px;">
-                <span id="mutagenDisplay" style="color: var(--gold); font-size: 2.6rem; font-weight: bold; line-height: 1;">10</span>
-                <div style="font-size: 0.65rem; color: var(--gold); font-weight: 800;">MUTAGENICIDADE</div>
+            <div style="text-align: right; min-width: 130px;">
+                <span id="mutagenVal" style="color: var(--gold); font-size: 2.6rem; font-weight: bold; line-height: 1;">10</span>
+                <div style="font-size: 0.65rem; color: var(--gold); font-weight: 800; text-transform: uppercase;">Mutagenicidade</div>
             </div>
             <button class="btn-main" style="width: 120px; font-size: 0.85rem; background: var(--blue); color: black;" onclick="alert('Dados Mundiais')">Mundo</button>
         </div>
     </div>
 
-    <div id="tutorialModal" class="suspended-overlay">
+    <div id="tutorialModal" class="overlay">
         <div class="glass modal-body">
-            <button class="btn-close" onclick="closeModal()">✕</button>
-            <h2 style="color: var(--blue); margin-bottom: 20px; font-family: Orbitron;">DIRETRIZES DE CAMPO</h2>
+            <button class="btn-x" onclick="closeModal()">✕</button>
+            <h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 20px;">MANUAL DO ESTRATEGISTA</h2>
             <div style="text-align: left; line-height: 1.6; color: #ccc;">
-                <p>1. <b>Início:</b> Selecione um país clicando no mapa para liberar o patógeno.</p>
-                <p>2. <b>Mutagenicidade:</b> A cada 1.000 (10³) infectados, você recebe 1 ponto de mutagenicidade.</p>
-                <p>3. <b>Resiliência:</b> Mutações biológicas atrasam ou regridem o progresso de cura e vacina humana.</p>
-                <p>4. <b>Logística:</b> A cura foca nos infectados; a vacina protege os saudáveis.</p>
+                <p>• <b>Invasão:</b> Clique em um país para iniciar o surto.</p>
+                <p>• <b>Mutagenicidade:</b> A cada 1.000 (10³) infectados, +1 ponto.</p>
+                <p>• <b>Cura vs Vacina:</b> A cura foca em tratar doentes; a vacina em imunizar saudáveis.</p>
+                <p>• <b>Regressão:</b> Mutações forçam cientistas a revisarem dados, atrasando a cura.</p>
             </div>
         </div>
     </div>
 
-    <div id="settingsModal" class="suspended-overlay">
+    <div id="settingsModal" class="overlay">
         <div class="glass modal-body" style="width: 420px; text-align: center;">
-            <button class="btn-close" onclick="closeModal()">✕</button>
+            <button class="btn-x" onclick="closeModal()">✕</button>
             <h2 style="margin-bottom: 30px; font-family: Orbitron;">COMANDO CENTRAL</h2>
-            <div class="config-row"><span>ÁUDIO GLOBAL</span><button class="btn-toggle on" onclick="toggleH(this)">LIGADO</button></div>
-            <div class="config-row"><span>EFEITOS SONOROS</span><button class="btn-toggle on" onclick="toggleH(this)">LIGADO</button></div>
-            <button class="btn-main" style="width: 100%; margin-top: 15px;" onclick="game.active = !game.active">PAUSAR SIMULAÇÃO</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <span>SOM GLOBAL</span><button class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <span>EFEITOS DE CAOS</span><button class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button>
+            </div>
+            <button class="btn-main" style="width: 100%; margin-top: 10px;" onclick="game.active = !game.active">PAUSAR</button>
             <button class="btn-main" style="width: 100%; background: #222; color: #888;" onclick="location.reload()">SALVAR E FECHAR</button>
         </div>
     </div>
 
-    <div id="countryPopup" class="glass popup-card">
-        <button class="btn-close" style="top:5px; right:12px; font-size: 1.4rem;" onclick="this.parentElement.style.display='none'">✕</button>
-        <h2 id="popCountry" style="color: var(--blue); margin-bottom: 10px; font-family: Orbitron;">IDENTIFICANDO...</h2>
+    <div id="countryPopup" class="glass tactical-popup">
+        <button class="btn-x" style="top:5px; right:12px; font-size: 1.4rem;" onclick="this.parentElement.style.display='none'">✕</button>
+        <h2 id="popCountry" style="color: var(--blue); font-family: Orbitron; margin-bottom: 10px;">IDENTIFICANDO...</h2>
         <div id="popData" style="color: #ccc; margin-bottom: 25px; line-height: 1.4;">Aguardando sinal orbital...</div>
-        <button id="btnInfect" class="btn-main" style="width: 100%; font-size: 1.1rem;" onclick="startOutbreak()">Iniciar surto aqui</button>
+        <button class="btn-main" style="width: 100%;" onclick="startOutbreak()">Iniciar surto aqui</button>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // --- ESTADO DO JOGO ---
+        // --- MOTOR LÓGICO ---
         const WORLD_POP = 8000000000;
         let game = {
-            active: false, started: false,
-            name: '', type: '', diff: '',
+            active: false, started: false, speed: 1,
+            name: '', pathogen: '', diff: '',
             mutagen: 10, totalTally: 10,
             healthy: WORLD_POP, infected: 0, dead: 0, cured: 0, vaccinated: 0,
             curaProg: 0, vacinaProg: 0,
-            infectRate: 1.12, lethality: 0.01,
             country: ''
         };
 
-        // --- NAVEGAÇÃO SETUP ---
-        function initSetup() { document.getElementById('startMenu').classList.remove('active'); document.getElementById('selectionFlow').classList.add('active'); }
-        function setGameValue(key, val, el) {
-            game[key] = val;
-            el.parentElement.querySelectorAll('.card-item').forEach(i => i.classList.remove('selected'));
-            el.classList.add('selected');
+        // --- SETUP ---
+        function startSetup() { document.getElementById('startMenu').classList.remove('active'); document.getElementById('setupFlow').classList.add('active'); loadGenePool(); }
+        function setSetup(key, val, el) { game[key] = val; el.parentElement.querySelectorAll('.opt-item').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
+        function nextPhase(id) { document.querySelectorAll('.setup-card').forEach(c => c.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        
+        function loadGenePool() {
+            const pool = document.getElementById('genePool');
+            const genes = ["Ar I", "Água I", "Aves I", "Tosse", "Calor I", "Frio I"];
+            pool.innerHTML = genes.map(g => `<div class="opt-item" onclick="mutate('${g}')">${g}</div>`).join('');
         }
-        function nextSetup(id) {
-            document.querySelectorAll('.setup-card').forEach(c => c.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+
+        function mutate(gene) {
+            game.mutagen = Math.max(0, game.mutagen - 2);
+            game.curaProg = Math.max(0, game.curaProg - 3); // Regressão lógica
+            document.getElementById('mutagenVal').innerText = game.mutagen;
+            alert(`Mutação ${gene} aplicada. Pesquisa humana atrasada.`);
         }
-        function toggleGene(el) { el.classList.toggle('selected'); }
+
         function startGame() {
-            game.name = document.getElementById('plagueNameInput').value || "PRAGA-0";
-            document.getElementById('selectionFlow').classList.remove('active');
-            document.getElementById('mainGame').style.display = 'block';
+            game.name = document.getElementById('nameIn').value || "PRAGA-0";
+            document.getElementById('setupFlow').classList.remove('active');
+            document.getElementById('gameScreen').style.display = 'block';
             initMap();
         }
 
-        // --- MAPA & API PAÍS ---
+        // --- MAPA & SIMULAÇÃO ---
         let map;
         function initMap() {
             if (map) return;
@@ -234,9 +238,9 @@
                 if(game.started) return;
                 const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${e.latlng.lat}&longitude=${e.latlng.lng}&localityLanguage=pt`);
                 const data = await res.json();
-                game.country = data.countryName || "Águas Neutras";
+                game.country = data.countryName || "Zona Remota";
                 document.getElementById('popCountry').innerText = game.country.toUpperCase();
-                document.getElementById('popData').innerHTML = `Continente: ${data.continent || 'Desconhecido'}<br>Status: Saudável<br>Vigilância: Baixa`;
+                document.getElementById('popData').innerHTML = `Continente: ${data.continent}<br>Clima: Variável<br>Status: Saudável`;
                 document.getElementById('countryPopup').style.display = 'block';
             });
         }
@@ -244,68 +248,57 @@
         function startOutbreak() {
             game.started = true; game.active = true; game.infected = 1; game.healthy--;
             document.getElementById('countryPopup').style.display = 'none';
-            document.getElementById('newsTicker').innerText = `CASO ZERO CONFIRMADO EM ${game.country.toUpperCase()}! PATÓGENO ${game.name.toUpperCase()} ATIVO.`;
+            document.getElementById('ticker').innerText = `CASO ZERO CONFIRMADO EM ${game.country.toUpperCase()}! PATÓGENO ${game.name.toUpperCase()} ATIVO.`;
             runLoop();
         }
 
-        // --- MOTOR DE SIMULAÇÃO ---
+        function setSpeed(s, el) { game.speed = s; document.querySelectorAll('.btn-speed').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
+
         function runLoop() {
             setInterval(() => {
                 if(!game.active) return;
 
-                // 1. Disseminação (Lógica Populacional)
-                let spread = Math.ceil(game.infected * (game.infectRate - 1));
-                if(game.infected < game.healthy) {
-                    game.infected += spread;
-                    game.healthy -= spread;
+                // 1. Infecção Exponencial
+                for(let i=0; i<game.speed; i++) {
+                    let spread = Math.ceil(game.infected * 0.05);
+                    if(game.infected < game.healthy) {
+                        game.infected += spread;
+                        game.healthy -= spread;
+                    }
                 }
 
-                // 2. Mutagenicidade (1 ponto por 1.000 infectados)
+                // 2. Mutagenicidade (1 ponto por 1.000)
                 let calc = Math.floor(game.infected / 1000) + 10;
                 if(calc > game.totalTally) {
                     game.mutagen += (calc - game.totalTally);
                     game.totalTally = calc;
                 }
 
-                // 3. Pesquisa Humana Reativa
-                if(game.infected > 100000) {
-                    game.curaProg += (game.infected / WORLD_POP) * 15;
-                    game.vacinaProg += (game.infected / WORLD_POP) * 8;
+                // 3. Pesquisa Reativa
+                if(game.infected > 1000000) {
+                    game.curaProg += (game.infected / WORLD_POP) * 10 * game.speed;
+                    game.vacinaProg += (game.infected / WORLD_POP) * 5 * game.speed;
                 }
 
-                updateHUD();
+                updateUI();
             }, 1000);
         }
 
-        function updateHUD() {
-            document.getElementById('mutagenDisplay').innerText = game.mutagen;
-            document.getElementById('lblInf').innerText = `Infectados: ${game.infected.toLocaleString()}`;
-            document.getElementById('barInf').style.width = (game.infected / WORLD_POP * 100) + "%";
+        function updateUI() {
+            document.getElementById('mutagenVal').innerText = game.mutagen;
+            document.getElementById('l-inf').innerText = `Infectados: ${game.infected.toLocaleString()}`;
+            document.getElementById('b-inf').style.width = (game.infected / WORLD_POP * 100) + "%";
 
-            // Lógica de Cura (Troca de Label em 100%)
-            if(game.curaProg >= 100) {
-                document.getElementById('lblCura').innerText = "Curados: " + game.infected.toLocaleString();
-                document.getElementById('lblCura').style.color = "var(--blue)";
-                document.getElementById('barCura').style.width = "100%";
-            } else {
-                document.getElementById('lblCura').innerText = `Progresso Cura: ${game.curaProg.toFixed(1)}%`;
-                document.getElementById('barCura').style.width = game.curaProg + "%";
-            }
+            // Lógica Curados/Vacinados
+            if(game.curaProg >= 100) { document.getElementById('l-cura').innerText = "Curados: " + game.infected.toLocaleString(); document.getElementById('b-cura').style.width = "100%"; }
+            else { document.getElementById('l-cura').innerText = `Progresso Cura: ${game.curaProg.toFixed(1)}%`; document.getElementById('b-cura').style.width = game.curaProg + "%"; }
 
-            // Lógica de Vacina (Troca de Label em 100%)
-            if(game.vacinaProg >= 100) {
-                document.getElementById('lblVac').innerText = "Vacinados: " + game.healthy.toLocaleString();
-                document.getElementById('lblVac').style.color = "var(--green)";
-                document.getElementById('barVac').style.width = "100%";
-            } else {
-                document.getElementById('lblVac').innerText = `Progresso Vacina: ${game.vacinaProg.toFixed(1)}%`;
-                document.getElementById('barVac').style.width = game.vacinaProg + "%";
-            }
+            if(game.vacinaProg >= 100) { document.getElementById('l-vac').innerText = "Vacinados: " + game.healthy.toLocaleString(); document.getElementById('b-vac').style.width = "100%"; }
+            else { document.getElementById('l-vac').innerText = `Progresso Vacina: ${game.vacinaProg.toFixed(1)}%`; document.getElementById('b-vac').style.width = game.vacinaProg + "%"; }
         }
 
-        // --- UTILIDADES ---
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal() { document.querySelectorAll('.suspended-overlay').forEach(o => o.style.display = 'none'); }
+        function closeModal() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); }
         function toggleH(btn) {
             const on = btn.classList.contains('on');
             btn.classList.toggle('on', !on); btn.classList.toggle('off', on);
