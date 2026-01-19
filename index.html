@@ -3,284 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plague Inc - Estratégia de Pandemia</title>
+    <title>Plague Evolution 2026 - Estrategista Ambiental</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --red: #ff1744; --blue: #00e5ff; --gold: #ffd700; --purple: #9c27b0; --yellow: #ffeb3b;
+            --glass: rgba(10, 10, 10, 0.92); --border: rgba(255, 255, 255, 0.1);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            overflow: hidden;
-            height: 100vh;
-            background: #000;
+        body { font-family: 'Rajdhani', sans-serif; background: #000; color: white; overflow: hidden; height: 100vh; }
+
+        /* MAPA FUNDO */
+        #map { width: 100%; height: 100vh; z-index: 1; filter: brightness(0.6) saturate(0.8); }
+
+        /* INTERFACE GLASSMORPHISM */
+        .glass { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 12px; }
+
+        /* HUD SUPERIOR & INFERIOR */
+        .hud { position: fixed; z-index: 1000; pointer-events: none; }
+        .hud button, .hud .interact { pointer-events: auto; }
+
+        .top-hud { top: 15px; left: 50%; transform: translateX(-50%); width: 95%; height: 45px; display: flex; align-items: center; padding: 0 15px; }
+        .bottom-hud { bottom: 15px; left: 50%; transform: translateX(-50%); width: 95%; height: 90px; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; }
+
+        /* BARRAS DE STATUS (Baseadas nos prints de 2026) */
+        .bars-container { flex: 1; margin: 0 30px; display: flex; flex-direction: column; gap: 8px; }
+        .bar-group { display: flex; align-items: center; gap: 10px; }
+        .bar-label { font-size: 0.65rem; color: #888; text-transform: uppercase; width: 80px; }
+        .bar-bg { flex: 1; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
+        .bar-fill { height: 100%; transition: width 1s ease-in-out; }
+
+        /* TELAS OVERLAY (Sistema SPA) */
+        .overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.96); z-index: 2000; display: none; 
+            flex-direction: column; padding: 30px; animation: fadeIn 0.3s ease;
+        }
+        .overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(1.02); } to { opacity: 1; transform: scale(1); } }
+
+        /* MENU DE ABAS */
+        .tab-nav { display: flex; gap: 5px; margin-bottom: 25px; border-bottom: 2px solid var(--border); }
+        .tab { 
+            padding: 15px 30px; cursor: pointer; color: #555; font-weight: 700; text-transform: uppercase; 
+            transition: 0.3s; border-radius: 8px 8px 0 0;
+        }
+        .tab.active { color: white; background: rgba(255,23,68,0.15); border-bottom: 3px solid var(--red); }
+        .tab.active.blue { background: rgba(0,229,255,0.15); border-bottom: 3px solid var(--blue); }
+
+        /* GRADE HEXAGONAL (Evolução) */
+        .hex-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(85px, 1fr)); gap: 20px; max-width: 900px; margin: auto; padding: 20px; }
+        .hex { 
+            width: 85px; height: 85px; background: #111; border: 2px solid #333; cursor: pointer; transition: 0.3s;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+        }
+        .hex:hover { border-color: var(--red); box-shadow: 0 0 20px var(--red); transform: scale(1.1); }
+        .hex.unlocked { background: var(--red); color: black; border-color: white; }
+
+        /* POPUP PAÍS (Brasil Info) */
+        .country-card { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 380px; padding: 30px; z-index: 3000; display: none; 
         }
 
-        /* BACKGROUND GLOBAL */
-        .background {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #4b0000 0%, #8b0000 50%, #000 100%);
-            z-index: 0;
-        }
+        /* BOTÕES */
+        .btn { background: white; color: black; border: none; padding: 12px 25px; border-radius: 6px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .btn-close { position: absolute; top: 25px; right: 25px; background: none; border: none; color: #666; font-size: 2rem; cursor: pointer; }
+        .btn-close:hover { color: white; }
 
-        /* NEWS TICKER */
-        .news-ticker {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            height: 35px;
-            background: rgba(0, 0, 0, 0.8);
-            border-bottom: 2px solid #ff4444;
-            z-index: 1000;
-            display: none; /* Só aparece no jogo */
-            overflow: hidden;
-            color: #ff4444;
-            font-weight: bold;
-            line-height: 35px;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-        }
+        /* MANUAL CARDS */
+        .manual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 800px; margin: 50px auto; }
+        .card { padding: 40px; text-align: center; cursor: pointer; transition: 0.3s; background: rgba(255,255,255,0.03); }
+        .card:hover { border-color: var(--red); background: rgba(255, 23, 68, 0.1); }
 
-        .ticker-content {
-            display: inline-block;
-            white-space: nowrap;
-            padding-left: 100%;
-            animation: ticker 25s linear infinite;
-        }
-
-        @keyframes ticker {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(-100%, 0); }
-        }
-
-        /* HUD DO JOGO */
-        .game-hud {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 80px;
-            background: rgba(0, 0, 0, 0.9);
-            border-top: 3px solid #ff4444;
-            z-index: 1000;
-            display: none;
-            justify-content: space-around;
-            align-items: center;
-            color: white;
-            padding: 0 20px;
-        }
-
-        .hud-item { text-align: center; }
-        .hud-value { font-size: 1.5rem; font-weight: bold; display: block; }
-        .hud-label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; }
-        .dna-points { color: #fbc02d; text-shadow: 0 0 10px rgba(251, 192, 45, 0.5); }
-
-        /* VÍRUS ANIMADO (MENU) */
-        .virus-icon {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: min(600px, 80vw);
-            height: min(600px, 80vw);
-            opacity: 0.15;
-            z-index: 1;
-        }
-
-        .virus-core {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 40%; height: 40%;
-            background: radial-gradient(circle, rgba(255, 100, 100, 0.3) 0%, rgba(139, 0, 0, 0.2) 100%);
-            border-radius: 50%;
-            animation: pulse 3s ease-in-out infinite;
-        }
-
-        .spike {
-            position: absolute; top: 50%; left: 50%;
-            width: 8px; height: 35%;
-            background: linear-gradient(to bottom, rgba(255, 50, 50, 0.4), transparent);
-            border-radius: 50% 50% 0 0;
-            transform-origin: bottom center;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.1); }
-        }
-
-        /* TELAS */
-        .screen {
-            display: none;
-            position: relative;
-            z-index: 10;
-            height: 100vh;
-        }
-
-        .screen.active { display: flex; flex-direction: column; }
-
-        /* MAPA */
-        #map {
-            width: 100%;
-            height: calc(100vh - 115px); /* Descontando ticker e hud */
-            background: #0b0b0b;
-            margin-top: 35px;
-        }
-
-        /* BOTÕES E MODAIS (ESTILOS ANTERIORES MANTIDOS) */
-        .settings-btn, .back-btn {
-            position: absolute; top: 50px; left: 20px;
-            width: 50px; height: 50px; border-radius: 12px;
-            cursor: pointer; z-index: 1100; border: none;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .settings-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); }
-        .back-btn { background: #fff; color: #8b0000; font-size: 20px; font-weight: bold; }
-
-        .menu { display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%; margin: auto; }
-        .menu-button {
-            width: 300px; padding: 15px; font-size: 1.5rem; font-weight: bold;
-            color: #8b0000; background: #fff; border: none; border-radius: 10px;
-            cursor: pointer; transition: 0.3s;
-        }
-        .menu-button:hover { transform: scale(1.05); background: #ff4444; color: #fff; }
-
-        /* MANUAL E CONFIGS */
-        .modal { background: rgba(0,0,0,0.9); padding: 30px; border-radius: 15px; border: 1px solid #444; margin: auto; color: #fff; max-width: 500px; }
-        .manual-item { display: flex; gap: 15px; margin-bottom: 20px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; }
-        .manual-icon { font-size: 2rem; }
     </style>
 </head>
 <body>
 
-    <div class="background"></div>
-    
-    <div id="newsTicker" class="news-ticker">
-        <div class="ticker-content" id="tickerText">
-            CARREGANDO DADOS GLOBAIS... | OMS ALERTA PARA NOVOS SURTOS VIRAIS | CIENTISTAS MONITORAM MUTAÇÕES EM TEMPO REAL | BEM-VINDO À ESTRATÉGIA DE ERRADICAÇÃO 2026.
-        </div>
+    <div id="map"></div>
+
+    <div class="hud glass top-hud">
+        <button class="btn" style="padding: 4px 12px; font-size: 0.7rem; background: var(--red); color: white;" onclick="openOverlay('news')">NOTÍCIAS</button>
+        <marquee id="ticker" style="flex:1; padding: 0 20px; font-weight: 600; font-size: 0.95rem; color: #ddd;">
+            BRASIL: GOVERNO CAIU | PESQUISA DA CURA ATINGE 84% | OMS EMITE ALERTA DE EXTINÇÃO | CLIMA QUENTE ACELERA SURTO TROPICAL
+        </marquee>
+        <button onclick="openOverlay('settings')" style="background:none; border:none; cursor:pointer; font-size:1.4rem;">⚙️</button>
     </div>
 
-    <div class="virus-icon" id="menuVirus"><div class="virus-core"></div></div>
-
-    <div class="screen main-menu active" id="mainMenu">
-        <button class="settings-btn" onclick="showScreen('settings')">⚙️</button>
-        <div class="menu">
-            <button class="menu-button" onclick="showScreen('game')">JOGAR</button>
-            <button class="menu-button" onclick="showScreen('tutorial')">COMO JOGAR</button>
-            <button class="menu-button" onclick="alert('Em breve')">CONQUISTAS</button>
-        </div>
-    </div>
-
-    <div class="screen" id="game">
-        <button class="back-btn" style="top: 50px;" onclick="showScreen('mainMenu')">◄</button>
-        <div id="map"></div>
-        <div class="game-hud">
-            <div class="hud-item">
-                <span class="hud-label">DNA</span>
-                <span class="hud-value dna-points" id="dnaPoints">0</span>
+    <div class="hud glass bottom-hud">
+        <button class="btn" onclick="openOverlay('disease')">DOENÇA</button>
+        
+        <div class="bars-container">
+            <div class="bar-group">
+                <span class="bar-label">Infectados</span>
+                <div class="bar-bg"><div class="bar-fill" style="width: 75%; background: var(--red);"></div></div>
             </div>
-            <div class="hud-item">
-                <span class="hud-label">Infectados</span>
-                <span class="hud-value" id="infectedCount">0</span>
-            </div>
-            <div class="hud-item">
-                <span class="hud-label">Mortos</span>
-                <span class="hud-value" id="deathCount">0</span>
+            <div class="bar-group">
+                <span class="bar-label">Cura</span>
+                <div class="bar-bg"><div class="bar-fill" style="width: 84%; background: var(--blue);"></div></div>
             </div>
         </div>
+
+        <div style="text-align: right; margin-right: 20px;">
+            <span style="color: var(--gold); font-size: 1.8rem; font-weight: 700; display: block; line-height: 1;">7</span>
+            <span style="font-size: 0.65rem; color: var(--gold); font-weight: bold;">PONTOS DNA</span>
+        </div>
+        <button class="btn" style="background: var(--blue);" onclick="openOverlay('world')">MUNDO</button>
     </div>
 
-    <div class="screen" id="settings">
-        <button class="back-btn" onclick="showScreen('mainMenu')">◄</button>
-        <div class="modal">
-            <h2>Configurações</h2><br>
-            <p>Sons: [ON]</p><br>
-            <p>Idioma: Português</p>
+    <div id="disease" class="overlay">
+        <button class="btn-close" onclick="closeAll()">✕</button>
+        <div class="tab-nav">
+            <div class="tab active" onclick="loadTab('trans')">Transmissão</div>
+            <div class="tab" onclick="loadTab('sint')">Sintomas</div>
+            <div class="tab" onclick="loadTab('hab')">Habilidades</div>
+        </div>
+        <div class="hex-grid" id="evolutionGrid"></div>
+        <div class="glass" style="margin-top: auto; padding: 25px; display: flex; justify-content: space-between; align-items: center;">
+            <div id="nodeInfo">Selecione um sintoma ou vetor para evoluir</div>
+            <button class="btn" style="background: var(--red); color: white;">Evoluir</button>
         </div>
     </div>
 
-    <div class="screen" id="tutorial">
-        <button class="back-btn" onclick="showScreen('mainMenu')">◄</button>
-        <div class="modal">
-            <h2>Como Jogar</h2><br>
-            <div id="manualContent"></div>
+    <div id="world" class="overlay">
+        <button class="btn-close" onclick="closeAll()">✕</button>
+        <div class="tab-nav">
+            <div class="tab active blue" onclick="loadTab('res')">Resumo</div>
+            <div class="tab blue" onclick="loadTab('cure')">Cura</div>
+            <div class="tab blue" onclick="loadTab('data')">Dados Mundiais</div>
+        </div>
+        <div style="flex:1; display: flex; gap: 30px;">
+            <div class="glass" style="flex:1; padding: 20px;">
+                <h3 style="color: var(--blue);">Humanidade à beira da extinção</h3>
+                <p style="margin-top: 20px; font-size: 1.2rem;">Mortos: 7.927.115.027</p>
+                <p style="color: var(--red);">Infectados: 199.975</p>
+            </div>
+            <div class="glass" style="flex:1.5; padding: 20px; position: relative;">
+                <h4>Gráfico de Tendência</h4>
+                <div style="position: absolute; bottom: 20px; width: 90%; height: 60%; background: linear-gradient(transparent, rgba(0,229,255,0.1)); border-bottom: 2px solid #333;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="brasilPopup" class="glass country-card">
+        <button class="btn-close" style="top:10px; right:10px; font-size: 1.2rem;" onclick="this.parentElement.style.display='none'">✕</button>
+        <h2 style="color: var(--blue); margin-bottom: 15px;">BRASIL</h2>
+        <p style="color: #ccc; line-height: 1.6; font-size: 1.1rem;">
+            Um país rural. Tem um clima tipicamente quente, úmido.<br>
+            Continente: América do Sul.
+        </p>
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #333;">
+        <p><b>Status:</b> <span style="color: var(--red);">Não existe mais</span></p>
+        <p><b>Mortos:</b> 221.372.956</p>
+    </div>
+
+    <div id="manual" class="overlay">
+        <button class="btn-close" onclick="closeAll()">✕</button>
+        <h1 style="text-align: center;">CENTRAL DE COMANDO</h1>
+        <div class="manual-grid">
+            <div class="glass card">
+                <div style="font-size: 4rem; margin-bottom: 10px;">🎓</div>
+                <h2>TUTORIAL</h2>
+                <p style="color: #777; margin-top: 10px;">Aprenda a infectar o mundo passo a passo.</p>
+            </div>
+            <div class="glass card">
+                <div style="font-size: 4rem; margin-bottom: 10px;">📖</div>
+                <h2>MANUAL</h2>
+                <p style="color: #777; margin-top: 10px;">Consulte mecânicas detalhadas e estratégias.</p>
+            </div>
         </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // ESTADO DO JOGO
-        let gameState = {
-            dna: 0,
-            infected: 0,
-            deaths: 0,
-            news: [
-                "BRASIL INVESTE EM PESQUISA GENÉTICA",
-                "AEROPORTO DE LONDRES REGISTRA ATRASOS",
-                "CLIMA SECO ACELERA PROPAGAÇÃO EM ÁREAS RURAIS",
-                "NOVA VARIANTE DETECTADA EM ANIMAIS DOMÉSTICOS"
-            ]
-        };
+        // CONFIGURAÇÃO DO MAPA (Tático Dark)
+        const map = L.map('map', { center: [-15, -50], zoom: 3, zoomControl: false, attributionControl: false });
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-        // INICIAR VÍRUS DO MENU
-        const menuVirus = document.getElementById('menuVirus');
-        for (let i = 0; i < 24; i++) {
-            const spike = document.createElement('div');
-            spike.className = 'spike';
-            spike.style.transform = `translate(-50%, -100%) rotate(${(360 / 24) * i}deg)`;
-            menuVirus.appendChild(spike);
+        // SISTEMA DE TELAS (SPA)
+        function openOverlay(id) {
+            closeAll();
+            document.getElementById(id).classList.add('active');
+            if(id === 'disease') loadTab('trans');
         }
 
-        // GERENCIAMENTO DE TELAS
-        let map;
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+        function closeAll() {
+            document.querySelectorAll('.overlay').forEach(o => o.classList.remove('active'));
+        }
 
-            // Lógica de elementos de jogo
-            const isGame = (id === 'game');
-            document.getElementById('newsTicker').style.display = isGame ? 'block' : 'none';
-            document.querySelector('.game-hud').style.display = isGame ? 'flex' : 'none';
-            document.getElementById('menuVirus').style.display = isGame ? 'none' : 'block';
+        // GERADOR DE GRADE HEXAGONAL (Evolução)
+        function loadTab(type) {
+            const grid = document.getElementById('evolutionGrid');
+            grid.innerHTML = '';
+            const count = type === 'trans' ? 12 : 15;
+            const icons = type === 'trans' ? ['🐦', '🐀', '🦟', '💧', '💨'] : ['🤒', '🤧', '🤢', '🤮', '💀'];
 
-            if (isGame && !map) {
-                initMap();
+            for(let i=0; i<count; i++) {
+                const hex = document.createElement('div');
+                hex.className = 'hex';
+                hex.innerHTML = icons[i % icons.length];
+                hex.onclick = () => {
+                    hex.classList.toggle('unlocked');
+                    document.getElementById('nodeInfo').innerHTML = `<b>Traço ${i+1}:</b> Aumenta a contaminação em ambientes áridos e aviões.`;
+                };
+                grid.appendChild(hex);
             }
         }
 
-        // INICIALIZAÇÃO DO MAPA MÚNDI
-        function initMap() {
-            map = L.map('map', {
-                center: [20, 0],
-                zoom: 2,
-                zoomControl: false,
-                attributionControl: false
-            });
-
-            // Estilo Dark/Estratégico do mapa
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
-
-            // Simular atualização de notícias
-            setInterval(() => {
-                const randomNews = gameState.news[Math.floor(Math.random() * gameState.news.length)];
-                document.getElementById('tickerText').textContent = randomNews + " | " + randomNews;
-            }, 10000);
-        }
-
-        // Conteúdo simplificado do tutorial (baseado no que discutimos)
-        const manualItems = [
-            {icon: "🌍", title: "Início", desc: "Escolha um país rico em aeroportos."},
-            {icon: "🧬", title: "DNA", desc: "Ganhe pontos clicando nas bolhas laranjas."}
-        ];
-        document.getElementById('manualContent').innerHTML = manualItems.map(i => `
-            <div class="manual-item">
-                <div class="manual-icon">${i.icon}</div>
-                <div>
-                    <b>${i.title}</b><br><small>${i.desc}</small>
-                </div>
-            </div>
-        `).join('');
+        // TRIGGER INFO PAÍS (Brasil)
+        map.on('click', () => {
+            document.getElementById('brasilPopup').style.display = 'block';
+        });
 
     </script>
 </body>
