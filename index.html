@@ -15,11 +15,10 @@
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         body { font-family: 'Rajdhani', sans-serif; background: var(--dark); color: #FFF; overflow: hidden; height: 100vh; }
 
-        /* --- TELAS (SPA) --- */
+        /* --- TELA INICIAL (DEFINITIVA v20) --- */
         .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; }
         .screen.active { display: flex; }
 
-        /* ✅ MAPA DE FUNDO OPACO NO MENU INICIAL (SEM ALTERAR OUTRAS PROPRIEDADES) */
         #startMenu {
             background: radial-gradient(circle at center, #ff1744 0%, #4a0000 60%, #000 100%);
             position: relative;
@@ -29,7 +28,7 @@
             content: "";
             position: absolute;
             inset: 0;
-            background-image:
+            background-image: 
               radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06) 0%, transparent 55%),
               url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20600'%3E%3Cdefs%3E%3CradialGradient%20id='g'%20cx='50%25'%20cy='50%25'%20r='70%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23ffffff'%20stop-opacity='0.10'/%3E%3Cstop%20offset='100%25'%20stop-color='%23ffffff'%20stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect%20width='1200'%20height='600'%20fill='url(%23g)'/%3E%3Cpath%20d='M170%20355%20c45-55%20105-80%20165-82%2058-2%20103%2026%20140%2056%2038%2031%2075%2038%20106%2029%2023-7%2046-21%2068-35%2025-16%2055-26%2078-24%2018%202%2036%2012%2052%2023%2017%2011%2034%2026%2050%2042%2028%2029%2062%2058%2097%2072%2031%2012%2067%209%20101-5%2029-12%2055-34%2078-58%2010-11%2019-23%2030-34%2032-32%2066-42%20105-38%2045%205%2080%2033%20108%2064%2030%2032%2061%2054%20102%2060%2043%206%2084-8%20122-33%2027-18%2051-41%2071-67%2022-28%2042-58%2062-89%20l0%200%20c-11-7-24-10-38-8-28%204-55%2023-77%2050-17%2020-35%2040-55%2056-30%2025-63%2040-99%2038-38-2-78-23-110-56-30-31-62-54-97-66-44-16-92-12-136%2017-36%2024-63%2056-85%2094%20z'%20fill='rgba(255,255,255,0.08)'/%3E%3Cpath%20d='M820%20170%20c52-34%20112-47%20170-40%2052%206%2098%2029%20135%2062%2037%2033%2064%2078%2075%20129%2012%2056-8%20104-46%20143-35%2036-82%2056-132%2061-70%206-143-19-197-73-45-45-69-107-68-171%201-44%2014-83%2033-111%2010-15%2020-28%2030-40%20z'%20fill='rgba(255,255,255,0.08)'/%3E%3Cpath%20d='M650%20255%20c30-26%2066-40%20105-41%2040-1%2076%2013%20105%2040%2030%2028%2047%2063%2049%20107%202%2048-17%2089-52%20122-34%2032-78%2046-124%2043-46-3-87-23-117-58-29-34-41-78-34-123%205-37%2022-68%2048-90%20z'%20fill='rgba(255,255,255,0.07)'/%3E%3Cpath%20d='M965%20410%20c24-20%2055-30%2088-29%2033%201%2062%2014%2083%2037%2021%2024%2031%2055%2027%2089-4%2034-20%2064-46%2084-26%2020-57%2028-90%2023-35-6-65-26-83-56-18-30-23-66-12-97%206-18%2017-35%2033-51%20z'%20fill='rgba(255,255,255,0.07)'/%3E%3Cpath%20d='M365%20160%20c22-20%2049-30%2079-30%2030%200%2057%2011%2079%2031%2024%2022%2036%2051%2036%2083%200%2033-13%2061-37%2082-24%2021-52%2031-82%2030-31-1-58-13-79-35-21-22-32-50-32-82%200-33%2013-61%2037-79%20z'%20fill='rgba(255,255,255,0.07)'/%3E%3Cpath%20d='M235%20425%20c18-16%2042-24%2068-24%2026%200%2050%209%2068%2025%2019%2017%2029%2040%2029%2066%200%2026-10%2049-29%2066-19%2017-42%2026-68%2026-26%200-49-9-68-26-18-17-28-40-28-66%200-26%2010-49%2029-67%20z'%20fill='rgba(255,255,255,0.06)'/%3E%3C/svg%3E");
             background-size: cover;
@@ -50,23 +49,15 @@
         }
         #startMenu > * { position: relative; z-index: 1; }
 
-        #setupFlow { background: #000; overflow-y: auto; padding: 40px 0; }
-
-        /* --- UI GERAL --- */
+        /* --- UI GERAL & CONTRASTE --- */
         .glass { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 12px; }
         .btn-main { background: #FFF; color: #800000; border: none; padding: 12px 25px; font-size: 1.3rem; font-weight: 800; border-radius: 6px; cursor: pointer; transition: 0.3s; margin: 8px; text-transform: uppercase; width: 260px; box-shadow: 0 4px 0 #CCC; }
         .btn-main:hover { background: var(--red); color: #FFF; transform: scale(1.03); box-shadow: 0 4px 0 #900; }
-        
         .btn-gear { background: none; border: none; color: #FFF; font-size: 2rem; cursor: pointer; transition: 0.3s; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
         .btn-gear:hover { transform: rotate(90deg); color: var(--red); }
 
-        /* --- TOOLTIPS (DICAS FLUTUANTES) --- */
-        .dashed-info {
-            position: relative;
-            border-bottom: 1.5px dashed rgba(255, 255, 255, 0.6);
-            cursor: help;
-            color: #FFF; /* Alto Contraste */
-        }
+        /* --- TOOLTIPS --- */
+        .dashed-info { position: relative; border-bottom: 1.5px dashed rgba(255, 255, 255, 0.6); cursor: help; color: #FFF; }
         .dashed-info::after {
             content: attr(data-tooltip);
             position: absolute;
@@ -79,18 +70,17 @@
         }
         .dashed-info:hover::after { opacity: 1; visibility: visible; bottom: 145%; }
 
-        /* --- SETUP CARDS --- */
-        .setup-card { width: 92%; max-width: 780px; padding: 40px; text-align: center; display: none; }
+        /* --- SELECIONAR AGENTE (ATUALIZADO) --- */
+        #setupFlow { background: #000; overflow-y: auto; padding: 40px 0; }
+        .setup-card { width: 92%; max-width: 850px; padding: 40px; text-align: center; display: none; }
         .setup-card.active { display: block; animation: slideIn 0.4s ease; }
         @keyframes slideIn { from { opacity:0; transform: scale(0.95); } to { opacity:1; transform: scale(1); } }
         
-        .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; margin: 35px 0; }
-        .opt-box { padding: 25px; border: 1px solid #333; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,0.03); transition: 0.2s; color: #DDD; }
+        .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin: 35px 0; }
+        .opt-box { padding: 25px; border: 1px solid #333; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,0.03); transition: 0.2s; color: #DDD; text-align: left; }
         .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.2); color: #FFF; }
-        
-        .gene-slots { display: flex; justify-content: center; gap: 12px; margin: 35px 0; }
-        .slot { width: 60px; height: 60px; border: 2px dashed #555; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #888; font-weight: 800; }
-        .slot.filled { border-color: var(--gold); background: rgba(255,215,0,0.1); color: var(--gold); border-style: solid; box-shadow: 0 0 15px rgba(255,215,0,0.2); }
+        .opt-box b { display: block; font-size: 1.2rem; margin-bottom: 5px; color: #FFF; }
+        .opt-box small { color: #AAA; line-height: 1.4; display: block; }
 
         /* --- GAME HUD --- */
         #mainGame { width: 100%; height: 100vh; display: none; }
@@ -100,30 +90,15 @@
         .top-hud { top: 12px; width: 96%; left: 2%; height: 55px; display: flex; align-items: center; padding: 0 25px; justify-content: space-between; }
         .bottom-hud { bottom: 12px; width: 96%; left: 2%; height: 150px; display: flex; align-items: center; justify-content: space-between; padding: 0 35px; }
 
-        /* BARRAS DE STATUS */
-        .bars-panel { flex: 1; margin: 0 45px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .bar-wrap { display: flex; flex-direction: column; }
-        .bar-label { font-size: 0.7rem; color: #FFF; text-transform: uppercase; margin-bottom: 4px; font-weight: 800; letter-spacing: 1.5px; text-shadow: 1px 1px 2px #000; }
-        .bar-bg { width: 100%; height: 10px; background: #000; border-radius: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
-        .bar-fill { height: 100%; width: 0%; transition: width 0.8s ease-out; }
-
-        /* --- OVERLAYS --- */
+        /* MODAIS */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.94); z-index: 9000; display: none; align-items: center; justify-content: center; }
         .modal-card { width: 600px; padding: 45px; position: relative; border: 1px solid var(--border); box-shadow: 0 0 100px #000; }
         .btn-x { position: absolute; top: 20px; right: 25px; background: none; border: none; color: #777; font-size: 2.2rem; cursor: pointer; transition: 0.2s; }
         .btn-x:hover { color: #FFF; transform: scale(1.1); }
-
-        /* BOTÕES HEURÍSTICOS */
-        .config-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .btn-toggle { width: 140px; padding: 12px; border-radius: 8px; font-weight: 900; cursor: pointer; border: 2px solid rgba(255,255,255,0.15); font-size: 1rem; transition: 0.2s; }
-        .btn-on { background: #1B5E20; color: #FFF; border-color: #4CAF50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.4); }
-        .btn-off { background: #B71C1C; color: #FFF; border-color: #EF5350; box-shadow: 0 0 15px rgba(239, 83, 80, 0.4); }
-
-        /* POPUP PAÍS */
-        .tactical-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; padding: 35px; z-index: 8000; display: none; border: 2px solid var(--blue); background: rgba(0, 10, 20, 0.98); box-shadow: 0 0 50px rgba(0,229,255,0.2); }
     </style>
 </head>
 <body>
+
     <div id="startMenu" class="screen active">
         <div style="position: absolute; top: 25px; right: 25px; z-index: 10;">
             <button class="btn-gear" onclick="openSettings('menu')">⚙️</button>
@@ -138,22 +113,46 @@
         <button class="btn-x" style="position: fixed; top:25px; right:25px; z-index:100;" onclick="location.reload()">✕</button>
         
         <div id="setupType" class="glass setup-card active">
-            <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 12px; font-size: 2.2rem;">IDENTIFICAR AGENTE</h2>
+            <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 15px; font-size: 2.2rem; letter-spacing: 2px;">SELECIONAR AGENTE</h2>
             <div class="grid-select">
-                <div class="opt-box" onclick="setVar('type', 'Bactéria', this)">🦠 BACTÉRIA<br><small style="color:#AAA">Versátil e resiliente.</small></div>
-                <div class="opt-box" onclick="setVar('type', 'Vírus', this)">🧬 VÍRUS<br><small style="color:#AAA">Mutação em cascata.</small></div>
-                <div class="opt-box" onclick="setVar('type', 'Fungo', this)">🍄 FUNGO<br><small style="color:#AAA">Resistência extrema.</small></div>
-                <div class="opt-box" onclick="setVar('type', 'Príon', this)">💎 PRÍON<br><small style="color:#AAA">Morte silenciosa.</small></div>
+                <div class="opt-box" onclick="setVar('type', 'Bactéria', this)">
+                    <b>🦠 BACTÉRIA</b>
+                    <small>Causa mais comum de Praga. Potencial versátil e ilimitado.</small>
+                </div>
+                <div class="opt-box" onclick="setVar('type', 'Vírus', this)">
+                    <b>🧬 VÍRUS</b>
+                    <small>Agente de mutação rápida e instável. Extremamente difícil de controlar.</small>
+                </div>
+                <div class="opt-box" onclick="setVar('type', 'Fungo', this)">
+                    <b>🍄 FUNGO</b>
+                    <small>Esporos persistentes. Difícil de erradicar sem ajuda especializada.</small>
+                </div>
+                <div class="opt-box" onclick="setVar('type', 'Parasita', this)">
+                    <b>🪱 PARASITA</b>
+                    <small>Hospedeiro oculto. Estilo parasitário impede alterações iniciais de DNA.</small>
+                </div>
+                <div class="opt-box" onclick="setVar('type', 'Príon', this)">
+                    <b>💎 PRÍON</b>
+                    <small>Patógeno lento, sutil e complexo escondido no cérebro.</small>
+                </div>
+                <div class="opt-box" onclick="setVar('type', 'Nano-Vírus', this)">
+                    <b>🤖 NANO-VÍRUS</b>
+                    <small>Máquina microscópica fora de controle com protocolo de emergência.</small>
+                </div>
+                <div class="opt-box" onclick="setVar('type', 'Bio-Arma', this)">
+                    <b>☢️ BIO-ARMA</b>
+                    <small>Agente letal instável que mata tudo o que toca. Criado para o caos.</small>
+                </div>
             </div>
-            <button class="btn-main" style="width: 100%;" onclick="nextStep('setupDiff')">Confirmar</button>
+            <button class="btn-main" style="width: 100%;" onclick="nextStep('setupDiff')">Confirmar Agente</button>
         </div>
 
         <div id="setupDiff" class="glass setup-card">
             <h2 style="color: var(--gold); font-family: Orbitron; font-size: 2.2rem;">AMEAÇA GLOBAL</h2>
             <div class="grid-select">
-                <div class="opt-box" onclick="setVar('diff', 'Casual', this)"><span style="color: var(--green);">CASUAL</span><br><small style="color:#AAA">População descuidada.</small></div>
-                <div class="opt-box" onclick="setVar('diff', 'Normal', this)"><span style="color: var(--gold);">NORMAL</span><br><small style="color:#AAA">Resposta padrão.</small></div>
-                <div class="opt-box" onclick="setVar('diff', 'Brutal', this)"><span style="color: var(--red);">BRUTAL</span><br><small style="color:#AAA">Ciência agressiva.</small></div>
+                <div class="opt-box" onclick="setVar('diff', 'Casual', this)"><span style="color: var(--green);">CASUAL</span><br><small>População descuidada.</small></div>
+                <div class="opt-box" onclick="setVar('diff', 'Normal', this)"><span style="color: var(--gold);">NORMAL</span><br><small>Resposta padrão.</small></div>
+                <div class="opt-box" onclick="setVar('diff', 'Brutal', this)"><span style="color: var(--red);">BRUTAL</span><br><small>Ciência agressiva.</small></div>
             </div>
             <button class="btn-main" style="width: 100%;" onclick="nextStep('setupName')">Confirmar</button>
         </div>
@@ -161,60 +160,18 @@
         <div id="setupName" class="glass setup-card">
             <h2 style="color: var(--blue); font-family: Orbitron; font-size: 2.2rem;">NOMEAR PATÓGENO</h2>
             <input type="text" id="nameIn" placeholder="NOME..." maxlength="18" style="width: 100%; padding: 25px; background: rgba(0,0,0,0.6); border: 2px solid #444; color: #FFF; text-align: center; font-size: 2.5rem; margin: 45px 0; font-family: Rajdhani; letter-spacing: 4px; border-radius: 10px;">
-            <button class="btn-main" style="width: 100%;" onclick="nextStep('setupGenes')">Registrar</button>
-        </div>
-
-        <div id="setupGenes" class="glass setup-card">
-            <h2 style="color: var(--green); font-family: Orbitron; font-size: 2.2rem;">CÓDIGO GENÉTICO</h2>
-            <div class="gene-slots">
-                <div class="slot" id="slot-t1">TRANS</div><div class="slot" id="slot-t2">TRANS</div><div class="slot" id="slot-t3">TRANS</div>
-                <div class="slot" id="slot-s1">SINT</div><div class="slot" id="slot-r1">RES</div>
-            </div>
-            <div class="grid-select" id="genePool" style="max-height: 220px; overflow-y: auto; padding-right: 8px;">
-                <div class="opt-box" onclick="addGene(this, 'Ar I', 'trans')">💨 Mutação Aérea I</div>
-                <div class="opt-box" onclick="addGene(this, 'Água I', 'trans')">💧 Transmissão Hídrica I</div>
-                <div class="opt-box" onclick="addGene(this, 'Aves I', 'trans')">🐦 Vetor Aviário I</div>
-                <div class="opt-box" onclick="addGene(this, 'Tosse', 'sint')">😷 Sintoma: Tosse</div>
-                <div class="opt-box" onclick="addGene(this, 'Calor I', 'res')">🔥 Resistência Térmica I</div>
-            </div>
-            <button class="btn-main" style="width: 100%; margin-top: 25px; background: var(--green); color: #000;" onclick="startGame()">INICIAR SIMULAÇÃO</button>
+            <button class="btn-main" style="width: 100%;" onclick="startGame()">Iniciar Simulação</button>
         </div>
     </div>
 
     <div id="mainGame">
         <div id="map"></div>
-        
         <div class="hud glass top-hud">
             <div style="display: flex; align-items: center;">
                  <span style="color: var(--red); font-weight: 800; margin-right: 18px; font-size: 0.85rem; font-family: Orbitron; letter-spacing: 2px;">NOTÍCIAS</span>
-                <marquee id="ticker" style="width: 450px; color: #FFF; font-weight: 700; font-size: 1rem;">SISTEMA BIO-TACTICAL ONLINE. AGUARDANDO IDENTIFICAÇÃO DO PACIENTE ZERO...</marquee>
+                <marquee id="ticker" style="width: 450px; color: #FFF; font-weight: 700; font-size: 1rem;">SISTEMA BIO-TACTICAL ONLINE...</marquee>
             </div>
-            
-            <div style="display: flex; align-items: center; gap: 25px;">
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn-main" style="width: 55px; padding: 10px; font-size: 0.8rem; margin:0;" onclick="setSpeed(1)">x1</button>
-                    <button class="btn-main" style="width: 55px; padding: 10px; font-size: 0.8rem; margin:0;" onclick="setSpeed(3)">x3</button>
-                </div>
-                <button class="btn-gear" onclick="openSettings('game')">⚙️</button>
-            </div>
-        </div>
-
-        <div class="hud glass bottom-hud">
-            <button class="btn-main" style="width: 250px; font-size: 1rem;" onclick="alert('Status da Enfermidade')">Status da Enfermidade</button>
-            
-            <div class="bars-panel">
-                <div class="bar-wrap"><span class="bar-label" id="l-inf">Infectados: 0</span><div class="bar-bg"><div id="b-inf" class="bar-fill" style="background: var(--red);"></div></div></div>
-                <div class="bar-wrap"><span class="bar-label" id="l-mort">Mortos: 0</span><div class="bar-bg"><div id="b-mort" class="bar-fill" style="background: #555;"></div></div></div>
-                <div class="bar-wrap"><span class="bar-label" id="l-cura">Progresso da Cura: 0%</span><div class="bar-bg"><div id="b-cura" class="bar-fill" style="background: var(--blue);"></div></div></div>
-                <div class="bar-wrap"><span class="bar-label" id="l-vac">Progresso da Vacina: 0%</span><div class="bar-bg"><div id="b-vac" class="bar-fill" style="background: var(--green);"></div></div></div>
-            </div>
-
-            <div style="text-align: right; min-width: 150px;">
-                <span id="mutVal" style="color: var(--gold); font-size: 3.2rem; font-weight: bold; line-height: 0.9;">10</span>
-                <div style="font-size: 0.75rem; color: var(--gold); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Mutagenicidade</div>
-            </div>
-
-            <button class="btn-main" style="width: 140px; font-size: 1rem; background: var(--blue); color: #000;" onclick="alert('Estatísticas Mundiais')">Mundo</button>
+            <button class="btn-gear" onclick="openSettings('game')">⚙️</button>
         </div>
     </div>
 
@@ -224,9 +181,9 @@
             <h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px; letter-spacing: 2px;">MANUAL TÁTICO</h2>
             <div style="text-align: left; line-height: 1.8; color: #FFF; font-size: 1.15rem;">
                 <p>• <b>Inserção:</b> Clique em um país no mapa global para liberar o Agente Patogênico.</p>
-                <p>• <b>Recurso Genético:</b> Acumule 1 ponto de Mutagenicidade a cada <b>100.000</b> novos infectados ($10^5$).</p>
+                <p>• <b>Recurso Genético:</b> Acumule 1 ponto de Mutagenicidade a cada <b>100.000</b> novos infectados.</p>
                 <p>• <b>Resposta Global:</b> A Cura visa tratar os infectados; a Vacina visa imunizar os saudáveis.</p>
-                <p>• <b>Adaptação:</b> Evoluir a praga força a comunidade científica a reiniciar pesquisas, atrasando a cura.</p>
+                <p>• <b>Adaptação:</b> Evoluir a praga força a comunidade científica a reiniciar pesquisas.</p>
             </div>
         </div>
     </div>
@@ -235,123 +192,41 @@
         <div class="glass modal-card" style="width: 480px; text-align: center;">
             <button class="btn-x" onclick="closeModal()">✕</button>
             <h2 style="margin-bottom: 45px; font-family: Orbitron; letter-spacing: 3px; font-size: 1.8rem;">COMANDO CENTRAL</h2>
-            
             <div class="config-row">
                 <span class="dashed-info" data-tooltip="Habilita ou desabilita a música de fundo do jogo">ÁUDIO GLOBAL</span>
                 <button id="s-sound" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button>
             </div>
-
             <div class="config-row">
                 <span class="dashed-info" data-tooltip="Habilita ou desabilita os efeitos sonoros de caos generalizado">EFEITOS DO CAOS INSTAURADO</span>
                 <button id="s-sfx" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button>
             </div>
-            
             <div id="inGameControls" style="display: none; margin-top: 35px; border-top: 1px solid var(--border); padding-top: 35px;">
-                <button class="btn-main" style="width: 100%; margin: 12px 0;" onclick="togglePause()">PAUSAR / RETOMAR</button>
-                <button class="btn-main" style="width: 100%; background: #333; color: #AAA; margin: 12px 0; box-shadow: 0 4px 0 #111;" onclick="location.reload()">ABANDONAR</button>
+                <button class="btn-main" style="width: 100%; margin: 12px 0;" onclick="alert('Simulação Pausada')">PAUSAR / RETOMAR</button>
+                <button class="btn-main" style="width: 100%; background: #333; color: #AAA;" onclick="location.reload()">ABANDONAR</button>
             </div>
         </div>
     </div>
 
-    <div id="countryPopup" class="glass tactical-popup">
-        <button class="btn-x" style="top:10px; right:15px; font-size: 1.6rem;" onclick="this.parentElement.style.display='none'">✕</button>
-        <h2 id="popCountry" style="color: var(--blue); font-family: Orbitron; margin-bottom: 15px; letter-spacing: 1px;">IDENTIFICANDO...</h2>
-        <div id="popData" style="color: #FFF; margin-bottom: 30px; line-height: 1.6; font-size: 1.15rem; font-weight: 600;">Aguardando sinal orbital...</div>
-        <button id="btnInfect" class="btn-main" style="width: 100%; background: var(--red); color: #FFF;" onclick="confirmOutbreak()">EXECUTAR SURTO INICIAL</button>
-    </div>
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        const WORLD_POP = 8000000000;
-        let game = { active: false, started: false, speed: 1, name: '', type: '', diff: '', mut: 10, tally: 10, h: WORLD_POP, i: 0, d: 0, c: 0, v: 0, curaProg: 0, vacinaProg: 0, spreadRate: 1.18, country: '' };
-
         function initSetup() { document.getElementById('startMenu').classList.remove('active'); document.getElementById('selectionFlow').classList.add('active'); }
-        function setVar(key, val, el) { game[key] = val; el.parentElement.querySelectorAll('.opt-box').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
+        function setVar(key, val, el) { 
+            el.parentElement.querySelectorAll('.opt-box').forEach(i => i.classList.remove('selected'));
+            el.classList.add('selected'); 
+        }
         function nextStep(id) { document.querySelectorAll('.setup-card').forEach(c => c.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-
-        function addGene(el, name, type) {
-            el.classList.toggle('selected');
-            const slotId = type === 'trans' ? 'slot-t' : type === 'sint' ? 'slot-s' : 'slot-r';
-            const empty = Array.from(document.querySelectorAll(`[id^="${slotId}"]`)).find(s => !s.classList.contains('filled'));
-            if(empty) { empty.innerText = name.split(' ')[0]; empty.classList.add('filled'); }
-        }
-
-        function startGame() {
-            game.name = document.getElementById('nameIn').value || "PRAGA-0";
-            document.getElementById('selectionFlow').classList.remove('active');
-            document.getElementById('mainGame').style.display = 'block';
-            initMap();
-        }
-
-        function openSettings(context) {
-            const controls = document.getElementById('inGameControls');
-            if(context === 'game') { controls.style.display = 'block'; if(game.active) togglePause(); } else { controls.style.display = 'none'; }
-            openModal('settingsModal');
-        }
-        function togglePause() { game.active = !game.active; }
-
-        let map;
-        function initMap() {
-            if (map) return;
-            map = L.map('map', { center: [20, 0], zoom: 2.5, zoomControl: false, attributionControl: false });
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
-
-            map.on('click', async (e) => {
-                if(game.started) return;
-                const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${e.latlng.lat}&longitude=${e.latlng.lng}&localityLanguage=pt`);
-                const data = await res.json();
-                game.country = data.countryName || "Território Neutro";
-                document.getElementById('popCountry').innerText = game.country.toUpperCase();
-                document.getElementById('popData').innerHTML = `Continente: ${data.continent}<br>Status: Saudável<br>Defesa: ${game.diff}`;
-                document.getElementById('countryPopup').style.display = 'block';
-            });
-        }
-
-        function confirmOutbreak() {
-            game.started = true; game.active = true; game.i = 1; game.h--;
-            document.getElementById('countryPopup').style.display = 'none';
-            document.getElementById('ticker').innerText = `PACIENTE ZERO LOCALIZADO EM: ${game.country.toUpperCase()}. PROTOCOLO ${game.name.toUpperCase()} INICIADO.`;
-            runLoop();
-        }
-
-        function setSpeed(s) { game.speed = s; }
-
-        function runLoop() {
-            setInterval(() => {
-                if(!game.active) return;
-                for(let k=0; k<game.speed; k++) {
-                    let spread = Math.ceil(game.i * (game.spreadRate - 1));
-                    if(game.i < game.h) { game.i += spread; game.h -= spread; }
-                    
-                    // NOVA LÓGICA: 1 Ponto a cada 100.000 infectados
-                    let calc = Math.floor(game.i / 100000) + 10;
-                    if(calc > game.tally) { game.mut += (calc - game.tally); game.tally = calc; }
-                    
-                    if(game.i > 1000000) { game.curaProg += (game.i / WORLD_POP) * 10; game.vacinaProg += (game.i / WORLD_POP) * 5; }
-                }
-                updateUI();
-            }, 1000);
-        }
-
-        function updateUI() {
-            document.getElementById('mutVal').innerText = game.mut;
-            document.getElementById('l-inf').innerText = `Infectados: ${game.i.toLocaleString()}`;
-            document.getElementById('b-inf').style.width = (game.i / WORLD_POP * 100) + "%";
-            if(game.curaProg >= 100) { document.getElementById('l-cura').innerText = "Curados: " + game.i.toLocaleString(); document.getElementById('b-cura').style.width = "100%"; }
-            else { document.getElementById('l-cura').innerText = `Progresso Cura: ${game.curaProg.toFixed(1)}%`; document.getElementById('b-cura').style.width = game.curaProg + "%"; }
-            if(game.vacinaProg >= 100) { document.getElementById('l-vac').innerText = "Vacinados: " + game.h.toLocaleString(); document.getElementById('b-vac').style.width = "100%"; }
-            else { document.getElementById('l-vac').innerText = `Progresso Vacina: ${game.vacinaProg.toFixed(1)}%`; document.getElementById('b-vac').style.width = game.vacinaProg + "%"; }
-        }
-
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); if(game.started && !game.active) game.active = true; }
-
-        function toggleH(btn) {
-            const isOn = btn.classList.contains('btn-on');
-            btn.classList.toggle('btn-on', !isOn);
-            btn.classList.toggle('btn-off', isOn);
-            btn.innerText = isOn ? "DESLIGADO" : "LIGADO";
+        function closeModal() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); }
+        function openSettings(context) { 
+            document.getElementById('inGameControls').style.display = (context === 'game') ? 'block' : 'none';
+            openModal('settingsModal'); 
         }
+        function toggleH(btn) {
+            const on = btn.classList.contains('btn-on');
+            btn.classList.toggle('btn-on', !on); btn.classList.toggle('btn-off', on);
+            btn.innerText = on ? "DESLIGADO" : "LIGADO";
+        }
+        function startGame() { document.getElementById('selectionFlow').classList.remove('active'); document.getElementById('mainGame').style.display = 'block'; }
     </script>
 </body>
 </html>
