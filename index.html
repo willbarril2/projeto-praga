@@ -15,7 +15,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         body { font-family: 'Rajdhani', sans-serif; background: var(--dark); color: #FFF; overflow: hidden; height: 100vh; }
 
-        /* --- TELAS (DEFINITIVAS) --- */
+        /* --- TELAS DEFINITIVAS --- */
         .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; }
         .screen.active { display: flex; }
         #startMenu { background: radial-gradient(circle at center, #ff1744 0%, #4a0000 60%, #000 100%); position: relative; overflow: hidden; }
@@ -34,26 +34,31 @@
         .btn-gear { background: none; border: none; color: #FFF; font-size: 2rem; cursor: pointer; transition: 0.3s; }
         .btn-gear:hover { transform: rotate(90deg); color: var(--red); }
 
-        /* --- TOOLTIPS (FIX RESPONSIVIDADE v35) --- */
+        /* --- TOOLTIPS (ESTABILIZADOS v36) --- */
         .dashed-info { position: relative; border-bottom: 1.5px dashed rgba(255, 255, 255, 0.6); cursor: help; }
         .dashed-info::after {
             content: attr(data-tooltip); position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
             background: #000; border: 1px solid var(--border); color: #FFF; padding: 12px 18px; border-radius: 8px; font-size: 0.9rem;
-            width: 240px; text-align: center; opacity: 0; visibility: hidden; transition: 0.2s ease; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            width: 250px; text-align: center; opacity: 0; visibility: hidden; transition: 0.2s ease; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
         .dashed-info:hover::after { opacity: 1; visibility: visible; }
         
-        /* Tooltip News (Cresce para Baixo) */
-        .tooltip-down::after { bottom: auto !important; top: 150% !important; }
+        /* CORREÇÃO CRÍTICA TOOLTIP NOTÍCIAS */
+        .tooltip-down::after { 
+            bottom: auto !important; 
+            top: calc(100% + 15px) !important; 
+            left: 0 !important; 
+            transform: none !important;
+            text-align: left !important;
+        }
 
-        /* --- AVISO DE ERRO INTERNO (NOVO v35) --- */
+        /* --- AVISO DE ERRO --- */
         .error-msg-box { color: var(--red); font-weight: 700; font-size: 1rem; margin: 10px 0; min-height: 24px; opacity: 0; transition: 0.3s; letter-spacing: 1px; }
 
         /* --- SETUP FLOW --- */
         #setupFlow { background: #000; overflow-y: auto; padding: 40px 0; }
         .setup-card { width: 92%; max-width: 850px; padding: 40px; text-align: center; display: none; }
         .setup-card.active { display: block; animation: slideIn 0.4s ease; }
-        @keyframes slideIn { from { opacity:0; transform: scale(0.95); } to { opacity:1; transform: scale(1); } }
         
         .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin: 35px 0; }
         .opt-box { padding: 20px; border: 1px solid #333; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,0.03); transition: 0.2s; color: #DDD; text-align: center; }
@@ -66,31 +71,23 @@
         #map { width: 100%; height: 100vh; z-index: 1; }
         .hud { position: fixed; z-index: 1000; pointer-events: none; }
         .hud * { pointer-events: auto; }
-
         .top-hud { top: 12px; width: 96%; left: 2%; height: 55px; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }
-        .news-label { 
-            color: var(--red); font-weight: 800; font-size: 0.85rem; font-family: Orbitron; letter-spacing: 2px; white-space: nowrap; margin-right: 20px; 
-            border-bottom: 2px dashed rgba(255, 23, 68, 0.6); cursor: pointer;
-        }
+        
+        .news-marquee-container { flex: 1; overflow: hidden; position: relative; height: 30px; margin: 0 15px; }
+        #ticker { color: #FFF; font-weight: 700; font-size: 1rem; position: absolute; white-space: nowrap; right: -100%; width: fit-content; }
 
-        /* Container de Manchetes (v35 corrigido) */
-        .news-marquee-container { flex: 1; overflow: hidden; position: relative; height: 30px; }
-        #ticker { 
-            color: #FFF; font-weight: 700; font-size: 1rem; position: absolute; white-space: nowrap; 
-            right: -100%; /* Inicia escondido à direita na engrenagem */
-            width: fit-content;
-        }
-
-        /* --- MODAIS --- */
+        /* --- OVERLAYS --- */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.94); z-index: 9000; display: none; align-items: center; justify-content: center; }
         .modal-card { width: 600px; padding: 45px; position: relative; border: 1px solid var(--border); box-shadow: 0 0 100px #000; }
         .btn-x { position: absolute; top: 20px; right: 25px; background: none; border: none; color: #777; font-size: 2.2rem; cursor: pointer; }
         .btn-x:hover { color: #FFF; }
 
+        /* RESTAURAÇÃO COMANDO CENTRAL */
+        .config-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; width: 100%; padding: 0 10px; }
         .btn-toggle { width: 140px; padding: 12px; border-radius: 8px; font-weight: 900; cursor: pointer; border: 2px solid rgba(255,255,255,0.15); font-size: 1rem; }
         .btn-on { background: #1B5E20; color: #FFF; border-color: #4CAF50; }
         .btn-off { background: #B71C1C; color: #FFF; border-color: #EF5350; }
-
+        
         .tactical-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; padding: 35px; z-index: 8000; display: none; border: 2px solid var(--blue); background: rgba(0, 10, 20, 0.98); }
     </style>
 </head>
@@ -106,9 +103,8 @@
 
     <div id="selectionFlow" class="screen">
         <button class="btn-x" style="position: fixed; top:25px; right:25px; z-index:100;" onclick="location.reload()">✕</button>
-        
         <div id="setupType" class="glass setup-card active">
-            <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 15px; font-size: 2.2rem; letter-spacing: 2px;">SELECIONAR AGENTE</h2>
+            <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 15px; font-size: 2.2rem;">SELECIONAR AGENTE</h2>
             <div class="grid-select">
                 <div class="opt-box" onclick="setVar('type', 'Bactéria', this)"><b>🦠 BACTÉRIA</b><small>Potencial versátil e ilimitado</small></div>
                 <div class="opt-box" onclick="setVar('type', 'Vírus', this)"><b>🧬 VÍRUS</b><small>Agente de mutação rápida</small></div>
@@ -121,9 +117,8 @@
             <div id="errorType" class="error-msg-box"></div>
             <button class="btn-main" style="width: 100%;" onclick="nextStep('setupDiff', 'type', 'errorType', 'Você precisa selecionar um agente para avançar')">Confirmar Agente</button>
         </div>
-
         <div id="setupDiff" class="glass setup-card">
-            <h2 class="dashed-info" data-tooltip="O nível de dificuldade escolhido dita os avanços da contaminação, pesquisa e cura" style="color: var(--gold); font-family: Orbitron; margin-bottom: 15px; font-size: 2.2rem; letter-spacing: 2px; display: inline-block;">NÍVEL DE RESPOSTA</h2>
+            <h2 class="dashed-info" data-tooltip="O nível de dificuldade escolhido dita os avanços da contaminação, pesquisa e cura" style="color: var(--gold); font-family: Orbitron; margin-bottom: 15px; font-size: 2.2rem; display: inline-block;">NÍVEL DE RESPOSTA</h2>
             <div class="grid-select">
                 <div class="opt-box" onclick="setVar('diff', 'Casual', this)"><b style="color: var(--green);">🟢 CASUAL</b><small>Mundo descuidado.<br>Médicos de meio período.</small></div>
                 <div class="opt-box" onclick="setVar('diff', 'Normal', this)"><b style="color: var(--gold);">🟡 NORMAL</b><small>Mundo reativo.<br>Higiene mediana.</small></div>
@@ -132,11 +127,10 @@
             <div id="errorDiff" class="error-msg-box"></div>
             <button class="btn-main" style="width: 100%;" onclick="nextStep('setupName', 'diff', 'errorDiff', 'Você precisa selecionar um nível de resposta para avançar')">Confirmar Resposta</button>
         </div>
-
         <div id="setupName" class="glass setup-card">
-            <h2 style="color: var(--blue); font-family: Orbitron; font-size: 2.2rem; letter-spacing: 2px;">NOMEIE SUA CRIAÇÃO</h2>
-            <p style="color: #AAA; margin-bottom: 10px; font-weight: 600;">Identifique o agente do fim da humanidade.</p>
-            <input type="text" id="nameIn" placeholder="NOME..." maxlength="18" style="width: 100%; padding: 25px; background: rgba(0,0,0,0.6); border: 2px solid #444; color: #FFF; text-align: center; font-size: 2.5rem; margin: 25px 0; font-family: Rajdhani; letter-spacing: 4px; border-radius: 10px;">
+            <h2 style="color: var(--blue); font-family: Orbitron; font-size: 2.2rem;">NOMEIE SUA CRIAÇÃO</h2>
+            <p style="color: #AAA; margin-bottom: 10px;">Identifique o agente do fim da humanidade.</p>
+            <input type="text" id="nameIn" placeholder="NOME..." maxlength="18" style="width: 100%; padding: 25px; background: rgba(0,0,0,0.6); border: 2px solid #444; color: #FFF; text-align: center; font-size: 2.5rem; margin: 40px 0; font-family: Rajdhani; border-radius: 10px;">
             <div id="errorName" class="error-msg-box"></div>
             <button class="btn-main" style="width: 100%; background: var(--red); color: #FFF;" onclick="startGame()">INICIAR ANIQUILAÇÃO</button>
         </div>
@@ -146,54 +140,51 @@
         <div id="map"></div>
         <div class="hud glass top-hud">
             <span class="news-label dashed-info tooltip-down" data-tooltip="Clique para consultar as manchetes anteriores" onclick="openNewsLog()">NOTÍCIAS</span>
-            <div class="news-marquee-container">
-                <div id="ticker"></div>
-            </div>
+            <div class="news-marquee-container"><div id="ticker"></div></div>
             <button class="btn-gear" style="margin-left: 20px; color: #FFF;" onclick="openSettings('game')">⚙️</button>
         </div>
     </div>
 
-    <div id="tutorialModal" class="overlay"><div class="glass modal-card"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px; letter-spacing: 2px;">MANUAL TÁTICO</h2><div style="text-align: left; line-height: 1.8; color: #FFF; font-size: 1.15rem;"><p>• 1. Inserção: Clique em um país no mapa global para liberar o Agente Patogênico.</p><p>• 2. Recurso Genético: Acumule 1 ponto de Mutagenicidade a cada 100.000 novos infectados.</p><p>• 3. Resposta Global: A Cura foca nos infectados; a Vacina protege os saudáveis.</p><p>• 4. Adaptação: Evoluir a praga força cientistas a reiniciar pesquisas, atrasando cura e vacina.</p></div></div></div>
+    <div id="tutorialModal" class="overlay">
+        <div class="glass modal-card">
+            <button class="btn-x" onclick="closeModal()">✕</button>
+            <h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px; letter-spacing: 2px;">MANUAL TÁTICO</h2>
+            <div style="text-align: left; line-height: 1.8; color: #FFF; font-size: 1.15rem;">
+                <p>• <b>1. Inserção:</b> Clique em um país no mapa global para liberar o Agente Patogênico.</p>
+                <p>• <b>2. Recurso Genético:</b> Acumule 1 ponto de Mutagenicidade a cada <b>100.000</b> novos infectados.</p>
+                <p>• <b>3. Resposta Global:</b> A Cura foca nos infectados; a Vacina protege os saudáveis.</p>
+                <p>• <b>4. Adaptação:</b> Evoluir a praga força cientistas a reiniciar pesquisas, <b>atrasando cura e vacina</b>.</p>
+            </div>
+        </div>
+    </div>
+
     <div id="newsLogModal" class="overlay"><div class="glass modal-card"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px;">HISTÓRICO DE MANCHETES</h2><div id="newsEntries" style="max-height: 400px; overflow-y: auto;"></div></div></div>
-    <div id="settingsModal" class="overlay"><div class="glass modal-card" style="width: 500px; text-align: center;"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="margin-bottom: 45px; font-family: Orbitron; font-size: 1.8rem;">COMANDO CENTRAL</h2><div class="config-row"><span class="dashed-info" data-tooltip="Habilita ou desabilita a música">ÁUDIO GLOBAL</span><button id="s-sound" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button></div><div class="config-row"><span class="dashed-info" data-tooltip="Habilita ou desabilita efeitos sonoros">EFEITOS DO CAOS INSTAURADO</span><button id="s-sfx" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button></div><div id="inGameControls" style="display: none; margin-top: 35px; border-top: 1px solid var(--border); padding-top: 35px;"><button class="btn-main" style="width: 100%; background: #333; color: #AAA;" onclick="location.reload()">ABANDONAR</button></div></div></div>
+    <div id="settingsModal" class="overlay"><div class="glass modal-card" style="width: 500px; text-align: center;"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="margin-bottom: 45px; font-family: Orbitron; font-size: 1.8rem;">COMANDO CENTRAL</h2><div class="config-row"><span class="dashed-info" data-tooltip="Habilita ou desabilita a música">ÁUDIO GLOBAL</span><button id="s-sound" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button></div><div class="config-row"><span class="dashed-info" data-tooltip="Habilita ou desabilita os efeitos sonoros de caos generalizado">EFEITOS DO CAOS INSTAURADO</span><button id="s-sfx" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button></div><div id="inGameControls" style="display: none; margin-top: 35px; border-top: 1px solid var(--border); padding-top: 35px;"><button class="btn-main" style="width: 100%; background: #333; color: #AAA;" onclick="location.reload()">ABANDONAR</button></div></div></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         let game = { started: false, name: '', type: '', diff: '', active: false, newsLog: [] };
 
-        // --- SISTEMA DE MANCHETE (CORRER E SUMIR v35) ---
         function registerNews(text) {
             game.newsLog.unshift({ date: "20 jan. 2026", message: text });
             const ticker = document.getElementById('ticker');
             ticker.innerText = text.toUpperCase();
             ticker.style.transition = 'none';
-            ticker.style.right = '-100%';
+            ticker.style.right = '-110%'; // Começa na engrenagem
             
             setTimeout(() => {
-                ticker.style.transition = 'right 12s linear';
-                ticker.style.right = '110%'; // Corre até passar o label Notícias e some
-            }, 50);
+                ticker.style.transition = 'right 14s linear'; // Velocidade ajustada conforme solicitado
+                ticker.style.right = '120%'; // Passa o rótulo Notícias e some
+            }, 100);
         }
 
-        function openNewsLog() {
-            game.active = false;
-            document.getElementById('newsEntries').innerHTML = game.newsLog.map(e => `<div style="padding:10px; border-bottom:1px solid #333"><b style="color:var(--blue)">${e.date}</b>: ${e.message}</div>`).join('');
-            openModal('newsLogModal');
-        }
-
-        // --- CORE LOGIC ---
+        function openNewsLog() { game.active = false; document.getElementById('newsEntries').innerHTML = game.newsLog.map(e => `<div style="padding:10px; border-bottom:1px solid #333"><b style="color:var(--blue)">${e.date}</b>: ${e.message}</div>`).join(''); openModal('newsLogModal'); }
         function initSetup() { document.getElementById('startMenu').classList.remove('active'); document.getElementById('selectionFlow').classList.add('active'); }
         function setVar(key, val, el) { game[key] = val; el.parentElement.querySelectorAll('.opt-box').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
 
-        // Validação de Fluxo v35
         function nextStep(id, currentKey, errorDivId, message) {
             const errorDiv = document.getElementById(errorDivId);
-            if (!game[currentKey]) {
-                errorDiv.innerText = message;
-                errorDiv.style.opacity = '1';
-                setTimeout(() => errorDiv.style.opacity = '0', 3000);
-                return;
-            }
+            if (!game[currentKey]) { errorDiv.innerText = message; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; }
             document.querySelectorAll('.setup-card').forEach(c => c.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
@@ -201,22 +192,15 @@
         function startGame() { 
             const name = document.getElementById('nameIn').value.trim();
             const errorDiv = document.getElementById('errorName');
-            if (!name) {
-                errorDiv.innerText = "Você precisa nomear sua criação para avançar";
-                errorDiv.style.opacity = '1';
-                setTimeout(() => errorDiv.style.opacity = '0', 3000);
-                return;
-            }
-            game.name = name;
-            document.getElementById('selectionFlow').classList.remove('active');
-            document.getElementById('mainGame').style.display = 'block'; 
-            const vetorMap = { 'Bactéria': 'BACTERIANO', 'Vírus': 'VIRAL', 'Fungo': 'FÚNGICO', 'Parasita': 'PARASITÁRIO', 'Príon': 'PRIÔNICO', 'Nano-Vírus': 'NANOTECNOLÓGICO', 'Bio-Arma': 'BIOLÓGICO' };
-            registerNews(`SISTEMA DE ANIQUILAÇÃO BIO-TÁTICA ONLINE. VETOR ${vetorMap[game.type]} PRONTO. AGUARDANDO DISPERSÃO EM LOCALIDADE OPORTUNA.`);
-            setTimeout(() => { initMap(); map.invalidateSize(); }, 100); 
+            if (!name) { errorDiv.innerText = "Você precisa nomear sua criação para avançar"; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; }
+            game.name = name; document.getElementById('selectionFlow').classList.remove('active'); document.getElementById('mainGame').style.display = 'block'; 
+            const vMap = { 'Bactéria': 'BACTERIANO', 'Vírus': 'VIRAL', 'Fungo': 'FÚNGICO', 'Parasita': 'PARASITÁRIO', 'Príon': 'PRIÔNICO', 'Nano-Vírus': 'NANOTECNOLÓGICO', 'Bio-Arma': 'BIOLÓGICO' };
+            registerNews(`SISTEMA DE ANIQUILAÇÃO BIO-TÁTICA ONLINE. VETOR ${vMap[game.type]} PRONTO. AGUARDANDO DISPERSÃO EM LOCALIDADE OPORTUNA.`);
+            setTimeout(() => { if(!map) initMap(); map.invalidateSize(); }, 100); 
         }
 
         let map;
-        function initMap() { if (map) return; map = L.map('map', { center: [20, 0], zoom: 2.5, zoomControl: false, attributionControl: false }); L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); }
+        function initMap() { map = L.map('map', { center: [20, 0], zoom: 2.5, zoomControl: false, attributionControl: false }); L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); if(game.started) game.active = true; }
         function openSettings(context) { game.active = false; document.getElementById('inGameControls').style.display = (context === 'game') ? 'block' : 'none'; openModal('settingsModal'); }
