@@ -15,7 +15,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         body { font-family: 'Rajdhani', sans-serif; background: var(--dark); color: #FFF; overflow: hidden; height: 100vh; }
 
-        /* --- PRESERVAÇÃO: BACKGROUND & SETUP --- */
+        /* --- PRESERVAÇÃO: SETUP & BACKGROUND --- */
         #bgOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('background.png') no-repeat center center; background-size: cover; opacity: 0.25; z-index: 1; pointer-events: none; transition: opacity 0.8s ease; }
         .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; background: transparent; }
         .screen.active { display: flex; }
@@ -40,43 +40,49 @@
         .btn-main { background: #FFF; color: #800000; border: none; padding: 14px 30px; font-size: 1.2rem; font-weight: 800; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; margin: 10px; text-transform: uppercase; width: 280px; font-family: 'Rajdhani'; box-shadow: 0 4px 0 #CCC; }
         .btn-main:hover { background: var(--red); color: #FFF; transform: scale(1.08); box-shadow: 0 6px 20px rgba(255, 23, 68, 0.4); }
 
-        /* --- NOVO: HUD INFERIOR TÁTICO (v50) --- */
+        /* --- ATUALIZADO: HUD INFERIOR (v51) --- */
         .bottom-hud {
-            position: fixed; bottom: 20px; left: 2%; width: 96%; height: 80px;
-            z-index: 9000; display: flex; align-items: center; justify-content: space-between;
+            position: fixed; bottom: 20px; left: 2%; width: 96%; height: 90px;
+            z-index: 9000; display: flex; align-items: flex-end; justify-content: space-between;
             pointer-events: none;
         }
         .bottom-hud > * { pointer-events: auto; }
 
         .hud-panel {
             background: rgba(5, 5, 5, 0.95); border: 1px solid var(--border);
-            padding: 12px 25px; border-radius: 12px; display: flex; flex-direction: column;
-            justify-content: center; backdrop-filter: blur(10px); min-width: 250px;
+            padding: 12px 20px; border-radius: 12px; display: grid;
+            grid-template-columns: 1fr 1fr; gap: 10px 30px;
+            backdrop-filter: blur(10px); min-width: 320px;
             box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
         }
 
-        .stat-row { display: flex; justify-content: space-between; align-items: center; margin: 2px 0; }
-        .stat-label { font-family: Orbitron; font-size: 0.7rem; color: #888; letter-spacing: 1px; }
-        .stat-value { font-weight: 700; font-size: 1.2rem; color: #FFF; }
-        .stat-value.infected { color: var(--red); text-shadow: 0 0 10px rgba(255, 23, 68, 0.3); }
+        .stat-item { display: flex; flex-direction: column; }
+        /* ✅ CORREÇÃO: Contraste elevado nas letrinhas (Branco Puro #FFF) */
+        .stat-label { font-family: Orbitron; font-size: 0.65rem; color: #FFF; font-weight: 700; letter-spacing: 1px; margin-bottom: 2px; }
+        .stat-value { font-weight: 700; font-size: 1.1rem; color: #FFF; }
+        .stat-value.infected { color: var(--red); text-shadow: 0 0 10px rgba(255, 23, 68, 0.4); }
+        .stat-value.cured { color: var(--green); }
+        .stat-value.vax { color: var(--blue); }
 
-        /* Botão Mundo Especial */
-        .world-btn-container { position: relative; top: -10px; }
+        /* Botão Mundo */
+        .world-btn-container { margin-bottom: 5px; }
         .btn-world { width: 180px; height: 50px; font-size: 1.1rem; letter-spacing: 2px; font-family: Orbitron; }
 
-        /* --- COMPONENTES DE GRID E INPUT --- */
+        /* --- MAPA & GAMEPLAY (v51) --- */
+        #mainGame { width: 100%; height: 100vh; display: none; position: relative; z-index: 10; }
+        /* ✅ CORREÇÃO: Cursor de mão de clique no mapa */
+        #map { width: 100%; height: 100vh; z-index: 1; background: #0b0e14; cursor: crosshair !important; }
+        .leaflet-container { cursor: crosshair !important; }
+        .leaflet-interactive { cursor: pointer !important; }
+
+        /* Componentes Gerais */
         .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 25px 0; }
         .opt-box { padding: 18px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; background: rgba(20, 20, 20, 0.7); transition: 0.2s; color: #DDD; text-align: center; }
         .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.3); color: #FFF; }
         .opt-box b { display: block; font-size: 1.1rem; margin-bottom: 2px; color: #FFF; }
         #nameIn { width: 100%; padding: 25px; background: rgba(10, 10, 10, 0.85); border: 2px solid #666; color: #FFF; text-align: center; font-size: 2.5rem; margin: 30px 0; font-family: Rajdhani; border-radius: 10px; }
-
-        /* --- MAPA & GAMEPLAY --- */
-        #mainGame { width: 100%; height: 100vh; display: none; position: relative; z-index: 10; }
-        #map { width: 100%; height: 100vh; z-index: 1; filter: saturate(0.8) contrast(1.1); }
         .news-marquee-container { overflow: hidden; position: relative; height: 30px; margin: 0 20px; display: flex; align-items: center; }
         #ticker { color: #FFF; font-weight: 700; font-size: 1rem; position: absolute; white-space: nowrap; right: -110%; width: fit-content; }
-
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 9999; display: none; align-items: center; justify-content: center; }
         .modal-card { width: 600px; padding: 45px; position: relative; border: 1px solid var(--border); box-shadow: 0 0 100px #000; border-radius: 15px; background: #080808; }
         .btn-x { position: absolute; top: 20px; right: 25px; background: none; border: none; color: #777; font-size: 2.2rem; cursor: pointer; }
@@ -152,13 +158,21 @@
         
         <div class="bottom-hud">
             <div class="hud-panel">
-                <div class="stat-row">
+                <div class="stat-item">
                     <span class="stat-label">INFECTADOS</span>
                     <span class="stat-value infected" id="valInfected">0</span>
                 </div>
-                <div class="stat-row">
+                <div class="stat-item">
+                    <span class="stat-label">CURADOS</span>
+                    <span class="stat-value cured" id="valCured">0</span>
+                </div>
+                <div class="stat-item">
                     <span class="stat-label">MORTOS</span>
                     <span class="stat-value" id="valDead">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">VACINADOS</span>
+                    <span class="stat-value vax" id="valVax">0</span>
                 </div>
             </div>
 
@@ -166,12 +180,12 @@
                 <button class="btn-main btn-world" onclick="alert('Relatório Mundial em Desenvolvimento')">MUNDO</button>
             </div>
 
-            <div class="hud-panel">
-                <div class="stat-row">
+            <div class="hud-panel" style="grid-template-columns: 1fr;">
+                <div class="stat-item">
                     <span class="stat-label">MUTAGENICIDADE (DNA)</span>
                     <span class="stat-value" style="color: var(--blue);" id="valDNA">0</span>
                 </div>
-                <div class="stat-row">
+                <div class="stat-item">
                     <span class="stat-label">NÍVEL DE AMEAÇA</span>
                     <span class="stat-value" id="valThreat">MÍNIMO</span>
                 </div>
@@ -184,9 +198,12 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        let game = { started: false, name: '', type: '', diff: '', active: false, newsLog: [], soundOn: true, infected: 0, dead: 0, dna: 0 };
+        let game = { 
+            started: false, name: '', type: '', diff: '', active: false, newsLog: [], soundOn: true,
+            infected: 0, dead: 0, cured: 0, vax: 0, dna: 0, 
+            popCap: 8200000000 // ✅ Limite populacional solicitado
+        };
         
-        // --- SISTEMA DE ÁUDIO (PRESERVADO) ---
         const audioSystem = {
             tracks: [document.getElementById('bgMusic1'), document.getElementById('bgMusic2')],
             currentTrackIndex: 0, isMuted: false, fadeInterval: null,
@@ -205,7 +222,6 @@
                 '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
         }
 
-        // --- MANCHETES (PRESERVADO) ---
         const preGameNewsSource = ["\"Cansamos de salvar um futuro que insiste em se destruir.\"", "\"Quando o fato vira opinião, a ciência vira ruína.\"", "\"O descrédito é o ácido que corrói as fundações do amanhã.\"", "\"A ciência não vai cair. Ela vai simplesmente se calar.\"", "\"Onde a crença vence a prova, o cientista se torna um fantasma.\"", "\"Não há como curar um mundo que ama a própria ferida.\"", "\"O laboratório está vazio porque a verdade se tornou indesejada.\"", "\"A razão se retirou da sala. O colapso agora é livre.\"", "\"Não somos mais guias, somos apenas testemunhas da queda.\""];
         let newsQueue = []; let newsTimeout;
         function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
@@ -245,7 +261,21 @@
             setTimeout(() => { if(!map) initMap(); map.invalidateSize(); }, 100); 
         }
 
-        let map; function initMap() { map = L.map('map', { center: [20, 0], zoom: 2.5, zoomControl: false, attributionControl: false }); L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); }
+        // ✅ CORREÇÃO: MAPA COM ZOOM FIXO E CURSOR DE CLIQUE (v51)
+        let map; function initMap() { 
+            map = L.map('map', { 
+                center: [20, 0], 
+                zoom: 2.5, 
+                minZoom: 2.5, // Impede o mapa de ficar bugado ao tirar o zoom
+                zoomControl: false, 
+                attributionControl: false,
+                worldCopyJump: true
+            }); 
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                noWrap: false
+            }).addTo(map); 
+        }
+
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); if(game.started) game.active = true; }
     </script>
