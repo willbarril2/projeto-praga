@@ -63,7 +63,7 @@
         .bio-blip { background: #800000; border-radius: 50%; width: 15px; height: 15px; border: 2px solid var(--red); box-shadow: 0 0 15px var(--red); position: relative; }
         .bio-blip::after { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--red); animation: pulse-blip 1.5s infinite; }
 
-        /* ✅ CUSTOM TOOLTIP: DISPERSÃO (mantido da v61) */
+        /* ✅ CUSTOM TOOLTIP: DISPERSÃO (v61) */
         .leaflet-popup-content-wrapper { background: rgba(5, 5, 5, 0.98) !important; color: #FFF !important; border: 1px solid var(--border) !important; border-radius: 8px !important; box-shadow: 0 10px 40px #000 !important; padding: 5px; }
         .leaflet-popup-tip { background: rgba(5, 5, 5, 0.98) !important; border: 1px solid var(--border) !important; }
         .dispersal-box { text-align: center; padding: 10px; min-width: 220px; }
@@ -87,6 +87,10 @@
         .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 25px 0; }
         .opt-box { padding: 18px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; background: rgba(20, 20, 20, 0.7); transition: 0.2s; color: #DDD; text-align: center; }
         .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.3); color: #FFF; }
+        
+        /* ✅ CORREÇÃO DO LAYOUT DOS BOTÕES DE SELEÇÃO (v63) */
+        .opt-box b { display: block; font-size: 1.1rem; margin-bottom: 5px; color: #FFF; }
+        
         #nameIn { width: 100%; padding: 25px; background: rgba(10, 10, 10, 0.85); border: 2px solid #666; color: #FFF; text-align: center; font-size: 2.5rem; margin: 30px 0; font-family: Rajdhani; border-radius: 10px; }
         .news-marquee-container { overflow: hidden; position: relative; height: 30px; margin: 0 20px; display: flex; align-items: center; }
         #ticker { color: #FFF; font-weight: 700; font-size: 1rem; position: absolute; white-space: nowrap; right: -110%; width: fit-content; }
