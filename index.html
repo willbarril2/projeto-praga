@@ -18,7 +18,38 @@
         /* --- TELAS (SPA) --- */
         .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; }
         .screen.active { display: flex; }
-        #startMenu { background: radial-gradient(circle at center, #ff1744 0%, #4a0000 60%, #000 100%); }
+
+        /* ✅ MAPA DE FUNDO OPACO NO MENU INICIAL (SEM ALTERAR OUTRAS PROPRIEDADES) */
+        #startMenu {
+            background: radial-gradient(circle at center, #ff1744 0%, #4a0000 60%, #000 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        #startMenu::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+              radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06) 0%, transparent 55%),
+              url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20600'%3E%3Cdefs%3E%3CradialGradient%20id='g'%20cx='50%25'%20cy='50%25'%20r='70%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23ffffff'%20stop-opacity='0.10'/%3E%3Cstop%20offset='100%25'%20stop-color='%23ffffff'%20stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect%20width='1200'%20height='600'%20fill='url(%23g)'/%3E%3Cpath%20d='M170%20355%20c45-55%20105-80%20165-82%2058-2%20103%2026%20140%2056%2038%2031%2075%2038%20106%2029%2023-7%2046-21%2068-35%2025-16%2055-26%2078-24%2018%202%2036%2012%2052%2023%2017%2011%2034%2026%2050%2042%2028%2029%2062%2058%2097%2072%2031%2012%2067%209%20101-5%2029-12%2055-34%2078-58%2010-11%2019-23%2030-34%2032-32%2066-42%20105-38%2045%205%2080%2033%20108%2064%2030%2032%2061%2054%20102%2060%2043%206%2084-8%20122-33%2027-18%2051-41%2071-67%2022-28%2042-58%2062-89%20l0%200%20c-11-7-24-10-38-8-28%204-55%2023-77%2050-17%2020-35%2040-55%2056-30%2025-63%2040-99%2038-38-2-78-23-110-56-30-31-62-54-97-66-44-16-92-12-136%2017-36%2024-63%2056-85%2094%20z'%20fill='rgba(255,255,255,0.08)'/%3E%3Cpath%20d='M820%20170%20c52-34%20112-47%20170-40%2052%206%2098%2029%20135%2062%2037%2033%2064%2078%2075%20129%2012%2056-8%20104-46%20143-35%2036-82%2056-132%2061-70%206-143-19-197-73-45-45-69-107-68-171%201-44%2014-83%2033-111%2010-15%2020-28%2030-40%20z'%20fill='rgba(255,255,255,0.08)'/%3E%3Cpath%20d='M650%20255%20c30-26%2066-40%20105-41%2040-1%2076%2013%20105%2040%2030%2028%2047%2063%2049%20107%202%2048-17%2089-52%20122-34%2032-78%2046-124%2043-46-3-87-23-117-58-29-34-41-78-34-123%205-37%2022-68%2048-90%20z'%20fill='rgba(255,255,255,0.07)'/%3E%3Cpath%20d='M965%20410%20c24-20%2055-30%2088-29%2033%201%2062%2014%2083%2037%2021%2024%2031%2055%2027%2089-4%2034-20%2064-46%2084-26%2020-57%2028-90%2023-35-6-65-26-83-56-18-30-23-66-12-97%206-18%2017-35%2033-51%20z'%20fill='rgba(255,255,255,0.07)'/%3E%3Cpath%20d='M365%20160%20c22-20%2049-30%2079-30%2030%200%2057%2011%2079%2031%2024%2022%2036%2051%2036%2083%200%2033-13%2061-37%2082-24%2021-52%2031-82%2030-31-1-58-13-79-35-21-22-32-50-32-82%200-33%2013-61%2037-79%20z'%20fill='rgba(255,255,255,0.07)'/%3E%3Cpath%20d='M235%20425%20c18-16%2042-24%2068-24%2026%200%2050%209%2068%2025%2019%2017%2029%2040%2029%2066%200%2026-10%2049-29%2066-19%2017-42%2026-68%2026-26%200-49-9-68-26-18-17-28-40-28-66%200-26%2010-49%2029-67%20z'%20fill='rgba(255,255,255,0.06)'/%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+            opacity: 0.20;
+            filter: blur(0.2px) saturate(0.8) contrast(1.15);
+            transform: scale(1.03);
+            pointer-events: none;
+            z-index: 0;
+        }
+        #startMenu::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.85) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        #startMenu > * { position: relative; z-index: 1; }
+
         #setupFlow { background: #000; overflow-y: auto; padding: 40px 0; }
 
         /* --- UI GERAL --- */
@@ -93,7 +124,6 @@
     </style>
 </head>
 <body>
-
     <div id="startMenu" class="screen active">
         <div style="position: absolute; top: 25px; right: 25px; z-index: 10;">
             <button class="btn-gear" onclick="openSettings('menu')">⚙️</button>
@@ -183,6 +213,7 @@
                 <span id="mutVal" style="color: var(--gold); font-size: 3.2rem; font-weight: bold; line-height: 0.9;">10</span>
                 <div style="font-size: 0.75rem; color: var(--gold); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Mutagenicidade</div>
             </div>
+
             <button class="btn-main" style="width: 140px; font-size: 1rem; background: var(--blue); color: #000;" onclick="alert('Estatísticas Mundiais')">Mundo</button>
         </div>
     </div>
@@ -209,6 +240,7 @@
                 <span class="dashed-info" data-tooltip="Habilita ou desabilita a música de fundo do jogo">ÁUDIO GLOBAL</span>
                 <button id="s-sound" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button>
             </div>
+
             <div class="config-row">
                 <span class="dashed-info" data-tooltip="Habilita ou desabilita os efeitos sonoros de caos generalizado">EFEITOS DO CAOS INSTAURADO</span>
                 <button id="s-sfx" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button>
@@ -236,6 +268,7 @@
         function initSetup() { document.getElementById('startMenu').classList.remove('active'); document.getElementById('selectionFlow').classList.add('active'); }
         function setVar(key, val, el) { game[key] = val; el.parentElement.querySelectorAll('.opt-box').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
         function nextStep(id) { document.querySelectorAll('.setup-card').forEach(c => c.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
         function addGene(el, name, type) {
             el.classList.toggle('selected');
             const slotId = type === 'trans' ? 'slot-t' : type === 'sint' ? 'slot-s' : 'slot-r';
@@ -262,6 +295,7 @@
             if (map) return;
             map = L.map('map', { center: [20, 0], zoom: 2.5, zoomControl: false, attributionControl: false });
             L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+
             map.on('click', async (e) => {
                 if(game.started) return;
                 const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${e.latlng.lat}&longitude=${e.latlng.lng}&localityLanguage=pt`);
@@ -281,6 +315,7 @@
         }
 
         function setSpeed(s) { game.speed = s; }
+
         function runLoop() {
             setInterval(() => {
                 if(!game.active) return;
@@ -310,10 +345,12 @@
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); if(game.started && !game.active) game.active = true; }
+
         function toggleH(btn) {
-            const on = btn.classList.contains('on');
-            btn.classList.toggle('on', !on); btn.classList.toggle('off', on);
-            btn.innerText = on ? "DESLIGADO" : "LIGADO";
+            const isOn = btn.classList.contains('btn-on');
+            btn.classList.toggle('btn-on', !isOn);
+            btn.classList.toggle('btn-off', isOn);
+            btn.innerText = isOn ? "DESLIGADO" : "LIGADO";
         }
     </script>
 </body>
