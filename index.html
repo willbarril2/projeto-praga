@@ -27,14 +27,13 @@
         }
         #startMenu > * { position: relative; z-index: 1; }
 
-        /* --- UI COMPONENTS --- */
         .glass { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 12px; }
         .btn-main { background: #FFF; color: #800000; border: none; padding: 12px 25px; font-size: 1.3rem; font-weight: 800; border-radius: 6px; cursor: pointer; transition: 0.3s; margin: 8px; text-transform: uppercase; width: 260px; box-shadow: 0 4px 0 #CCC; }
         .btn-main:hover { background: var(--red); color: #FFF; transform: scale(1.03); box-shadow: 0 4px 0 #900; }
         .btn-gear { background: none; border: none; color: #FFF; font-size: 2rem; cursor: pointer; transition: 0.3s; }
         .btn-gear:hover { transform: rotate(90deg); color: var(--red); }
 
-        /* --- TOOLTIPS (ESTABILIZADOS) --- */
+        /* --- TOOLTIPS GERAIS --- */
         .dashed-info { position: relative; border-bottom: 1.5px dashed rgba(255, 255, 255, 0.6); cursor: help; }
         .dashed-info::after {
             content: attr(data-tooltip); position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
@@ -43,12 +42,14 @@
         }
         .dashed-info:hover::after { opacity: 1; visibility: visible; }
         
-        /* CORREÇÃO RESPONSIVA TOOLTIP NOTÍCIAS */
+        /* ✅ CORREÇÃO DEFINITIVA TOOLTIP NOTÍCIAS v39.0 */
         .tooltip-down::after { 
             bottom: auto !important; 
             top: calc(100% + 20px) !important; 
-            left: 50% !important;
-            transform: translateX(-50%) !important;
+            left: 0 !important; 
+            transform: none !important;
+            text-align: left !important;
+            width: 280px !important;
         }
 
         /* --- AVISO DE ERRO --- */
@@ -73,9 +74,8 @@
         .top-hud { top: 12px; width: 96%; left: 2%; height: 55px; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }
         
         .news-marquee-container { flex: 1; overflow: hidden; position: relative; height: 30px; margin: 0 15px; }
-        #ticker { color: #FFF; font-weight: 700; font-size: 1rem; position: absolute; white-space: nowrap; right: -100%; width: fit-content; }
+        #ticker { color: #FFF; font-weight: 700; font-size: 1rem; position: absolute; white-space: nowrap; right: -110%; width: fit-content; }
 
-        /* RÓTULO NOTÍCIAS (RESTAURADO v38) */
         .news-label { 
             color: var(--red); 
             font-weight: 900; 
@@ -94,7 +94,7 @@
         .btn-x { position: absolute; top: 20px; right: 25px; background: none; border: none; color: #777; font-size: 2.2rem; cursor: pointer; }
         .btn-x:hover { color: #FFF; }
 
-        /* COMANDO CENTRAL (CORES FIXAS v38) */
+        /* ✅ ESTADO FIXO COMANDO CENTRAL v39 */
         .config-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; width: 100%; padding: 0 10px; }
         .btn-toggle { width: 140px; padding: 12px; border-radius: 8px; font-weight: 900; cursor: pointer; border: 2px solid rgba(255,255,255,0.15); font-size: 1rem; transition: 0.2s; }
         .btn-on { background: #1B5E20 !important; color: #FFF !important; border-color: #4CAF50 !important; }
