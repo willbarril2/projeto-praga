@@ -34,7 +34,7 @@
         .btn-gear { background: none; border: none; color: #FFF; font-size: 2rem; cursor: pointer; transition: 0.3s; }
         .btn-gear:hover { transform: rotate(90deg); color: var(--red); }
 
-        /* --- TOOLTIPS (ESTABILIZADOS v36) --- */
+        /* --- TOOLTIPS --- */
         .dashed-info { position: relative; border-bottom: 1.5px dashed rgba(255, 255, 255, 0.6); cursor: help; }
         .dashed-info::after {
             content: attr(data-tooltip); position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
@@ -43,7 +43,6 @@
         }
         .dashed-info:hover::after { opacity: 1; visibility: visible; }
         
-        /* CORREÇÃO CRÍTICA TOOLTIP NOTÍCIAS */
         .tooltip-down::after { 
             bottom: auto !important; 
             top: calc(100% + 15px) !important; 
@@ -76,19 +75,30 @@
         .news-marquee-container { flex: 1; overflow: hidden; position: relative; height: 30px; margin: 0 15px; }
         #ticker { color: #FFF; font-weight: 700; font-size: 1rem; position: absolute; white-space: nowrap; right: -100%; width: fit-content; }
 
-        /* --- OVERLAYS --- */
+        /* ✅ AJUSTE FINAL: NOTÍCIAS EM VERMELHO E NEGRITO */
+        .news-label { 
+            color: var(--red); 
+            font-weight: 900; /* Mais negrito */
+            font-size: 0.85rem; 
+            font-family: Orbitron; 
+            letter-spacing: 2.5px; 
+            white-space: nowrap; 
+            margin-right: 20px; 
+            border-bottom: 2px dashed rgba(255, 23, 68, 0.8); 
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* --- MODAIS --- */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.94); z-index: 9000; display: none; align-items: center; justify-content: center; }
         .modal-card { width: 600px; padding: 45px; position: relative; border: 1px solid var(--border); box-shadow: 0 0 100px #000; }
         .btn-x { position: absolute; top: 20px; right: 25px; background: none; border: none; color: #777; font-size: 2.2rem; cursor: pointer; }
         .btn-x:hover { color: #FFF; }
 
-        /* RESTAURAÇÃO COMANDO CENTRAL */
         .config-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; width: 100%; padding: 0 10px; }
         .btn-toggle { width: 140px; padding: 12px; border-radius: 8px; font-weight: 900; cursor: pointer; border: 2px solid rgba(255,255,255,0.15); font-size: 1rem; }
         .btn-on { background: #1B5E20; color: #FFF; border-color: #4CAF50; }
         .btn-off { background: #B71C1C; color: #FFF; border-color: #EF5350; }
-        
-        .tactical-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; padding: 35px; z-index: 8000; display: none; border: 2px solid var(--blue); background: rgba(0, 10, 20, 0.98); }
     </style>
 </head>
 <body>
@@ -159,7 +169,7 @@
     </div>
 
     <div id="newsLogModal" class="overlay"><div class="glass modal-card"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px;">HISTÓRICO DE MANCHETES</h2><div id="newsEntries" style="max-height: 400px; overflow-y: auto;"></div></div></div>
-    <div id="settingsModal" class="overlay"><div class="glass modal-card" style="width: 500px; text-align: center;"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="margin-bottom: 45px; font-family: Orbitron; font-size: 1.8rem;">COMANDO CENTRAL</h2><div class="config-row"><span class="dashed-info" data-tooltip="Habilita ou desabilita a música">ÁUDIO GLOBAL</span><button id="s-sound" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button></div><div class="config-row"><span class="dashed-info" data-tooltip="Habilita ou desabilita os efeitos sonoros de caos generalizado">EFEITOS DO CAOS INSTAURADO</span><button id="s-sfx" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button></div><div id="inGameControls" style="display: none; margin-top: 35px; border-top: 1px solid var(--border); padding-top: 35px;"><button class="btn-main" style="width: 100%; background: #333; color: #AAA;" onclick="location.reload()">ABANDONAR</button></div></div></div>
+    <div id="settingsModal" class="overlay"><div class="glass modal-card" style="width: 500px; text-align: center;"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="margin-bottom: 45px; font-family: Orbitron; font-size: 1.8rem;">COMANDO CENTRAL</h2><div class="config-row"><span class="dashed-info" data-tooltip="Habilita ou desabilita a música">ÁUDIO GLOBAL</span><button id="s-sound" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button></div><div class="config-row"><span class="dashed-info" data-tooltip="Habilita ou desabilita efeitos sonoros">EFEITOS DO CAOS INSTAURADO</span><button id="s-sfx" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button></div><div id="inGameControls" style="display: none; margin-top: 35px; border-top: 1px solid var(--border); padding-top: 35px;"><button class="btn-main" style="width: 100%; background: #333; color: #AAA;" onclick="location.reload()">ABANDONAR</button></div></div></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -170,11 +180,11 @@
             const ticker = document.getElementById('ticker');
             ticker.innerText = text.toUpperCase();
             ticker.style.transition = 'none';
-            ticker.style.right = '-110%'; // Começa na engrenagem
+            ticker.style.right = '-110%'; 
             
             setTimeout(() => {
-                ticker.style.transition = 'right 14s linear'; // Velocidade ajustada conforme solicitado
-                ticker.style.right = '120%'; // Passa o rótulo Notícias e some
+                ticker.style.transition = 'right 18s linear'; // ✅ VELOCIDADE REDUZIDA
+                ticker.style.right = '125%'; 
             }, 100);
         }
 
@@ -204,7 +214,7 @@
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); if(game.started) game.active = true; }
         function openSettings(context) { game.active = false; document.getElementById('inGameControls').style.display = (context === 'game') ? 'block' : 'none'; openModal('settingsModal'); }
-        function toggleH(btn) { const on = btn.classList.contains('btn-on'); btn.classList.toggle('btn-on', !on); btn.classList.toggle('btn-off', on); btn.innerText = on ? "DESLIGADO" : "LIGADO"; }
+        function toggleH(btn) { const on = btn.classList.contains('btn-on'); btn.classList.toggle('btn-on', !on); btn.classList.toggle('off', on); btn.innerText = on ? "DESLIGADO" : "LIGADO"; }
     </script>
 </body>
 </html>
