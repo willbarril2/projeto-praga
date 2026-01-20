@@ -44,7 +44,7 @@
         .btn-gear { background: none; border: none; color: #FFF; font-size: 2rem; cursor: pointer; transition: 0.3s; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
         .btn-gear:hover { transform: rotate(90deg); color: var(--red); }
 
-        /* --- TOOLTIPS (DICAS FLUTUANTES v16) --- */
+        /* --- TOOLTIPS (DEFINITIVOS v16) --- */
         .dashed-info { position: relative; border-bottom: 1.5px dashed rgba(255, 255, 255, 0.6); cursor: help; color: #FFF; }
         .dashed-info::after {
             content: attr(data-tooltip); position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
@@ -60,7 +60,7 @@
         @keyframes slideIn { from { opacity:0; transform: scale(0.95); } to { opacity:1; transform: scale(1); } }
         
         .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin: 35px 0; }
-        .opt-box { padding: 20px; border: 1px solid #333; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,0.03); transition: 0.2s; color: #DDD; text-align: left; }
+        .opt-box { padding: 25px; border: 1px solid #333; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,0.03); transition: 0.2s; color: #DDD; text-align: left; }
         .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.2); color: #FFF; }
         .opt-box b { display: block; font-size: 1.2rem; margin-bottom: 3px; color: #FFF; }
         .opt-box small { color: #AAA; line-height: 1.2; display: block; font-weight: 400; font-size: 0.95rem; }
@@ -117,26 +117,18 @@
         <div id="setupDiff" class="glass setup-card">
             <h2 class="dashed-info" data-tooltip="O nível de dificuldade escolhido dita os avanços da contaminação, pesquisa e cura" style="color: var(--gold); font-family: Orbitron; margin-bottom: 15px; font-size: 2.2rem; letter-spacing: 2px; display: inline-block;">NÍVEL DE RESPOSTA</h2>
             <div class="grid-select">
-                <div class="opt-box" onclick="setVar('diff', 'Casual', this)">
-                    <b style="color: var(--green);">🟢 CASUAL</b>
-                    <small>Mundo descuidado. Higiene rara e médicos de meio período.</small>
-                </div>
-                <div class="opt-box" onclick="setVar('diff', 'Normal', this)">
-                    <b style="color: var(--gold);">🟡 NORMAL</b>
-                    <small>Resposta padrão. Higiene básica e pesquisa ativa.</small>
-                </div>
-                <div class="opt-box" onclick="setVar('diff', 'Brutal', this)">
-                    <b style="color: var(--red);">🔴 BRUTAL</b>
-                    <small>Mundo em alerta. Médicos compulsivos e pesquisa agressiva.</small>
-                </div>
+                <div class="opt-box" onclick="setVar('diff', 'Casual', this)"><b style="color: var(--green);">🟢 CASUAL</b><small>Mundo descuidado. Higiene rara e médicos de meio período.</small></div>
+                <div class="opt-box" onclick="setVar('diff', 'Normal', this)"><b style="color: var(--gold);">🟡 NORMAL</b><small>Resposta padrão. Higiene básica e pesquisa ativa.</small></div>
+                <div class="opt-box" onclick="setVar('diff', 'Brutal', this)"><b style="color: var(--red);">🔴 BRUTAL</b><small>Mundo em alerta. Médicos compulsivos e pesquisa agressiva.</small></div>
             </div>
             <button class="btn-main" style="width: 100%;" onclick="nextStep('setupName')">Confirmar Resposta</button>
         </div>
 
         <div id="setupName" class="glass setup-card">
-            <h2 style="color: var(--blue); font-family: Orbitron; font-size: 2.2rem;">NOMEAR PATÓGENO</h2>
-            <input type="text" id="nameIn" placeholder="NOME..." maxlength="18" style="width: 100%; padding: 25px; background: rgba(0,0,0,0.6); border: 2px solid #444; color: #FFF; text-align: center; font-size: 2.5rem; margin: 45px 0; font-family: Rajdhani; letter-spacing: 4px; border-radius: 10px;">
-            <button class="btn-main" style="width: 100%;" onclick="startGame()">Iniciar Simulação</button>
+            <h2 style="color: var(--blue); font-family: Orbitron; font-size: 2.2rem; letter-spacing: 2px;">NOMEIE SUA CRIAÇÃO</h2>
+            <p style="color: #AAA; margin-bottom: 10px;">Identifique o agente do fim da humanidade.</p>
+            <input type="text" id="nameIn" placeholder="NOME..." maxlength="18" style="width: 100%; padding: 25px; background: rgba(0,0,0,0.6); border: 2px solid #444; color: #FFF; text-align: center; font-size: 2.5rem; margin: 40px 0; font-family: Rajdhani; letter-spacing: 4px; border-radius: 10px;">
+            <button class="btn-main" style="width: 100%; background: var(--red); color: #FFF; box-shadow: 0 4px 0 #900;" onclick="startGame()">INICIAR ANIQUILAÇÃO</button>
         </div>
     </div>
 
