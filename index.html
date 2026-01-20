@@ -39,10 +39,9 @@
         /* --- PRESERVAÇÃO: BOTÕES PADRONIZADOS --- */
         .btn-main { background: #FFF; color: #800000; border: none; padding: 14px 30px; font-size: 1.2rem; font-weight: 800; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; margin: 10px; text-transform: uppercase; width: 280px; font-family: 'Rajdhani'; box-shadow: 0 4px 0 #CCC; }
         .btn-main:hover { background: var(--red); color: #FFF; transform: scale(1.08); box-shadow: 0 6px 20px rgba(255, 23, 68, 0.4); }
-        /* ✅ NOVO: Estado desabilitado para o botão OK */
-        .btn-main:disabled { opacity: 0.5; cursor: default; pointer-events: none; box-shadow: none; }
+        .btn-main:disabled { opacity: 0.5; cursor: default; pointer-events: none; }
 
-        /* --- PRESERVAÇÃO: HUD INFERIOR --- */
+        /* --- HUD INFERIOR --- */
         .bottom-hud { position: fixed; bottom: 20px; left: 2%; width: 96%; height: 90px; z-index: 9000; display: flex; align-items: flex-end; justify-content: space-between; pointer-events: none; }
         .bottom-hud > * { pointer-events: auto; }
         .hud-panel { background: rgba(5, 5, 5, 0.95); border: 1px solid var(--border); padding: 12px 20px; border-radius: 12px; display: grid; backdrop-filter: blur(10px); min-width: 320px; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
@@ -52,36 +51,39 @@
         .stat-label { font-family: Orbitron; font-size: 0.65rem; color: #FFF; font-weight: 700; letter-spacing: 1px; margin-bottom: 2px; }
         .stat-value { font-weight: 700; font-size: 1.1rem; color: #FFF; }
         .stat-value.infected { color: var(--red); text-shadow: 0 0 10px rgba(255, 23, 68, 0.4); }
-        .stat-value.cured { color: var(--green); }
-        .stat-value.vax { color: var(--blue); }
-        .world-btn-container { margin-bottom: 5px; }
         .btn-world { min-width: 180px; width: auto; max-width: 300px; height: 50px; font-size: 1rem; letter-spacing: 2px; font-family: Orbitron; padding: 0 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* --- MAPA & GAMEPLAY --- */
+        /* --- MAPA & SIMBOLOGIA TÁTICA (v55) --- */
         #mainGame { width: 100%; height: 100vh; display: none; position: relative; z-index: 10; }
         #map { width: 100%; height: 100vh; z-index: 1; background: #0b0e14; cursor: crosshair !important; }
-        .leaflet-container { cursor: crosshair !important; }
+        
+        /* Estilo dos Hubs */
+        .hub-icon { 
+            background: none; border: none; 
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.2s;
+        }
+        .hub-icon svg { 
+            fill: #FFF; filter: drop-shadow(0 0 2px #000); 
+            width: 20px; height: 20px;
+            opacity: 0.8;
+        }
+        .hub-icon:hover svg { fill: var(--red); transform: scale(1.2); opacity: 1; }
+
         @keyframes pulse-blip { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
         .bio-blip { background: #800000; border-radius: 50%; width: 15px; height: 15px; border: 2px solid var(--red); box-shadow: 0 0 15px var(--red); position: relative; }
         .bio-blip::after { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--red); animation: pulse-blip 1.5s infinite; }
 
-        /* --- MODAIS DE JOGO (v54 REFINADO) --- */
-        /* ✅ Fundo translúcido (50%) */
+        /* --- MODAIS --- */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: none; align-items: center; justify-content: center; }
         .modal-card { width: 600px; padding: 45px; position: relative; border: 1px solid var(--border); box-shadow: 0 0 100px #000; border-radius: 15px; background: #080808; }
-        
-        /* ✅ Botão X com estado desabilitado */
         .btn-x { position: absolute; top: 20px; right: 25px; background: none; border: none; color: #777; font-size: 2.2rem; cursor: pointer; transition: 0.3s; }
         .btn-x:hover:not(:disabled) { color: #FFF; }
         .btn-x:disabled { opacity: 0.3; cursor: default; }
-
-        /* Estilo Paginação Welcome (v54) */
         .welcome-nav { display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 30px; }
-        .btn-nav-arrow { background: none; border: 1px solid #444; color: #FFF; font-size: 1.5rem; cursor: pointer; width: 45px; height: 45px; border-radius: 50%; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
-        .btn-nav-arrow:hover:not(:disabled) { border-color: var(--red); color: var(--red); background: rgba(255, 23, 68, 0.1); }
-        .btn-nav-arrow:disabled { opacity: 0.2; cursor: default; }
-        /* ✅ Indicador de página */
-        #wPageIndicator { text-align: center; margin-top: 15px; color: #888; font-size: 0.9rem; font-family: Orbitron; letter-spacing: 2px; }
+        .btn-nav-arrow { background: none; border: 1px solid #444; color: #FFF; font-size: 1.5rem; cursor: pointer; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .btn-nav-arrow:disabled { opacity: 0.2; }
+        #wPageIndicator { text-align: center; margin-top: 15px; color: #888; font-size: 0.9rem; font-family: Orbitron; }
 
         /* Auxiliares */
         .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 25px 0; }
@@ -177,7 +179,6 @@
     <div id="welcomeGameModal" class="overlay" style="background: rgba(0,0,0,0.5);">
         <div class="glass modal-card" style="max-width: 500px; min-height: 480px; display: flex; flex-direction: column; justify-content: space-between;">
             <button class="btn-x" id="btnWClose" onclick="closeModal()" disabled>✕</button>
-            
             <div id="welcomePages" style="flex-grow: 1;">
                 <div class="w-page active">
                     <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 20px;">PROTOCOLO INICIADO</h2>
@@ -188,7 +189,6 @@
                     <p style="font-size: 1.1rem; line-height: 1.6; color: #EEE;">Toque no país que seu agente infectará primeiro!<br><br>Ao selecionar um país, você poderá ver suas informações no mesmo botão <b>"MUNDO"</b> na parte inferior da tela.</p>
                 </div>
             </div>
-            
             <div>
                 <div class="welcome-nav">
                     <button class="btn-nav-arrow" id="btnWPrev" onclick="navWelcome(-1)" disabled>←</button>
@@ -206,6 +206,22 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         let game = { started: false, name: '', type: '', diff: '', active: false, newsLog: [], soundOn: true, infected: 0, dead: 0, cured: 0, vax: 0, dna: 0, popCap: 8200000000, selectedCountry: null };
+        
+        // --- BASE DE DADOS DE HUBS (v55) ---
+        const worldHubs = [
+            { country: "Brasil", type: "airport", city: "Brasília", lat: -15.8697, lng: -47.9208 },
+            { country: "Brasil", type: "port", city: "Salvador", lat: -12.9228, lng: -38.5122 },
+            { country: "EUA", type: "airport", city: "Washington", lat: 38.8512, lng: -77.0402 },
+            { country: "Groenlândia", type: "port", city: "Nuuk", lat: 64.1750, lng: -51.7389 },
+            { country: "Madagascar", type: "port", city: "Toamasina", lat: -18.1492, lng: 49.4023 },
+            { country: "Suíça", type: "airport", city: "Berna", lat: 46.9128, lng: 7.4984 },
+            { country: "China", type: "airport", city: "Pequim", lat: 40.0799, lng: 116.6031 },
+            { country: "China", type: "port", city: "Xangai", lat: 31.2222, lng: 121.4892 },
+            { country: "Reino Unido", type: "airport", city: "Londres", lat: 51.4700, lng: -0.4543 },
+            { country: "Rússia", type: "airport", city: "Moscou", lat: 55.7558, lng: 37.6173 }
+        ];
+
+        // --- SISTEMA DE ÁUDIO ---
         const audioSystem = {
             tracks: [document.getElementById('bgMusic1'), document.getElementById('bgMusic2')],
             currentTrackIndex: 0, isMuted: false, fadeInterval: null,
@@ -223,28 +239,7 @@
                 '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
         }
         
-        // --- BEM-VINDO NAVEGÁVEL COM TRAVA (v54) ---
-        let welcomePageIndex = 0;
-        let welcomeFullyRead = false;
-
-        function navWelcome(dir) {
-            const pages = document.querySelectorAll('.w-page');
-            const indicator = document.getElementById('wPageIndicator');
-            pages[welcomePageIndex].style.display = 'none';
-            welcomePageIndex += dir;
-            pages[welcomePageIndex].style.display = 'block';
-
-            document.getElementById('btnWPrev').disabled = (welcomePageIndex === 0);
-            document.getElementById('btnWNext').disabled = (welcomePageIndex === pages.length - 1);
-            indicator.innerText = `${welcomePageIndex + 1}/${pages.length}`;
-
-            // Se chegou na última página, marca como lido e habilita os botões de saída
-            if (welcomePageIndex === pages.length - 1) {
-                welcomeFullyRead = true;
-                document.getElementById('btnWClose').disabled = false;
-                document.getElementById('btnWOk').disabled = false;
-            }
-        }
+        let welcomePageIndex = 0; function navWelcome(dir) { const pages = document.querySelectorAll('.w-page'); const indicator = document.getElementById('wPageIndicator'); pages[welcomePageIndex].style.display = 'none'; welcomePageIndex += dir; pages[welcomePageIndex].style.display = 'block'; document.getElementById('btnWPrev').disabled = (welcomePageIndex === 0); document.getElementById('btnWNext').disabled = (welcomePageIndex === pages.length - 1); indicator.innerText = `${welcomePageIndex + 1}/${pages.length}`; if (welcomePageIndex === pages.length - 1) { document.getElementById('btnWClose').disabled = false; document.getElementById('btnWOk').disabled = false; } }
 
         const preGameNewsSource = ["\"Cansamos de salvar um futuro que insiste em se destruir.\"", "\"Quando o fato vira opinião, a ciência vira ruína.\"", "\"O descrédito é o ácido que corrói as fundações do amanhã.\"", "\"A ciência não vai cair. Ela vai simplesmente se calar.\"", "\"Onde a crença vence a prova, o cientista se torna um fantasma.\"", "\"Não há como curar um mundo que ama a própria ferida.\"", "\"O laboratório está vazio porque a verdade se tornou indesejada.\"", "\"A razão se retirou da sala. O colapso agora é livre.\"", "\"Não somos mais guias, somos apenas testemunhas da queda.\""];
         let newsQueue = []; let newsTimeout;
@@ -259,34 +254,76 @@
         function setVar(key, val, el) { game[key] = val; el.parentElement.querySelectorAll('.opt-box').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
         function registerNews(text) { if (game.started) game.newsLog.unshift({ date: "20 jan. 2026", message: text }); const ticker = document.getElementById('ticker'); ticker.innerText = text.toUpperCase(); ticker.style.transition = 'none'; ticker.style.right = '-110%'; setTimeout(() => { ticker.style.transition = 'right 20s linear'; ticker.style.right = '125%'; }, 100); }
         function runNextStep(btn, id, currentKey, errorDivId, message) { const errorDiv = document.getElementById(errorDivId); if (!game[currentKey]) { errorDiv.innerText = message; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; } btn.closest('.setup-card').classList.remove('active'); document.getElementById(id).classList.add('active'); }
+        
         function startGame() { 
             const name = document.getElementById('nameIn').value.trim(); const errorDiv = document.getElementById('errorName'); 
             if (!name) { errorDiv.innerText = "Você precisa nomear sua criação para avançar"; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; } 
-            game.name = name; game.started = true; clearTimeout(newsTimeout); 
-            document.getElementById('bgOverlay').style.opacity = '0'; setTimeout(() => document.getElementById('bgOverlay').style.display = 'none', 800);
-            document.getElementById('selectionFlow').classList.remove('active'); document.getElementById('mainGame').style.display = 'block'; 
-            document.getElementById('unifiedTopBar').classList.replace('glass-bar', 'highlight-bar'); 
+            game.name = name; game.started = true; clearTimeout(newsTimeout); document.getElementById('bgOverlay').style.opacity = '0'; document.getElementById('selectionFlow').classList.remove('active'); 
+            document.getElementById('mainGame').style.display = 'block'; document.getElementById('unifiedTopBar').classList.replace('glass-bar', 'highlight-bar'); 
             const vMap = { 'Bactéria': 'BACTERIANO', 'Vírus': 'VIRAL', 'Fungo': 'FÚNGICO', 'Parasita': 'PARASITÁRIO', 'Príon': 'PRIÔNICO', 'Nano-Vírus': 'NANOTECNOLÓGICO', 'Bio-Arma': 'BIOLÓGICO' }; 
             registerNews(`SISTEMA DE ANIQUILAÇÃO BIO-TÁTICA ONLINE. VETOR ${vMap[game.type]} PRONTO. AGUARDANDO DISPERSÃO.`); 
             setTimeout(() => { if(!map) initMap(); map.invalidateSize(); openModal('welcomeGameModal'); }, 100); 
         }
 
-        let map; let blipMarker;
+        let map; let blipMarker; 
+        const hubLayer = L.layerGroup(); // Camada para os ícones de transporte
+
         function initMap() { 
             map = L.map('map', { center: [20, 0], zoom: 2.5, minZoom: 2.5, zoomControl: false, attributionControl: false, worldCopyJump: true }); 
             L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { noWrap: false }).addTo(map); 
+            hubLayer.addTo(map);
+
+            // Controle de Zoom: Esconde Hubs em zoom baixo
+            map.on('zoomend', () => {
+                if (map.getZoom() < 3) map.removeLayer(hubLayer);
+                else hubLayer.addTo(map);
+            });
+
+            // Carrega Hubs Iniciais
+            renderHubs();
+
             map.on('click', async (e) => {
-                const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${e.latlng.lat}&longitude=${e.latlng.lng}&localityLanguage=pt`;
-                const res = await fetch(url); const data = await res.json(); const btn = document.getElementById('btnWorld');
-                if (data.countryName) {
-                    game.selectedCountry = data.countryName; btn.innerText = data.countryName.toUpperCase();
-                    if (blipMarker) map.removeLayer(blipMarker); const blipIcon = L.divIcon({ className: 'bio-blip', iconSize: [15, 15] }); blipMarker = L.marker(e.latlng, { icon: blipIcon }).addTo(map);
-                } else {
-                    game.selectedCountry = null; btn.innerText = "MUNDO"; if (blipMarker) map.removeLayer(blipMarker);
-                }
+                updateCountrySelection(e.latlng);
             });
         }
-        function handleWorldClick() { if (game.selectedCountry) { alert(`Relatório tático de ${game.selectedCountry} em processamento...`); } else { alert('Estatísticas globais em desenvolvimento.'); } }
+
+        async function updateCountrySelection(latlng) {
+            const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latlng.lat}&longitude=${latlng.lng}&localityLanguage=pt`;
+            const res = await fetch(url); const data = await res.json(); 
+            const btn = document.getElementById('btnWorld');
+            
+            if (data.countryName) {
+                game.selectedCountry = data.countryName; btn.innerText = data.countryName.toUpperCase();
+                if (blipMarker) map.removeLayer(blipMarker); 
+                const blipIcon = L.divIcon({ className: 'bio-blip', iconSize: [15, 15] }); 
+                blipMarker = L.marker(latlng, { icon: blipIcon }).addTo(map);
+            } else {
+                game.selectedCountry = null; btn.innerText = "MUNDO"; if (blipMarker) map.removeLayer(blipMarker);
+            }
+        }
+
+        // ✅ Renderização dos Hubs de Transporte (v55)
+        function renderHubs() {
+            const icons = {
+                airport: '<svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L14 19v-5.5l8 2.5z"/></svg>',
+                port: '<svg viewBox="0 0 24 24"><path d="M12 2C10.34 2 9 3.34 9 5c0 1.28.8 2.37 1.93 2.8L10 9H6.18c-.45-1.72-2-3-3.85-3C2.12 6 .89 7.04.22 8.5C.08 8.81 0 9.14 0 9.5c0 1.25.77 2.31 1.86 2.76.09.84.45 1.63 1.05 2.29.35.39.79.7 1.27.9.06.63.26 1.22.58 1.74.45.74 1.11 1.34 1.9 1.74.05.23.14.44.25.64.44.75 1.25 1.26 2.18 1.38V24h5.82v-1.05c.93-.12 1.74-.63 2.18-1.38.11-.2.2-.41.25-.64.79-.4 1.45-1 1.9-1.74.32-.52.52-1.11.58-1.74.48-.2 1.92-.51 1.27-.9.6-.66.96-1.45 1.05-2.29 1.09-.45 1.86-1.51 1.86-2.76 0-.36-.08-.69-.22-1-.67-1.46-1.9-2.5-3.83-2.5-1.85 0-3.4 1.28-3.85 3H14V9l-.93-1.2C14.2 7.37 15 6.28 15 5c0-1.66-1.34-3-3-3z"/></svg>'
+            };
+
+            worldHubs.forEach(hub => {
+                const icon = L.divIcon({
+                    className: 'hub-icon',
+                    html: icons[hub.type],
+                    iconSize: [24, 24]
+                });
+                const marker = L.marker([hub.lat, hub.lng], { icon: icon }).addTo(hubLayer);
+                marker.on('click', (e) => {
+                    L.DomEvent.stopPropagation(e); // Impede o clique duplo no mapa
+                    updateCountrySelection({lat: hub.lat, lng: hub.lng});
+                });
+            });
+        }
+
+        function handleWorldClick() { if (game.selectedCountry) alert(`Relatório tático de ${game.selectedCountry} em processamento...`); else alert('Estatísticas globais em desenvolvimento.'); }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); if(game.started) game.active = true; }
     </script>
