@@ -15,81 +15,65 @@
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         body { font-family: 'Rajdhani', sans-serif; background: var(--dark); color: #FFF; overflow: hidden; height: 100vh; }
 
-        #bgOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('background.png') no-repeat center center;
-            background-size: cover; opacity: 0.25; z-index: 1; pointer-events: none; transition: opacity 0.8s ease;
-        }
-
-        /* --- SISTEMA DE TELAS --- */
+        /* --- PRESERVAÇÃO: BACKGROUND & SETUP --- */
+        #bgOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('background.png') no-repeat center center; background-size: cover; opacity: 0.25; z-index: 1; pointer-events: none; transition: opacity 0.8s ease; }
         .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; background: transparent; }
         .screen.active { display: flex; }
         #startMenu { background: radial-gradient(circle at center, rgba(255, 23, 68, 0.15) 0%, rgba(0, 0, 0, 0.8) 100%); }
         #optiScreen { background: rgba(20, 0, 0, 0.95); text-align: center; padding: 40px; }
-
-        /* CARDS DE SETUP */
-        .setup-card { 
-            width: 95%; max-width: 900px; max-height: 85vh; padding: 35px; text-align: center; 
-            display: none; margin: auto; overflow-y: auto;
-        }
+        .setup-card { width: 95%; max-width: 900px; max-height: 85vh; padding: 35px; text-align: center; display: none; margin: auto; overflow-y: auto; }
         .setup-card.active { display: block; animation: slideIn 0.4s ease; }
         @keyframes slideIn { from { opacity:0; transform: scale(0.98); } to { opacity:1; transform: scale(1); } }
 
-        /* --- BARRA SUPERIOR --- */
-        .top-bar {
-            position: fixed; top: 12px; left: 2%; width: 96%; height: 55px;
-            z-index: 9000; display: grid; grid-template-columns: 120px 1fr 60px;
-            align-items: center; padding: 0 20px; transition: 0.5s ease; border-radius: 12px;
-            pointer-events: none;
-        }
+        /* --- PRESERVAÇÃO: TOP HUD --- */
+        .top-bar { position: fixed; top: 12px; left: 2%; width: 96%; height: 55px; z-index: 9000; display: grid; grid-template-columns: 120px 1fr 60px; align-items: center; padding: 0 20px; transition: 0.5s ease; border-radius: 12px; pointer-events: none; }
         .top-bar > * { pointer-events: auto; }
         .glass-bar { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--border); }
         .highlight-bar { background: #000; border: 1px solid var(--red); box-shadow: 0 5px 25px rgba(0,0,0,0.8); }
-
         @keyframes pulse-red { 0% { color: var(--red); transform: scale(1); } 50% { color: #fff; transform: scale(1.03); } 100% { color: var(--red); transform: scale(1); } }
         .news-label-pulse { color: var(--red); font-weight: 900; font-family: Orbitron; font-size: 0.85rem; letter-spacing: 2px; cursor: pointer; animation: pulse-red 2s infinite ease-in-out; text-align: left; }
-
         .sound-btn { background: none; border: none; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; color: #FFF; }
         .sound-btn svg { width: 24px; height: 24px; fill: currentColor; }
         .sound-btn:hover { color: var(--red); transform: scale(1.1); }
 
-        /* --- BOTÃO PADRONIZADO (TEMA BRANCO -> VERMELHO v49) --- */
-        .btn-main { 
-            background: #FFF; color: #800000; /* Padrão Branco */
-            border: none; padding: 14px 30px; font-size: 1.2rem; font-weight: 800; 
-            border-radius: 6px; cursor: pointer; transition: all 0.2s ease; margin: 10px; 
-            text-transform: uppercase; width: 280px; font-family: 'Rajdhani';
-            box-shadow: 0 4px 0 #CCC;
+        /* --- PRESERVAÇÃO: BOTÕES PADRONIZADOS --- */
+        .btn-main { background: #FFF; color: #800000; border: none; padding: 14px 30px; font-size: 1.2rem; font-weight: 800; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; margin: 10px; text-transform: uppercase; width: 280px; font-family: 'Rajdhani'; box-shadow: 0 4px 0 #CCC; }
+        .btn-main:hover { background: var(--red); color: #FFF; transform: scale(1.08); box-shadow: 0 6px 20px rgba(255, 23, 68, 0.4); }
+
+        /* --- NOVO: HUD INFERIOR TÁTICO (v50) --- */
+        .bottom-hud {
+            position: fixed; bottom: 20px; left: 2%; width: 96%; height: 80px;
+            z-index: 9000; display: flex; align-items: center; justify-content: space-between;
+            pointer-events: none;
         }
-        .btn-main:hover { 
-            background: var(--red); color: #FFF; /* Hover Vermelho */
-            transform: scale(1.08); box-shadow: 0 6px 20px rgba(255, 23, 68, 0.4); 
+        .bottom-hud > * { pointer-events: auto; }
+
+        .hud-panel {
+            background: rgba(5, 5, 5, 0.95); border: 1px solid var(--border);
+            padding: 12px 25px; border-radius: 12px; display: flex; flex-direction: column;
+            justify-content: center; backdrop-filter: blur(10px); min-width: 250px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
         }
 
-        /* --- GRID SELEÇÃO (ALTO CONTRASTE v49) --- */
+        .stat-row { display: flex; justify-content: space-between; align-items: center; margin: 2px 0; }
+        .stat-label { font-family: Orbitron; font-size: 0.7rem; color: #888; letter-spacing: 1px; }
+        .stat-value { font-weight: 700; font-size: 1.2rem; color: #FFF; }
+        .stat-value.infected { color: var(--red); text-shadow: 0 0 10px rgba(255, 23, 68, 0.3); }
+
+        /* Botão Mundo Especial */
+        .world-btn-container { position: relative; top: -10px; }
+        .btn-world { width: 180px; height: 50px; font-size: 1.1rem; letter-spacing: 2px; font-family: Orbitron; }
+
+        /* --- COMPONENTES DE GRID E INPUT --- */
         .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 25px 0; }
-        .opt-box { 
-            padding: 18px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; 
-            background: rgba(20, 20, 20, 0.7); /* Fundo mais escuro para contraste */
-            transition: 0.2s; color: #DDD; text-align: center; 
-        }
+        .opt-box { padding: 18px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; background: rgba(20, 20, 20, 0.7); transition: 0.2s; color: #DDD; text-align: center; }
         .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.3); color: #FFF; }
         .opt-box b { display: block; font-size: 1.1rem; margin-bottom: 2px; color: #FFF; }
-        .opt-box small { color: #BBB; line-height: 1.3; display: block; font-size: 0.9rem; }
+        #nameIn { width: 100%; padding: 25px; background: rgba(10, 10, 10, 0.85); border: 2px solid #666; color: #FFF; text-align: center; font-size: 2.5rem; margin: 30px 0; font-family: Rajdhani; border-radius: 10px; }
 
-        /* --- INPUT NOME (ALTO CONTRASTE v49) --- */
-        #nameIn {
-            width: 100%; padding: 25px; 
-            background: rgba(10, 10, 10, 0.85); /* Mais escuro */
-            border: 2px solid #666; color: #FFF; text-align: center; 
-            font-size: 2.5rem; margin: 30px 0; font-family: Rajdhani; border-radius: 10px;
-        }
-        #nameIn:focus { border-color: var(--red); }
-
-        /* --- UI GERAL --- */
-        .glass { background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 12px; }
+        /* --- MAPA & GAMEPLAY --- */
         #mainGame { width: 100%; height: 100vh; display: none; position: relative; z-index: 10; }
-        #map { width: 100%; height: 100vh; z-index: 1; }
+        #map { width: 100%; height: 100vh; z-index: 1; filter: saturate(0.8) contrast(1.1); }
         .news-marquee-container { overflow: hidden; position: relative; height: 30px; margin: 0 20px; display: flex; align-items: center; }
         #ticker { color: #FFF; font-weight: 700; font-size: 1rem; position: absolute; white-space: nowrap; right: -110%; width: fit-content; }
 
@@ -115,10 +99,10 @@
     </div>
 
     <div id="startMenu" class="screen active">
-        <div class="bio-logo" style="font-family: Orbitron; font-size: 5.5rem; letter-spacing: 15px; text-shadow: 0 0 35px var(--red); margin-bottom: 55px; position: relative; z-index: 2;">PRAGA</div>
+        <div class="bio-logo" style="font-family: Orbitron; font-size: 5.5rem; letter-spacing: 15px; text-shadow: 0 0 35px var(--red); margin-bottom: 55px;">PRAGA</div>
         <button class="btn-main" onclick="goToOptimization()">Iniciar</button>
-        <button class="btn-main" onclick="openModal('tutorialModal')">Tutorial</button>
-        <button class="btn-main" onclick="alert('Histórico indisponível')">Conquistas</button>
+        <button class="btn-main" style="background: #FFF; color: #800000;" onclick="openModal('tutorialModal')">Tutorial</button>
+        <button class="btn-main" style="background: #FFF; color: #800000;" onclick="alert('Histórico indisponível')">Conquistas</button>
     </div>
 
     <div id="optiScreen" class="screen">
@@ -130,7 +114,6 @@
 
     <div id="selectionFlow" class="screen">
         <button class="btn-x" style="position: fixed; top:80px; right:25px; z-index:100;" onclick="location.reload()">✕</button>
-        
         <div id="setupType" class="glass setup-card active">
             <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 15px; font-size: 2.2rem;">SELECIONAR AGENTE</h2>
             <div class="grid-select">
@@ -145,7 +128,6 @@
             <div id="errorType" class="error-msg-box"></div>
             <button class="btn-main" onclick="runNextStep(this, 'setupDiff', 'type', 'errorType', 'Você precisa selecionar um agente para avançar')">Confirmar Agente</button>
         </div>
-
         <div id="setupDiff" class="glass setup-card">
             <h2 style="color: var(--gold); font-family: Orbitron; margin-bottom: 15px; font-size: 2.2rem;">NÍVEL DE RESPOSTA</h2>
             <div class="grid-select">
@@ -156,7 +138,6 @@
             <div id="errorDiff" class="error-msg-box"></div>
             <button class="btn-main" onclick="runNextStep(this, 'setupName', 'diff', 'errorDiff', 'Você precisa selecionar um nível de resposta para avançar')">Confirmar Resposta</button>
         </div>
-
         <div id="setupName" class="glass setup-card">
             <h2 style="color: var(--blue); font-family: Orbitron; font-size: 2.2rem;">NOMEIE SUA CRIAÇÃO</h2>
             <p style="color: #AAA; margin-bottom: 10px;">Identifique o agente do fim da humanidade.</p>
@@ -166,52 +147,54 @@
         </div>
     </div>
 
-    <div id="mainGame"><div id="map"></div></div>
+    <div id="mainGame">
+        <div id="map"></div>
+        
+        <div class="bottom-hud">
+            <div class="hud-panel">
+                <div class="stat-row">
+                    <span class="stat-label">INFECTADOS</span>
+                    <span class="stat-value infected" id="valInfected">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">MORTOS</span>
+                    <span class="stat-value" id="valDead">0</span>
+                </div>
+            </div>
 
-    <div id="tutorialModal" class="overlay">
-        <div class="glass modal-card">
-            <button class="btn-x" onclick="closeModal()">✕</button>
-            <h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px; letter-spacing: 2px;">MANUAL TÁTICO</h2>
-            <div style="text-align: left; line-height: 1.8; color: #FFF; font-size: 1.15rem;">
-                <p>• <b>1. Inserção:</b> Clique em um país no mapa global para liberar o Agente Patogênico.</p>
-                <p>• <b>2. Recurso Genético:</b> Acumule 1 ponto de Mutagenicidade a cada <b>100.000</b> novos infectados.</p>
-                <p>• <b>3. Resposta Global:</b> A <b>Cura</b> foca nos infectados; a <b>Vacina</b> protege os saudáveis.</p>
-                <p>• <b>4. Adaptação:</b> Evoluir a praga força cientistas a reiniciar pesquisas, <b>atrasando cura e vacina</b>.</p>
+            <div class="world-btn-container">
+                <button class="btn-main btn-world" onclick="alert('Relatório Mundial em Desenvolvimento')">MUNDO</button>
+            </div>
+
+            <div class="hud-panel">
+                <div class="stat-row">
+                    <span class="stat-label">MUTAGENICIDADE (DNA)</span>
+                    <span class="stat-value" style="color: var(--blue);" id="valDNA">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">NÍVEL DE AMEAÇA</span>
+                    <span class="stat-value" id="valThreat">MÍNIMO</span>
+                </div>
             </div>
         </div>
     </div>
+
+    <div id="tutorialModal" class="overlay"><div class="glass modal-card"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px;">MANUAL TÁTICO</h2><div style="text-align: left; line-height: 1.8; color: #FFF; font-size: 1.15rem;"><p>• <b>1. Inserção:</b> Clique em um país no mapa global para liberar o Agente Patogênico.</p><p>• <b>2. Recurso Genético:</b> Acumule 1 ponto de Mutagenicidade a cada <b>100.000</b> novos infectados.</p><p>• <b>3. Resposta Global:</b> A <b>Cura</b> foca nos infectados; a <b>Vacina</b> protege os saudáveis.</p><p>• <b>4. Adaptação:</b> Evoluir a praga força cientistas a reiniciar pesquisas, <b>atrasando cura e vacina</b>.</p></div></div></div>
     <div id="newsLogModal" class="overlay"><div class="glass modal-card"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px;">HISTÓRICO DE MANCHETES</h2><div id="newsEntries" style="max-height: 400px; overflow-y: auto;"></div></div></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        let game = { started: false, name: '', type: '', diff: '', active: false, newsLog: [], soundOn: true };
+        let game = { started: false, name: '', type: '', diff: '', active: false, newsLog: [], soundOn: true, infected: 0, dead: 0, dna: 0 };
         
         // --- SISTEMA DE ÁUDIO (PRESERVADO) ---
         const audioSystem = {
             tracks: [document.getElementById('bgMusic1'), document.getElementById('bgMusic2')],
             currentTrackIndex: 0, isMuted: false, fadeInterval: null,
-            init() { 
-                this.tracks[0].volume = 0; this.tracks[1].volume = 0;
-                this.tracks[0].addEventListener('ended', () => this.crossfadeTo(1));
-                this.tracks[1].addEventListener('ended', () => this.crossfadeTo(0));
-            },
+            init() { this.tracks[0].volume = 0; this.tracks[1].volume = 0; this.tracks[0].addEventListener('ended', () => this.crossfadeTo(1)); this.tracks[1].addEventListener('ended', () => this.crossfadeTo(0)); },
             startPlayback() { if (this.isMuted) return; this.fadeIn(0); },
-            crossfadeTo(nextIndex) {
-                if (this.isMuted) return;
-                const nextTrack = this.tracks[nextIndex]; const currentTrack = this.tracks[nextIndex === 0 ? 1 : 0];
-                nextTrack.play(); clearInterval(this.fadeInterval); let step = 0; const steps = 50;
-                this.fadeInterval = setInterval(() => {
-                    step++; currentTrack.volume = Math.max(0, 1 - (step / steps)); nextTrack.volume = Math.min(1, step / steps);
-                    if (step >= steps) { clearInterval(this.fadeInterval); currentTrack.pause(); currentTrack.currentTime = 0; this.currentTrackIndex = nextIndex; }
-                }, 100);
-            },
+            crossfadeTo(nextIndex) { if (this.isMuted) return; const nextTrack = this.tracks[nextIndex]; const currentTrack = this.tracks[nextIndex === 0 ? 1 : 0]; nextTrack.play(); clearInterval(this.fadeInterval); let step = 0; const steps = 50; this.fadeInterval = setInterval(() => { step++; currentTrack.volume = Math.max(0, 1 - (step / steps)); nextTrack.volume = Math.min(1, step / steps); if (step >= steps) { clearInterval(this.fadeInterval); currentTrack.pause(); currentTrack.currentTime = 0; this.currentTrackIndex = nextIndex; } }, 100); },
             fadeIn(index) { const track = this.tracks[index]; track.play(); let vol = 0; const int = setInterval(() => { vol = Math.min(1, vol + 0.05); track.volume = vol; if (vol >= 1) clearInterval(int); }, 200); },
-            toggleMute() {
-                this.isMuted = !this.isMuted; clearInterval(this.fadeInterval);
-                if (this.isMuted) { this.tracks.forEach(t => { t.volume = 0; t.pause(); }); }
-                else { this.tracks[this.currentTrackIndex].volume = 1; this.tracks[this.currentTrackIndex].play(); }
-                return this.isMuted;
-            }
+            toggleMute() { this.isMuted = !this.isMuted; clearInterval(this.fadeInterval); if (this.isMuted) { this.tracks.forEach(t => { t.volume = 0; t.pause(); }); } else { this.tracks[this.currentTrackIndex].volume = 1; this.tracks[this.currentTrackIndex].play(); } return this.isMuted; }
         };
         audioSystem.init();
 
@@ -222,49 +205,14 @@
                 '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
         }
 
-        // --- NOVA LÓGICA DE MANCHETES (v49) ---
-        const preGameNewsSource = [
-            "\"Cansamos de salvar um futuro que insiste em se destruir.\"",
-            "\"Quando o fato vira opinião, a ciência vira ruína.\"",
-            "\"O descrédito é o ácido que corrói as fundações do amanhã.\"",
-            "\"A ciência não vai cair. Ela vai simplesmente se calar.\"",
-            "\"Onde a crença vence a prova, o cientista se torna um fantasma.\"",
-            "\"Não há como curar um mundo que ama a própria ferida.\"",
-            "\"O laboratório está vazio porque a verdade se tornou indesejada.\"",
-            "\"A razão se retirou da sala. O colapso agora é livre.\"",
-            "\"Não somos mais guias, somos apenas testemunhas da queda.\""
-        ];
+        // --- MANCHETES (PRESERVADO) ---
+        const preGameNewsSource = ["\"Cansamos de salvar um futuro que insiste em se destruir.\"", "\"Quando o fato vira opinião, a ciência vira ruína.\"", "\"O descrédito é o ácido que corrói as fundações do amanhã.\"", "\"A ciência não vai cair. Ela vai simplesmente se calar.\"", "\"Onde a crença vence a prova, o cientista se torna um fantasma.\"", "\"Não há como curar um mundo que ama a própria ferida.\"", "\"O laboratório está vazio porque a verdade se tornou indesejada.\"", "\"A razão se retirou da sala. O colapso agora é livre.\"", "\"Não somos mais guias, somos apenas testemunhas da queda.\""];
         let newsQueue = []; let newsTimeout;
-
-        // Função para embaralhar (Fisher-Yates)
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
+        function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
+        function scheduleNextNews() { if (game.started) return; if (newsQueue.length === 0) { newsQueue = [...preGameNewsSource]; shuffleArray(newsQueue); }
+            registerNews(newsQueue.pop()); const randomDelay = Math.floor(Math.random() * 10001) + 10000; newsTimeout = setTimeout(scheduleNextNews, 20000 + randomDelay);
         }
-
-        function scheduleNextNews() {
-            if (game.started) return;
-            // Se a fila acabou, recarrega e embaralha
-            if (newsQueue.length === 0) {
-                newsQueue = [...preGameNewsSource];
-                shuffleArray(newsQueue);
-            }
-            const nextNews = newsQueue.pop();
-            registerNews(nextNews);
-
-            // Intervalo aleatório (10s a 20s) + tempo do ticker (20s)
-            const randomDelay = Math.floor(Math.random() * (20000 - 10000 + 1) + 10000);
-            newsTimeout = setTimeout(scheduleNextNews, 20000 + randomDelay);
-        }
-
-        window.onload = () => {
-             // Toca a primeira obrigatória
-            registerNews("O descrédito à ciência tem levado muitos cientistas a se manifestarem contra essa tendência. Será que a ciência se revoltará em breve?");
-            // Agenda o início do ciclo aleatório
-            setTimeout(scheduleNextNews, 22000);
-        };
+        window.onload = () => { registerNews("O descrédito à ciência tem levado muitos cientistas a se manifestarem contra essa tendência. Será que a ciência se revoltará em breve?"); setTimeout(scheduleNextNews, 22000); };
 
         function goToOptimization() { document.getElementById('startMenu').classList.remove('active'); document.getElementById('optiScreen').classList.add('active'); }
         function initSetup() { audioSystem.startPlayback(); document.getElementById('optiScreen').classList.remove('active'); document.getElementById('selectionFlow').classList.add('active'); }
@@ -281,16 +229,14 @@
         function runNextStep(btn, id, currentKey, errorDivId, message) {
             const errorDiv = document.getElementById(errorDivId);
             if (!game[currentKey]) { errorDiv.innerText = message; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; }
-            btn.closest('.setup-card').classList.remove('active');
-            document.getElementById(id).classList.add('active');
+            btn.closest('.setup-card').classList.remove('active'); document.getElementById(id).classList.add('active');
         }
 
         function startGame() { 
             const name = document.getElementById('nameIn').value.trim(); const errorDiv = document.getElementById('errorName');
             if (!name) { errorDiv.innerText = "Você precisa nomear sua criação para avançar"; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; }
-            game.name = name; game.started = true; 
-            clearTimeout(newsTimeout); // Para o ciclo de notícias pré-jogo
-            document.getElementById('bgOverlay').style.opacity = '0'; setTimeout(() => document.getElementById('bgOverlay').style.display = 'none', 800);
+            game.name = name; game.started = true; clearTimeout(newsTimeout);
+            document.getElementById('bgOverlay').style.opacity = '0';
             document.getElementById('selectionFlow').classList.remove('active'); 
             document.getElementById('mainGame').style.display = 'block'; 
             document.getElementById('unifiedTopBar').classList.replace('glass-bar', 'highlight-bar');
@@ -298,6 +244,7 @@
             registerNews(`SISTEMA DE ANIQUILAÇÃO BIO-TÁTICA ONLINE. VETOR ${vMap[game.type]} PRONTO. AGUARDANDO DISPERSÃO.`);
             setTimeout(() => { if(!map) initMap(); map.invalidateSize(); }, 100); 
         }
+
         let map; function initMap() { map = L.map('map', { center: [20, 0], zoom: 2.5, zoomControl: false, attributionControl: false }); L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); if(game.started) game.active = true; }
