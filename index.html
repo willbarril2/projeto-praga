@@ -18,7 +18,6 @@
         /* --- TELA INICIAL (DEFINITIVA v20) --- */
         .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; }
         .screen.active { display: flex; }
-
         #startMenu { background: radial-gradient(circle at center, #ff1744 0%, #4a0000 60%, #000 100%); position: relative; overflow: hidden; }
         #startMenu::before {
             content: ""; position: absolute; inset: 0;
@@ -48,6 +47,7 @@
         #setupFlow { background: #000; overflow-y: auto; padding: 40px 0; }
         .setup-card { width: 92%; max-width: 850px; padding: 40px; text-align: center; display: none; }
         .setup-card.active { display: block; animation: slideIn 0.4s ease; }
+        @keyframes slideIn { from { opacity:0; transform: scale(0.95); } to { opacity:1; transform: scale(1); } }
         
         .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin: 35px 0; }
         .opt-box { padding: 20px; border: 1px solid #333; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,0.03); transition: 0.2s; color: #DDD; text-align: center; }
@@ -61,13 +61,18 @@
         
         .hud { position: fixed; z-index: 1000; pointer-events: none; }
         .hud * { pointer-events: auto; }
-        .top-hud { top: 12px; width: 96%; left: 2%; height: 55px; display: flex; align-items: center; padding: 0 25px; justify-content: space-between; }
-        
-        /* CORREÇÃO DE CONTRASTE BARRA DE NOTÍCIAS */
-        #ticker { width: 450px; color: #FFF; font-weight: 700; font-size: 1rem; }
 
-        /* --- CONFIGURAÇÕES SPACING --- */
-        .config-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; width: 100%; padding: 0 10px; }
+        /* TOP HUD (CORREÇÃO DE LAYOUT v30) */
+        .top-hud { 
+            top: 12px; width: 96%; left: 2%; height: 55px; 
+            display: flex; align-items: center; padding: 0 20px; 
+            justify-content: space-between; 
+        }
+        .news-label { color: var(--red); font-weight: 800; font-size: 0.85rem; font-family: Orbitron; letter-spacing: 2px; white-space: nowrap; margin-right: 20px; }
+        #ticker { flex: 1; color: #FFF; font-weight: 700; font-size: 1rem; }
+
+        /* CONFIGURAÇÕES MODAL */
+        .config-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; width: 100%; padding: 0 15px; }
         .btn-toggle { width: 140px; padding: 12px; border-radius: 8px; font-weight: 900; cursor: pointer; border: 2px solid rgba(255,255,255,0.15); font-size: 1rem; transition: 0.2s; }
         .btn-on { background: #1B5E20; color: #FFF; border-color: #4CAF50; }
         .btn-off { background: #B71C1C; color: #FFF; border-color: #EF5350; }
@@ -113,8 +118,8 @@
             <h2 class="dashed-info" data-tooltip="O nível de dificuldade escolhido dita os avanços da contaminação, pesquisa e cura" style="color: var(--gold); font-family: Orbitron; margin-bottom: 15px; font-size: 2.2rem; letter-spacing: 2px; display: inline-block;">NÍVEL DE RESPOSTA</h2>
             <div class="grid-select">
                 <div class="opt-box" onclick="setVar('diff', 'Casual', this)"><b style="color: var(--green);">🟢 CASUAL</b><small>Mundo descuidado. Médicos de meio período.</small></div>
-                <div class="opt-box" onclick="setVar('diff', 'Normal', this)"><b style="color: var(--gold);">🟡 NORMAL</b><small>Resposta padrão. Pesquisa ativa.</small></div>
-                <div class="opt-box" onclick="setVar('diff', 'Brutal', this)"><b style="color: var(--red);">🔴 BRUTAL</b><small>Mundo em alerta. Pesquisa agressiva.</small></div>
+                <div class="opt-box" onclick="setVar('diff', 'Normal', this)"><b style="color: var(--gold);">🟡 NORMAL</b><small>Resposta padrão. Higiene básica e pesquisa ativa.</small></div>
+                <div class="opt-box" onclick="setVar('diff', 'Brutal', this)"><b style="color: var(--red);">🔴 BRUTAL</b><small>Mundo em alerta. Médicos compulsivos e pesquisa agressiva.</small></div>
             </div>
             <button class="btn-main" style="width: 100%;" onclick="nextStep('setupName')">Confirmar Resposta</button>
         </div>
@@ -122,7 +127,7 @@
         <div id="setupName" class="glass setup-card">
             <h2 style="color: var(--blue); font-family: Orbitron; font-size: 2.2rem; letter-spacing: 2px;">NOMEIE SUA CRIAÇÃO</h2>
             <p style="color: #AAA; margin-bottom: 10px; font-weight: 600;">Identifique o agente do fim da humanidade.</p>
-            <input type="text" id="nameIn" placeholder="NOME..." maxlength="18" style="width: 100%; padding: 25px; background: rgba(0,0,0,0.6); border: 2px solid #444; color: #FFF; text-align: center; font-size: 2.5rem; margin: 30px 0; font-family: Rajdhani; letter-spacing: 4px; border-radius: 10px;">
+            <input type="text" id="nameIn" placeholder="NOME..." maxlength="18" style="width: 100%; padding: 25px; background: rgba(0,0,0,0.6); border: 2px solid #444; color: #FFF; text-align: center; font-size: 2.5rem; margin: 40px 0; font-family: Rajdhani; letter-spacing: 4px; border-radius: 10px;">
             <button class="btn-main" style="width: 100%; background: var(--red); color: #FFF; box-shadow: 0 4px 0 #900;" onclick="startGame()">INICIAR ANIQUILAÇÃO</button>
         </div>
     </div>
@@ -130,11 +135,9 @@
     <div id="mainGame">
         <div id="map"></div>
         <div class="hud glass top-hud">
-            <div style="display: flex; align-items: center;">
-                 <span style="color: var(--red); font-weight: 800; margin-right: 18px; font-size: 0.85rem; font-family: Orbitron; letter-spacing: 2px;">NOTÍCIAS</span>
-                <marquee id="ticker">SISTEMA BIO-TACTICAL ONLINE. AGUARDANDO IDENTIFICAÇÃO DO PACIENTE ZERO NO MAPA...</marquee>
-            </div>
-            <button class="btn-gear" style="color: #000" onclick="openSettings('game')">⚙️</button>
+            <span class="news-label">NOTÍCIAS</span>
+            <marquee id="ticker" scrollamount="4">SISTEMA BIO-TACTICAL ONLINE. AGUARDANDO IDENTIFICAÇÃO DO PACIENTE ZERO NO MAPA...</marquee>
+            <button class="btn-gear" style="margin-left: 20px;" onclick="openSettings('game')">⚙️</button>
         </div>
 
         <div id="countryPopup" class="glass tactical-popup">
@@ -150,8 +153,10 @@
             <button class="btn-x" onclick="closeModal()">✕</button>
             <h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px; letter-spacing: 2px;">MANUAL TÁTICO</h2>
             <div style="text-align: left; line-height: 1.8; color: #FFF; font-size: 1.15rem;">
-                <p>• <b>Inserção:</b> Clique em um país no mapa para liberar o Agente Patogênico.</p>
-                <p>• <b>Recurso Genético:</b> Ganhe 1 ponto de Mutagenicidade a cada 100.000 novos infectados.</p>
+                <p>• <b>1. Inserção:</b> Clique em um país no mapa global para liberar o Agente Patogênico.</p>
+                <p>• <b>2. Recurso Genético:</b> Acumule 1 ponto de Mutagenicidade a cada <b>100.000</b> novos infectados.</p>
+                <p>• <b>3. Resposta Global:</b> A Cura visa tratar os infectados; a Vacina protege os saudáveis.</p>
+                <p>• <b>4. Adaptação:</b> Evoluir a praga força a comunidade científica a reiniciar pesquisas, atrasando a cura.</p>
             </div>
         </div>
     </div>
@@ -161,14 +166,15 @@
             <button class="btn-x" onclick="closeModal()">✕</button>
             <h2 style="margin-bottom: 45px; font-family: Orbitron; letter-spacing: 3px; font-size: 1.8rem;">COMANDO CENTRAL</h2>
             <div class="config-row">
-                <span class="dashed-info" data-tooltip="Habilita ou desabilita a música de fundo">ÁUDIO GLOBAL</span>
+                <span class="dashed-info" data-tooltip="Habilita ou desabilita a música de fundo do jogo">ÁUDIO GLOBAL</span>
                 <button id="s-sound" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button>
             </div>
             <div class="config-row">
-                <span class="dashed-info" data-tooltip="Habilita ou desabilita os efeitos sonoros de caos">EFEITOS DO CAOS INSTAURADO</span>
+                <span class="dashed-info" data-tooltip="Habilita ou desabilita os efeitos sonoros de caos generalizado">EFEITOS DO CAOS INSTAURADO</span>
                 <button id="s-sfx" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button>
             </div>
             <div id="inGameControls" style="display: none; margin-top: 35px; border-top: 1px solid var(--border); padding-top: 35px;">
+                <button class="btn-main" style="width: 100%; margin: 12px 0;">PAUSAR / RETOMAR</button>
                 <button class="btn-main" style="width: 100%; background: #333; color: #AAA;" onclick="location.reload()">ABANDONAR</button>
             </div>
         </div>
