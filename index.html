@@ -56,21 +56,21 @@
         /* --- MAPA & SIMBOLOGIA TÁTICA --- */
         #mainGame { width: 100%; height: 100vh; display: none; position: relative; z-index: 10; }
         #map { width: 100%; height: 100vh; z-index: 1; background: #0b0e14; cursor: crosshair !important; }
-        
-        /* ✅ Estilo para os ícones externos SVG (v59) */
-        .hub-icon-img { 
-            filter: brightness(0) invert(1); 
-            transition: transform 0.2s, filter 0.2s;
-            pointer-events: auto;
-        }
-        .hub-icon-img:hover { 
-            transform: scale(1.3); 
-            filter: brightness(0) invert(1) drop-shadow(0 0 5px var(--red)); 
-        }
+        .hub-icon-img { filter: brightness(0) invert(1); transition: transform 0.2s, filter 0.2s; pointer-events: auto; }
+        .hub-icon-img:hover { transform: scale(1.3); filter: brightness(0) invert(1) drop-shadow(0 0 5px var(--red)); }
 
         @keyframes pulse-blip { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
         .bio-blip { background: #800000; border-radius: 50%; width: 15px; height: 15px; border: 2px solid var(--red); box-shadow: 0 0 15px var(--red); position: relative; }
         .bio-blip::after { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--red); animation: pulse-blip 1.5s infinite; }
+
+        /* ✅ CUSTOM TOOLTIP: DISPERSÃO (v61) */
+        .leaflet-popup-content-wrapper { background: rgba(5, 5, 5, 0.98) !important; color: #FFF !important; border: 1px solid var(--border) !important; border-radius: 8px !important; box-shadow: 0 10px 40px #000 !important; padding: 5px; }
+        .leaflet-popup-tip { background: rgba(5, 5, 5, 0.98) !important; border: 1px solid var(--border) !important; }
+        .dispersal-box { text-align: center; padding: 10px; min-width: 220px; }
+        .dispersal-box p { font-size: 0.95rem; margin-bottom: 15px; line-height: 1.4; font-family: 'Rajdhani'; font-weight: 600; }
+        .dispersal-actions { display: flex; justify-content: center; gap: 10px; }
+        .btn-mini { background: #FFF; color: #800000; border: none; padding: 6px 20px; font-size: 0.9rem; font-weight: 800; border-radius: 4px; cursor: pointer; transition: 0.2s; font-family: 'Orbitron'; text-transform: uppercase; }
+        .btn-mini:hover { background: var(--red); color: #FFF; transform: translateY(-2px); }
 
         /* --- MODAIS --- */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: none; align-items: center; justify-content: center; }
@@ -87,7 +87,6 @@
         .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 25px 0; }
         .opt-box { padding: 18px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; background: rgba(20, 20, 20, 0.7); transition: 0.2s; color: #DDD; text-align: center; }
         .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.3); color: #FFF; }
-        .opt-box b { display: block; font-size: 1.1rem; margin-bottom: 2px; color: #FFF; }
         #nameIn { width: 100%; padding: 25px; background: rgba(10, 10, 10, 0.85); border: 2px solid #666; color: #FFF; text-align: center; font-size: 2.5rem; margin: 30px 0; font-family: Rajdhani; border-radius: 10px; }
         .news-marquee-container { overflow: hidden; position: relative; height: 30px; margin: 0 20px; display: flex; align-items: center; }
         #ticker { color: #FFF; font-weight: 700; font-size: 1rem; position: absolute; white-space: nowrap; right: -110%; width: fit-content; }
@@ -178,10 +177,20 @@
         <div class="glass modal-card" style="max-width: 500px; min-height: 480px; display: flex; flex-direction: column; justify-content: space-between;">
             <button class="btn-x" id="btnWClose" onclick="closeModal()" disabled>✕</button>
             <div id="welcomePages" style="flex-grow: 1;">
-                <div class="w-page active"><h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 20px;">PROTOCOLO INICIADO</h2><p style="font-size: 1.1rem; line-height: 1.6; color: #EEE;">Bem-vindo(a) ao jogo <b>Praga</b>!<br><br>Você é um(a) cientista descontente com a humanidade e decide pôr fim à sua existência. Para isso, deverá espalhar seu agente pelo mundo inteiro, até eliminar todos os seres humanos da Terra. Sua mente brilhante será capaz de “consertar” o estado atual do mundo?</p></div>
-                <div class="w-page" style="display: none;"><h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 20px;">OBJETIVO INICIAL</h2><p style="font-size: 1.1rem; line-height: 1.6; color: #EEE;">Toque no país que seu agente infectará primeiro!
-                    
-                    Ao selecionar um país, você poderá ver suas informações no mesmo botão <b>"MUNDO"</b>.</p></div>
+                <div class="w-page active">
+                    <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 20px;">PROTOCOLO INICIADO</h2>
+                    <p style="font-size: 1.1rem; line-height: 1.6; color: #EEE;">
+                        Bem-vindo(a) ao jogo <b>Praga</b>!<br><br>
+                        Você é um(a) cientista descontente com a humanidade e decide pôr fim à sua existência. Para isso, deverá espalhar seu agente pelo mundo inteiro, até eliminar todos os seres humanos da Terra. Sua mente brilhante será capaz de “consertar” o estado atual do mundo?
+                    </p>
+                </div>
+                <div class="w-page" style="display: none;">
+                    <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 20px;">OBJETIVO INICIAL</h2>
+                    <p style="font-size: 1.1rem; line-height: 1.6; color: #EEE;">
+                        Toque no país que seu agente infectará primeiro!<br><br>
+                        Ao selecionar um país, você poderá ver suas informações no mesmo botão <b>"MUNDO"</b>. Clique no oceano para voltar a ver os dados globais.
+                    </p>
+                </div>
             </div>
             <div>
                 <div class="welcome-nav">
@@ -211,31 +220,20 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        let game = { started: false, name: '', type: '', diff: '', active: false, newsLog: [], soundOn: false, infected: 0, dead: 0, cured: 0, vax: 0, dna: 0, popCap: 8200000000, selectedCountry: null };
+        let game = { started: false, name: '', type: '', diff: '', active: false, newsLog: [], soundOn: false, infected: 0, dead: 0, cured: 0, vax: 0, dna: 0, popCap: 8200000000, selectedCountry: null, infectionStarted: false };
         
         // --- BASE DE HUBS ---
-        const worldHubs = [{ country: "Brasil", type: "airport", city: "Brasília", lat: -15.8697, lng: -47.9208 }, { country: "Brasil", type: "port", city: "Salvador", lat: -12.9228, lng: -38.5122 }, { country: "México", type: "airport", city: "Cidade do México", lat: 19.4326, lng: -99.1332 }, { country: "México", type: "port", city: "Veracruz", lat: 19.1738, lng: -96.1342 }, { country: "Canadá", type: "airport", city: "Ottawa", lat: 45.4215, lng: -75.6972 }, { country: "Canadá", type: "port", city: "Vancouver", lat: 49.2827, lng: -123.1207 }, { country: "Argentina", type: "airport", city: "Buenos Aires", lat: -34.6037, lng: -58.3816 }, { country: "Argentina", type: "port", city: "Mar del Plata", lat: -38.0055, lng: -57.5426 }, { country: "Peru", type: "airport", city: "Lima", lat: -12.0464, lng: -77.0428 }, { country: "Peru", type: "port", city: "Callao", lat: -12.0566, lng: -77.1491 }, { country: "Colômbia", type: "airport", city: "Bogotá", lat: 4.7110, lng: -74.0721 }, { country: "Colômbia", type: "port", city: "Cartagena", lat: 10.3910, lng: -75.4794 }, { country: "África do Sul", type: "airport", city: "Joanesburgo", lat: -26.1367, lng: 28.2411 }, { country: "África do Sul", type: "port", city: "Cidade do Cabo", lat: -33.9189, lng: 18.4233 }, { country: "Marrocos", type: "airport", city: "Rabat", lat: 33.9716, lng: -6.8498 }, { country: "Marrocos", type: "port", city: "Casablanca", lat: 33.5731, lng: -7.5898 }, { country: "Egito", type: "airport", city: "Cairo", lat: 30.1219, lng: 31.4056 }, { country: "Egito", type: "port", city: "Alexandria", lat: 31.2001, lng: 29.9187 }, { country: "Espanha", type: "airport", city: "Madrid", lat: 40.4839, lng: -3.5680 }, { country: "Espanha", type: "port", city: "Barcelona", lat: 41.3851, lng: 2.1734 }, { country: "França", type: "airport", city: "Paris", lat: 49.0097, lng: 2.5479 }, { country: "França", type: "port", city: "Marselha", lat: 43.2965, lng: 5.3698 }, { country: "Arábia Saudita", type: "airport", city: "Riad", lat: 24.9576, lng: 46.6988 }, { country: "Arábia Saudita", type: "port", city: "Jidá", lat: 21.4858, lng: 39.1925 }, { country: "Índia", type: "airport", city: "Nova Deli", lat: 28.5562, lng: 77.1000 }, { country: "Índia", type: "port", city: "Bombaim", lat: 18.9220, lng: 72.8347 }, { country: "Finlândia", type: "airport", city: "Helsínquia", lat: 60.3172, lng: 24.9633 }, { country: "Finlândia", type: "port", city: "Helsínquia", lat: 60.1600, lng: 24.9600 }, { country: "Japão", type: "airport", city: "Tóquio", lat: 35.5494, lng: 139.7798 }, { country: "Japão", type: "port", city: "Yokohama", lat: 35.4437, lng: 139.6380 }, { country: "Austrália", type: "airport", city: "Canberra", lat: -35.3050, lng: 149.1934 }, { country: "Austrália", type: "port", city: "Sydney", lat: -33.8688, lng: 151.2093 }, { country: "Nova Zelândia", type: "airport", city: "Wellington", lat: -41.3276, lng: 174.8076 }, { country: "Nova Zelândia", type: "port", city: "Auckland", lat: -36.8485, lng: 174.7633 }, { country: "Turquia", type: "airport", city: "Ancara", lat: 40.1281, lng: 32.9951 }, { country: "Turquia", type: "port", city: "Istambul", lat: 41.0082, lng: 28.9784 }, { country: "Reino Unido", type: "airport", city: "Londres", lat: 51.4700, lng: -0.4543 }, { country: "Rússia", type: "airport", city: "Moscou", lat: 55.7558, lng: 37.6173 }, { country: "EUA", type: "airport", city: "Washington", lat: 38.8512, lng: -77.0402 }, { country: "Groenlândia", type: "port", city: "Nuuk", lat: 64.1750, lng: -51.7389 }, { country: "Madagascar", type: "port", city: "Toamasina", lat: -18.1492, lng: 49.4023 }, { country: "Suíça", type: "airport", city: "Berna", lat: 46.9128, lng: 7.4984 }];
+        const worldHubs = [{ country: "Brasil", type: "airport", city: "Brasília", lat: -15.8697, lng: -47.9208 }, { country: "Brasil", type: "port", city: "Salvador", lat: -12.9228, lng: -38.5122 }, { country: "México", type: "airport", city: "Cidade do México", lat: 19.4326, lng: -99.1332 }, { country: "México", type: "port", city: "Veracruz", lat: 19.1738, lng: -96.1342 }, { country: "Canadá", type: "airport", city: "Ottawa", lat: 45.4215, lng: -75.6972 }, { country: "Canadá", type: "port", city: "Vancouver", lat: 49.2827, lng: -123.1207 }, { country: "Argentina", type: "airport", city: "Buenos Aires", lat: -34.6037, lng: -58.3816 }, { country: "Argentina", type: "port", city: "Mar del Plata", lat: -38.0055, lng: -57.5426 }, { country: "Peru", type: "airport", city: "Lima", lat: -12.0464, lng: -77.0428 }, { country: "Peru", type: "port", city: "Callao", lat: -12.0566, lng: -77.1491 }, { country: "Colômbia", type: "airport", city: "Bogotá", lat: 4.7110, lng: -74.0721 }, { country: "Colômbia", type: "port", city: "Cartagena", lat: 10.3910, lng: -75.4794 }, { country: "África do Sul", type: "airport", city: "Joanesburgo", lat: -26.1367, lng: 28.2411 }, { country: "África do Sul", type: "port", city: "Cidade do Cabo", lat: -33.9189, lng: 18.4233 }, { country: "Marrocos", type: "airport", city: "Rabat", lat: 33.9716, lng: -6.8498 }, { country: "Marrocos", type: "port", city: "Casablanca", lat: 33.5731, lng: -7.5898 }, { country: "Egito", type: "airport", city: "Cairo", lat: 30.1219, lng: 31.4056 }, { country: "Egito", type: "port", city: "Alexandria", lat: 31.2001, lng: 29.9187 }, { country: "Espanha", type: "airport", city: "Madrid", lat: 40.4839, lng: -3.5680 }, { country: "Espanha", type: "port", city: "Barcelona", lat: 41.3851, lng: 2.1734 }, { country: "França", type: "airport", city: "Paris", lat: 49.0097, lng: 2.5479 }, { country: "França", type: "port", city: "Marselha", lat: 43.2965, lng: 5.3698 }, { country: "Arábia Saudita", type: "airport", city: "Riad", lat: 24.9576, lng: 46.6988 }, { country: "Arábia Saudita", type: "port", city: "Jidá", lat: 21.4858, lng: 39.1925 }, { country: "Índia", type: "airport", city: "Nova Deli", lat: 28.5562, lng: 77.1000 }, { country: "Índia", type: "port", city: "Bombaim", lat: 18.9220, lng: 72.8347 }, { country: "Finlândia", type: "airport", city: "Helsínquia", lat: 60.3172, lng: 24.9633 }, { country: "Finlândia", type: "port", city: "Porto de Helsínquia", lat: 60.1600, lng: 24.9600 }, { country: "Japão", type: "airport", city: "Tóquio", lat: 35.5494, lng: 139.7798 }, { country: "Japão", type: "port", city: "Yokohama", lat: 35.4437, lng: 139.6380 }, { country: "Austrália", type: "airport", city: "Canberra", lat: -35.3050, lng: 149.1934 }, { country: "Austrália", type: "port", city: "Sydney", lat: -33.8688, lng: 151.2093 }, { country: "Nova Zelândia", type: "airport", city: "Wellington", lat: -41.3276, lng: 174.8076 }, { country: "Nova Zelândia", type: "port", city: "Auckland", lat: -36.8485, lng: 174.7633 }, { country: "Turquia", type: "airport", city: "Ancara", lat: 40.1281, lng: 32.9951 }, { country: "Turquia", type: "port", city: "Istambul", lat: 41.0082, lng: 28.9784 }, { country: "Reino Unido", type: "airport", city: "Londres", lat: 51.4700, lng: -0.4543 }, { country: "Rússia", type: "airport", city: "Moscou", lat: 55.7558, lng: 37.6173 }, { country: "EUA", type: "airport", city: "Washington", lat: 38.8512, lng: -77.0402 }, { country: "Groenlândia", type: "port", city: "Nuuk", lat: 64.1750, lng: -51.7389 }, { country: "Madagascar", type: "port", city: "Toamasina", lat: -18.1492, lng: 49.4023 }, { country: "Suíça", type: "airport", city: "Berna", lat: 46.9128, lng: 7.4984 }];
 
-        // --- SISTEMA DE ÁUDIO REFINADO (v59 - INÍCIO MUDO + FADE 0.3S) ---
+        // --- SISTEMA DE ÁUDIO ---
         const audioSystem = {
             tracks: [document.getElementById('bgMusic1'), document.getElementById('bgMusic2')],
             currentTrackIndex: 0, isMuted: true, fadeInterval: null,
             init() { this.tracks.forEach(t => t.volume = 0); this.tracks[0].addEventListener('ended', () => this.crossfadeTo(1)); this.tracks[1].addEventListener('ended', () => this.crossfadeTo(0)); },
-            startPlayback() { /* Agora não inicia som automaticamente */ },
-            fadeIn(index, duration = 300) { 
-                const track = this.tracks[index]; track.play(); 
-                let vol = 0; const steps = 10; const interval = duration / steps;
-                const fInt = setInterval(() => { vol = Math.min(1, vol + 0.1); track.volume = vol; if (vol >= 1) clearInterval(fInt); }, interval);
-            },
-            toggleMute() {
-                this.isMuted = !this.isMuted;
-                if (this.isMuted) { this.tracks.forEach(t => { t.volume = 0; t.pause(); }); }
-                else { this.fadeIn(this.currentTrackIndex, 300); }
-                return this.isMuted;
-            }
+            fadeIn(index, duration = 300) { const track = this.tracks[index]; track.play(); let vol = 0; const steps = 10; const interval = duration / steps; const fInt = setInterval(() => { vol = Math.min(1, vol + 0.1); track.volume = vol; if (vol >= 1) clearInterval(fInt); }, interval); },
+            toggleMute() { this.isMuted = !this.isMuted; if (this.isMuted) { this.tracks.forEach(t => { t.volume = 0; t.pause(); }); } else { this.fadeIn(this.currentTrackIndex, 300); } return this.isMuted; }
         };
         audioSystem.init();
-
         function toggleSoundManual() {
             const muted = audioSystem.toggleMute();
             document.getElementById('soundBtnIcon').innerHTML = muted ? 
@@ -266,14 +264,61 @@
             map.on('click', async (e) => { updateCountrySelection(e.latlng); });
         }
 
+        // ✅ LÓGICA DE GÊNERO GRAMATICAL (v61)
+        function getCountryArticle(name) {
+            const femCountries = ["França", "Espanha", "Argentina", "Colômbia", "Arábia Saudita", "Índia", "Finlândia", "Austrália", "Nova Zelândia", "Turquia", "Rússia", "Groenlândia", "Madagascar", "Suíça", "Bolívia", "África do Sul", "Turquia"];
+            const pluralCountries = ["Estados Unidos", "EUA", "Filipinas", "Bahamas", "Maldivas"];
+            if (pluralCountries.includes(name)) return "nos";
+            return femCountries.includes(name) ? "na" : "no";
+        }
+
         async function updateCountrySelection(latlng) {
             const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latlng.lat}&longitude=${latlng.lng}&localityLanguage=pt`;
             const res = await fetch(url); const data = await res.json(); const btn = document.getElementById('btnWorld');
-            if (data.countryName) { game.selectedCountry = data.countryName; btn.innerText = data.countryName.toUpperCase(); if (blipMarker) map.removeLayer(blipMarker); const blipIcon = L.divIcon({ className: 'bio-blip', iconSize: [15, 15] }); blipMarker = L.marker(latlng, { icon: blipIcon }).addTo(map); }
-            else { game.selectedCountry = null; btn.innerText = "MUNDO"; if (blipMarker) map.removeLayer(blipMarker); }
+            
+            if (data.countryName) {
+                game.selectedCountry = data.countryName; 
+                btn.innerText = data.countryName.toUpperCase();
+                
+                // Atualiza Blip Pulsante
+                if (blipMarker) map.removeLayer(blipMarker); 
+                const blipIcon = L.divIcon({ className: 'bio-blip', iconSize: [15, 15] }); 
+                blipMarker = L.marker(latlng, { icon: blipIcon }).addTo(map);
+
+                // ✅ Gatilho Paciente Zero (Caixa Suspensa)
+                if (!game.infectionStarted) {
+                    const article = getCountryArticle(data.countryName);
+                    const popupContent = `
+                        <div class="dispersal-box">
+                            <p>Deseja iniciar a dispersão do agente ${article} <b>${data.countryName}</b>?</p>
+                            <div class="dispersal-actions">
+                                <button class="btn-mini" onclick="confirmInfection()">SIM</button>
+                                <button class="btn-mini" onclick="map.closePopup()">NÃO</button>
+                            </div>
+                        </div>
+                    `;
+                    L.popup({ closeButton: false, offset: [0, -10] })
+                     .setLatLng(latlng)
+                     .setContent(popupContent)
+                     .openOn(map);
+                }
+            } else {
+                game.selectedCountry = null; 
+                btn.innerText = "MUNDO"; 
+                if (blipMarker) map.removeLayer(blipMarker);
+                map.closePopup();
+            }
         }
 
-        // ✅ RENDERIZAÇÃO DE HUBS COM ÍCONES EXTERNOS (v59)
+        // ✅ Confirmação de Início (v61)
+        function confirmInfection() {
+            game.infectionStarted = true;
+            game.dna = 1; // 1º Ponto de DNA
+            document.getElementById('valDNA').innerText = game.dna;
+            map.closePopup();
+            registerNews(`SURTO INICIADO. PACIENTE ZERO IDENTIFICADO ${getCountryArticle(game.selectedCountry).toUpperCase()} ${game.selectedCountry.toUpperCase()}.`);
+        }
+
         function renderHubs() {
             worldHubs.forEach(hub => {
                 const iconPath = (hub.type === 'airport') ? 'plane.svg' : 'anchor.svg';
