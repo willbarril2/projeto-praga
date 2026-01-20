@@ -60,7 +60,7 @@
         @keyframes slideIn { from { opacity:0; transform: scale(0.95); } to { opacity:1; transform: scale(1); } }
         
         .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin: 35px 0; }
-        .opt-box { padding: 25px; border: 1px solid #333; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,0.03); transition: 0.2s; color: #DDD; text-align: left; }
+        .opt-box { padding: 20px; border: 1px solid #333; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,0.03); transition: 0.2s; color: #DDD; text-align: center; } /* ✅ ALINHAMENTO CENTRALIZADO */
         .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.2); color: #FFF; }
         .opt-box b { display: block; font-size: 1.2rem; margin-bottom: 3px; color: #FFF; }
         .opt-box small { color: #AAA; line-height: 1.2; display: block; font-weight: 400; font-size: 0.95rem; }
@@ -71,9 +71,6 @@
         .hud { position: fixed; z-index: 1000; pointer-events: none; }
         .hud * { pointer-events: auto; }
         .top-hud { top: 12px; width: 96%; left: 2%; height: 55px; display: flex; align-items: center; padding: 0 25px; justify-content: space-between; }
-        .bottom-hud { bottom: 12px; width: 96%; left: 2%; height: 150px; display: flex; align-items: center; justify-content: space-between; padding: 0 35px; }
-
-        /* MODAIS */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.94); z-index: 9000; display: none; align-items: center; justify-content: center; }
         .modal-card { width: 600px; padding: 45px; position: relative; border: 1px solid var(--border); box-shadow: 0 0 100px #000; }
         .btn-x { position: absolute; top: 20px; right: 25px; background: none; border: none; color: #777; font-size: 2.2rem; cursor: pointer; transition: 0.2s; }
@@ -127,7 +124,7 @@
         <div id="setupName" class="glass setup-card">
             <h2 style="color: var(--blue); font-family: Orbitron; font-size: 2.2rem; letter-spacing: 2px;">NOMEIE SUA CRIAÇÃO</h2>
             <p style="color: #AAA; margin-bottom: 10px;">Identifique o agente do fim da humanidade.</p>
-            <input type="text" id="nameIn" placeholder="NOME..." maxlength="18" style="width: 100%; padding: 25px; background: rgba(0,0,0,0.6); border: 2px solid #444; color: #FFF; text-align: center; font-size: 2.5rem; margin: 40px 0; font-family: Rajdhani; letter-spacing: 4px; border-radius: 10px;">
+            <input type="text" id="nameIn" placeholder="NOME..." maxlength="18" style="width: 100%; padding: 25px; background: rgba(0,0,0,0.6); border: 2px solid #444; color: #FFF; text-align: center; font-size: 2.5rem; margin: 45px 0; font-family: Rajdhani; letter-spacing: 4px; border-radius: 10px;">
             <button class="btn-main" style="width: 100%; background: var(--red); color: #FFF; box-shadow: 0 4px 0 #900;" onclick="startGame()">INICIAR ANIQUILAÇÃO</button>
         </div>
     </div>
