@@ -21,73 +21,68 @@
             background-size: cover; opacity: 0.25; z-index: 1; pointer-events: none; transition: opacity 0.8s ease;
         }
 
-        /* --- ESTRUTURA DE TELAS (CORRIGIDA v47) --- */
-        /* Container base para telas cheias */
+        /* --- SISTEMA DE TELAS --- */
         .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; background: transparent; }
         .screen.active { display: flex; }
         
-        /* Estilos específicos de tela */
         #startMenu { background: radial-gradient(circle at center, rgba(255, 23, 68, 0.15) 0%, rgba(0, 0, 0, 0.8) 100%); }
-        /* Tela de Recomendação Vermelha e Plana (v47) */
-        #optiScreen { background: rgba(10, 0, 0, 0.9); text-align: center; padding: 40px; }
+        #optiScreen { background: rgba(20, 0, 0, 0.95); text-align: center; padding: 40px; }
 
-        /* Container de fluxo de seleção (fixo para centralizar os cards filhos) */
-        #selectionFlow { background: rgba(0,0,0,0.95); }
-        
-        /* Cards internos do fluxo (NÃO SÃO MAIS FIXED) (v47 FIX) */
+        /* CARDS DE SETUP (FIX RESPONSIVIDADE v48) */
         .setup-card { 
-            width: 92%; max-width: 850px; padding: 40px; text-align: center; 
-            display: none; /* Escondido por padrão */
-            margin: auto; /* Centraliza no fluxo */
+            width: 95%; max-width: 900px; max-height: 85vh; padding: 35px; text-align: center; 
+            display: none; margin: auto; overflow-y: auto;
         }
         .setup-card.active { display: block; animation: slideIn 0.4s ease; }
-        @keyframes slideIn { from { opacity:0; transform: scale(0.95); } to { opacity:1; transform: scale(1); } }
+        @keyframes slideIn { from { opacity:0; transform: scale(0.98); } to { opacity:1; transform: scale(1); } }
 
-        /* --- BARRA SUPERIOR (CENTRALIZADA v47) --- */
+        /* --- BARRA SUPERIOR --- */
         .top-bar {
             position: fixed; top: 12px; left: 2%; width: 96%; height: 55px;
-            z-index: 9000; display: grid; /* Mudança para Grid para facilitar centralização */
-            grid-template-columns: auto 1fr auto; /* Rótulo | Espaço Flexível | Botão */
-            align-items: center;
-            padding: 0 25px; transition: 0.5s ease; border-radius: 12px;
+            z-index: 9000; display: grid; grid-template-columns: 120px 1fr 60px;
+            align-items: center; padding: 0 20px; transition: 0.5s ease; border-radius: 12px;
             pointer-events: none;
         }
         .top-bar > * { pointer-events: auto; }
         .glass-bar { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--border); }
         .highlight-bar { background: #000; border: 1px solid var(--red); box-shadow: 0 5px 25px rgba(0,0,0,0.8); }
 
-        @keyframes pulse-red { 0% { color: var(--red); transform: scale(1); } 50% { color: #fff; transform: scale(1.05); } 100% { color: var(--red); transform: scale(1); } }
-        .news-label-pulse { color: var(--red); font-weight: 900; font-family: Orbitron; font-size: 0.85rem; letter-spacing: 2px; cursor: pointer; animation: pulse-red 2s infinite ease-in-out; white-space: nowrap; }
+        @keyframes pulse-red { 0% { color: var(--red); transform: scale(1); } 50% { color: #fff; transform: scale(1.03); } 100% { color: var(--red); transform: scale(1); } }
+        .news-label-pulse { color: var(--red); font-weight: 900; font-family: Orbitron; font-size: 0.85rem; letter-spacing: 2px; cursor: pointer; animation: pulse-red 2s infinite ease-in-out; text-align: left; }
 
-        /* Ícone de Som Sólido (v47) */
         .sound-btn { background: none; border: none; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; color: #FFF; }
-        .sound-btn svg { width: 26px; height: 26px; fill: currentColor; }
+        .sound-btn svg { width: 24px; height: 24px; fill: currentColor; }
         .sound-btn:hover { color: var(--red); transform: scale(1.1); }
 
-        /* --- UI GERAL --- */
-        .glass { background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 12px; }
-        .btn-main { background: #FFF; color: #800000; border: none; padding: 12px 25px; font-size: 1.3rem; font-weight: 800; border-radius: 6px; cursor: pointer; transition: 0.3s; margin: 8px; text-transform: uppercase; width: 260px; box-shadow: 0 4px 0 #CCC; position: relative; z-index: 2; }
-        .btn-main:hover { background: var(--red); color: #FFF; transform: scale(1.03); box-shadow: 0 4px 0 #900; }
+        /* --- BOTÃO PADRONIZADO (VERMELHO ESCALÁVEL v48) --- */
+        .btn-main { 
+            background: var(--red); color: #FFF; border: none; padding: 14px 30px; 
+            font-size: 1.2rem; font-weight: 800; border-radius: 6px; cursor: pointer; 
+            transition: transform 0.2s, box-shadow 0.2s; margin: 10px; 
+            text-transform: uppercase; width: 280px; font-family: 'Rajdhani';
+            box-shadow: 0 4px 15px rgba(255, 23, 68, 0.3);
+        }
+        .btn-main:hover { transform: scale(1.08); box-shadow: 0 6px 25px rgba(255, 23, 68, 0.5); }
+        .btn-white { background: #FFF; color: #800000; box-shadow: 0 4px 0 #CCC; }
+        .btn-white:hover { background: var(--red); color: #FFF; }
+
+        /* --- GRID SELEÇÃO (FIX v48) --- */
+        .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 25px 0; }
+        .opt-box { padding: 18px; border: 1px solid #333; border-radius: 8px; cursor: pointer; background: rgba(255,255,255,0.05); transition: 0.2s; color: #DDD; text-align: center; }
+        .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.2); color: #FFF; }
+        .opt-box b { display: block; font-size: 1.1rem; margin-bottom: 2px; color: #FFF; }
+        .opt-box small { color: #AAA; line-height: 1.3; display: block; font-size: 0.9rem; }
 
         #mainGame { width: 100%; height: 100vh; display: none; position: relative; z-index: 10; }
         #map { width: 100%; height: 100vh; z-index: 1; }
-        
-        /* Container da manchete centralizado na sua célula do grid */
-        .news-marquee-container { 
-            overflow: hidden; position: relative; height: 30px; margin: 0 30px; 
-            display: flex; align-items: center; justify-content: center; /* Centraliza verticalmente */
-        }
+        .news-marquee-container { overflow: hidden; position: relative; height: 30px; margin: 0 20px; display: flex; align-items: center; }
         #ticker { color: #FFF; font-weight: 700; font-size: 1rem; position: absolute; white-space: nowrap; right: -110%; width: fit-content; }
 
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.94); z-index: 9999; display: none; align-items: center; justify-content: center; }
-        .modal-card { width: 600px; padding: 45px; position: relative; border: 1px solid var(--border); box-shadow: 0 0 100px #000; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 9999; display: none; align-items: center; justify-content: center; }
+        .modal-card { width: 600px; padding: 45px; position: relative; border: 1px solid var(--border); box-shadow: 0 0 100px #000; border-radius: 15px; background: #080808; }
         .btn-x { position: absolute; top: 20px; right: 25px; background: none; border: none; color: #777; font-size: 2.2rem; cursor: pointer; }
         .btn-x:hover { color: #FFF; }
         .error-msg-box { color: var(--red); font-weight: 700; font-size: 1rem; margin: 10px 0; min-height: 24px; opacity: 0; transition: 0.3s; }
-
-        .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin: 35px 0; }
-        .opt-box { padding: 20px; border: 1px solid #333; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,0.05); transition: 0.2s; color: #DDD; text-align: center; }
-        .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.2); color: #FFF; }
     </style>
 </head>
 <body>
@@ -108,15 +103,15 @@
     <div id="startMenu" class="screen active">
         <div class="bio-logo" style="font-family: Orbitron; font-size: 5.5rem; letter-spacing: 15px; text-shadow: 0 0 35px var(--red); margin-bottom: 55px; position: relative; z-index: 2;">PRAGA</div>
         <button class="btn-main" onclick="goToOptimization()">Iniciar</button>
-        <button class="btn-main" onclick="openModal('tutorialModal')">Tutorial</button>
-        <button class="btn-main" onclick="alert('Histórico indisponível')">Conquistas</button>
+        <button class="btn-main" style="background: #FFF; color: #800000;" onclick="openModal('tutorialModal')">Tutorial</button>
+        <button class="btn-main" style="background: #FFF; color: #800000;" onclick="alert('Histórico indisponível')">Conquistas</button>
     </div>
 
     <div id="optiScreen" class="screen">
-        <div style="font-size: 4rem; margin-bottom: 20px; color: var(--red);">💻</div>
-        <h2 style="font-family: Orbitron; color: var(--red); margin-bottom: 20px; letter-spacing: 3px; font-size: 2rem;">RECOMENDAÇÃO DE TELA</h2>
-        <p style="font-size: 1.2rem; line-height: 1.6; color: #CCC; margin-bottom: 40px; max-width: 700px;">Para uma imersão tática completa e visualização precisa dos dados globais, recomendamos o uso de telas grandes como <b>notebooks, monitores ou tablets</b>.</p>
-        <button class="btn-main" style="background: var(--red); color: #FFF; box-shadow: 0 4px 0 #900;" onclick="initSetup()">Ciente</button>
+        <div style="font-size: 4.5rem; margin-bottom: 25px; color: var(--red);">💻</div>
+        <h2 style="font-family: Orbitron; color: var(--red); margin-bottom: 20px; letter-spacing: 3px; font-size: 2.2rem; font-weight: 900;">RECOMENDAÇÃO DE TELA</h2>
+        <p style="font-size: 1.3rem; line-height: 1.6; color: #FFF; margin-bottom: 45px; max-width: 750px;">Para uma imersão tática completa e visualização precisa dos dados globais, recomendamos o uso de telas grandes como <b>notebooks, monitores ou tablets</b>.</p>
+        <button class="btn-main" onclick="initSetup()">Ciente</button>
     </div>
 
     <div id="selectionFlow" class="screen">
@@ -134,7 +129,7 @@
                 <div class="opt-box" onclick="setVar('type', 'Bio-Arma', this)"><b>☢️ BIO-ARMA</b><small>Criado para matar</small></div>
             </div>
             <div id="errorType" class="error-msg-box"></div>
-            <button class="btn-main" onclick="nextStep('setupDiff', 'type', 'errorType', 'Você precisa selecionar um agente para avançar')">Confirmar Agente</button>
+            <button class="btn-main" onclick="runNextStep(this, 'setupDiff', 'type', 'errorType', 'Você precisa selecionar um agente para avançar')">Confirmar Agente</button>
         </div>
 
         <div id="setupDiff" class="glass setup-card">
@@ -145,7 +140,7 @@
                 <div class="opt-box" onclick="setVar('diff', 'Brutal', this)"><b style="color: var(--red);">🔴 BRUTAL</b><small>Mundo em alerta.<br>Pesquisa agressiva.</small></div>
             </div>
             <div id="errorDiff" class="error-msg-box"></div>
-            <button class="btn-main" onclick="nextStep('setupName', 'diff', 'errorDiff', 'Você precisa selecionar um nível de resposta para avançar')">Confirmar Resposta</button>
+            <button class="btn-main" onclick="runNextStep(this, 'setupName', 'diff', 'errorDiff', 'Você precisa selecionar um nível de resposta para avançar')">Confirmar Resposta</button>
         </div>
 
         <div id="setupName" class="glass setup-card">
@@ -153,178 +148,95 @@
             <p style="color: #AAA; margin-bottom: 10px;">Identifique o agente do fim da humanidade.</p>
             <input type="text" id="nameIn" placeholder="NOME..." maxlength="18" style="width: 100%; padding: 25px; background: rgba(0,0,0,0.6); border: 2px solid #444; color: #FFF; text-align: center; font-size: 2.5rem; margin: 30px 0; font-family: Rajdhani; border-radius: 10px;">
             <div id="errorName" class="error-msg-box"></div>
-            <button class="btn-main" style="width: 100%; background: var(--red); color: #FFF;" onclick="startGame()">INICIAR ANIQUILAÇÃO</button>
+            <button class="btn-main" onclick="startGame()">INICIAR ANIQUILAÇÃO</button>
         </div>
     </div>
 
     <div id="mainGame"><div id="map"></div></div>
 
-    <div id="tutorialModal" class="overlay"><div class="glass modal-card"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px;">MANUAL TÁTICO</h2><div style="text-align: left; line-height: 1.8; color: #FFF; font-size: 1.15rem;"><p>• 1. Inserção: Clique em um país no mapa global para liberar o Agente Patogênico.</p><p>• 2. Recurso Genético: Acumule 1 ponto de Mutagenicidade a cada 100.000 novos infectados.</p><p>• 3. Resposta Global: A Cura foca nos infectados; a Vacina protege os saudáveis.</p><p>• 4. Adaptação: Evoluir a praga força cientistas a reiniciar pesquisas, atrasando cura e vacina.</p></div></div></div>
+    <div id="tutorialModal" class="overlay">
+        <div class="glass modal-card">
+            <button class="btn-x" onclick="closeModal()">✕</button>
+            <h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px; letter-spacing: 2px;">MANUAL TÁTICO</h2>
+            <div style="text-align: left; line-height: 1.8; color: #FFF; font-size: 1.15rem;">
+                <p>• <b>1. Inserção:</b> Clique em um país no mapa global para liberar o Agente Patogênico.</p>
+                <p>• <b>2. Recurso Genético:</b> Acumule 1 ponto de Mutagenicidade a cada <b>100.000</b> novos infectados.</p>
+                <p>• <b>3. Resposta Global:</b> A <b>Cura</b> foca nos infectados; a <b>Vacina</b> protege os saudáveis.</p>
+                <p>• <b>4. Adaptação:</b> Evoluir a praga força cientistas a reiniciar pesquisas, <b>atrasando cura e vacina</b>.</p>
+            </div>
+        </div>
+    </div>
+
     <div id="newsLogModal" class="overlay"><div class="glass modal-card"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px;">HISTÓRICO DE MANCHETES</h2><div id="newsEntries" style="max-height: 400px; overflow-y: auto;"></div></div></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        let game = { started: false, name: '', type: '', diff: '', active: false, newsLog: [] };
-
-        // --- SISTEMA DE ÁUDIO COM CROSSFADE (v47) ---
+        let game = { started: false, name: '', type: '', diff: '', active: false, newsLog: [], soundOn: true };
         const audioSystem = {
             tracks: [document.getElementById('bgMusic1'), document.getElementById('bgMusic2')],
-            currentTrackIndex: 0,
-            isMuted: false,
-            fadeInterval: null,
-            
-            init() {
-                // Configura volumes iniciais
-                this.tracks[0].volume = 0;
-                this.tracks[1].volume = 0;
-                // Configura listeners para o fim de cada faixa
+            currentTrackIndex: 0, isMuted: false, fadeInterval: null,
+            init() { 
+                this.tracks[0].volume = 0; this.tracks[1].volume = 0;
                 this.tracks[0].addEventListener('ended', () => this.crossfadeTo(1));
                 this.tracks[1].addEventListener('ended', () => this.crossfadeTo(0));
             },
-
-            startPlayback() {
-                if (this.isMuted) return;
-                // Começa a tocar a faixa 1 e faz fade in
-                this.tracks[0].play();
-                this.fadeIn(0);
-            },
-
+            startPlayback() { if (this.isMuted) return; this.fadeIn(0); },
             crossfadeTo(nextIndex) {
                 if (this.isMuted) return;
-                const currentIndex = nextIndex === 0 ? 1 : 0;
-                const currentTrack = this.tracks[currentIndex];
-                const nextTrack = this.tracks[nextIndex];
-
-                nextTrack.play(); // Garante que a próxima comece
-
-                clearInterval(this.fadeInterval);
-                let step = 0;
-                const steps = 50; // 50 passos em 5s = 100ms por passo
-                
+                const nextTrack = this.tracks[nextIndex]; const currentTrack = this.tracks[nextIndex === 0 ? 1 : 0];
+                nextTrack.play(); clearInterval(this.fadeInterval); let step = 0; const steps = 50;
                 this.fadeInterval = setInterval(() => {
-                    step++;
-                    const fadeOutVol = Math.max(0, 1 - (step / steps));
-                    const fadeInVol = Math.min(1, step / steps);
-                    
-                    currentTrack.volume = fadeOutVol;
-                    nextTrack.volume = fadeInVol;
-
-                    if (step >= steps) {
-                        clearInterval(this.fadeInterval);
-                        currentTrack.pause();
-                        currentTrack.currentTime = 0; // Reseta a faixa antiga
-                        this.currentTrackIndex = nextIndex;
-                    }
-                }, 100); // 100ms * 50 steps = 5000ms (5s)
+                    step++; currentTrack.volume = Math.max(0, 1 - (step / steps)); nextTrack.volume = Math.min(1, step / steps);
+                    if (step >= steps) { clearInterval(this.fadeInterval); currentTrack.pause(); currentTrack.currentTime = 0; this.currentTrackIndex = nextIndex; }
+                }, 100);
             },
-
-            fadeIn(index) {
-                const track = this.tracks[index];
-                track.volume = 0;
-                track.play();
-                let vol = 0;
-                const interval = setInterval(() => {
-                    vol = Math.min(1, vol + 0.05);
-                    track.volume = vol;
-                    if (vol >= 1) clearInterval(interval);
-                }, 250); // Fade in inicial mais rápido (2.5s)
-            },
-
+            fadeIn(index) { const track = this.tracks[index]; track.play(); let vol = 0; const int = setInterval(() => { vol = Math.min(1, vol + 0.05); track.volume = vol; if (vol >= 1) clearInterval(int); }, 200); },
             toggleMute() {
-                this.isMuted = !this.isMuted;
-                clearInterval(this.fadeInterval); // Para qualquer fade em andamento
-                
-                if (this.isMuted) {
-                    this.tracks[0].volume = 0;
-                    this.tracks[1].volume = 0;
-                    this.tracks[0].pause();
-                    this.tracks[1].pause();
-                } else {
-                    // Retoma a faixa atual com volume máximo
-                    this.tracks[this.currentTrackIndex].volume = 1;
-                    this.tracks[this.currentTrackIndex].play();
-                }
+                this.isMuted = !this.isMuted; clearInterval(this.fadeInterval);
+                if (this.isMuted) { this.tracks.forEach(t => { t.volume = 0; t.pause(); }); }
+                else { this.tracks[this.currentTrackIndex].volume = 1; this.tracks[this.currentTrackIndex].play(); }
                 return this.isMuted;
             }
         };
-
         audioSystem.init();
 
         function toggleSoundManual() {
-            const isMuted = audioSystem.toggleMute();
-            const btn = document.getElementById('soundBtnIcon');
-            // Ícones Sólidos (v47)
-            btn.innerHTML = isMuted ? 
+            const muted = audioSystem.toggleMute();
+            document.getElementById('soundBtnIcon').innerHTML = muted ? 
                 '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51c.66-1.24 1.03-2.65 1.03-4.15 0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>' :
                 '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
         }
 
-        // --- MANCHETES PRÉ-JOGO (v47) ---
+        // --- MANCHETES COM LÓGICA DE ASPAS v48 ---
         const preGameNews = [
             "O descrédito à ciência tem levado muitos cientistas a se manifestarem contra essa tendência. Será que a ciência se revoltará em breve?",
-            "Cansamos de salvar um futuro que insiste em se destruir.",
-            "Quando o fato vira opinião, a ciência vira ruína.",
-            "O descrédito é o ácido que corrói as fundações do amanhã.",
-            "A ciência não vai cair. Ela vai simplesmente se calar.",
-            "Onde a crença vence a prova, o cientista se torna um fantasma.",
-            "Não há como curar um mundo que ama a própria ferida.",
-            "O laboratório está vazio porque a verdade se tornou indesejada.",
-            "A razão se retirou da sala. O colapso agora é livre.",
-            "Não somos mais guias, somos apenas testemunhas da queda."
+            "\"Cansamos de salvar um futuro que insiste em se destruir.\"",
+            "\"Quando o fato vira opinião, a ciência vira ruína.\"",
+            "\"O descrédito é o ácido que corrói as fundações do amanhã.\"",
+            "\"A ciência não vai cair. Ela vai simplesmente se calar.\"",
+            "\"Onde a crença vence a prova, o cientista se torna um fantasma.\"",
+            "\"Não há como curar um mundo que ama a própria ferida.\"",
+            "\"O laboratório está vazio porque a verdade se tornou indesejada.\"",
+            "\"A razão se retirou da sala. O colapso agora é livre.\"",
+            "\"Não somos mais guias, somos apenas testemunhas da queda.\""
         ];
-        let preGameNewsIndex = 0;
-        let newsInterval;
-
-        function startPreGameTicker() {
-            // Mostra a primeira imediatamente
-            registerNews(preGameNews[0]);
-            preGameNewsIndex = 1;
-            // Rotaciona as próximas a cada 22s (tempo do ticker + folga)
-            newsInterval = setInterval(() => {
-                if (game.started) { clearInterval(newsInterval); return; }
-                registerNews(preGameNews[preGameNewsIndex]);
-                preGameNewsIndex = (preGameNewsIndex + 1) % preGameNews.length;
-            }, 22000);
-        }
-
-        // Inicia o ticker assim que carrega
-        window.onload = startPreGameTicker;
+        let newsIdx = 0; let newsInt;
+        window.onload = () => { registerNews(preGameNews[0]); newsInt = setInterval(() => { if(!game.started){ newsIdx = (newsIdx+1)%preGameNews.length; registerNews(preGameNews[newsIdx]); } }, 22000); };
 
         function goToOptimization() { document.getElementById('startMenu').classList.remove('active'); document.getElementById('optiScreen').classList.add('active'); }
-        
-        function initSetup() { 
-            // INICIA O ÁUDIO DUPLO
-            audioSystem.startPlayback();
-            document.getElementById('optiScreen').classList.remove('active'); 
-            document.getElementById('selectionFlow').classList.add('active'); 
-        }
+        function initSetup() { audioSystem.startPlayback(); document.getElementById('optiScreen').classList.remove('active'); document.getElementById('selectionFlow').classList.add('active'); }
+        function openNewsLog() { game.active = false; document.getElementById('newsEntries').innerHTML = game.newsLog.map(e => `<div style="padding:10px; border-bottom:1px solid #333"><b style="color:var(--blue)">${e.date}</b>: ${e.message}</div>`).join(''); openModal('newsLogModal'); }
+        function setVar(key, val, el) { game[key] = val; el.parentElement.querySelectorAll('.opt-box').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
 
         function registerNews(text) {
-            // Adiciona ao log apenas se o jogo já começou, para não poluir o histórico com as frases pré-jogo
-            if (game.started) {
-                game.newsLog.unshift({ date: "20 jan. 2026", message: text });
-            }
+            if (game.started) game.newsLog.unshift({ date: "20 jan. 2026", message: text });
             const ticker = document.getElementById('ticker'); ticker.innerText = text.toUpperCase();
             ticker.style.transition = 'none'; ticker.style.right = '-110%'; 
-            // Tempo de corrida ajustado para 20s
             setTimeout(() => { ticker.style.transition = 'right 20s linear'; ticker.style.right = '125%'; }, 100);
         }
 
-        function openNewsLog() { game.active = false; document.getElementById('newsEntries').innerHTML = game.newsLog.map(e => `<div style="padding:10px; border-bottom:1px solid #333"><b style="color:var(--blue)">${e.date}</b>: ${e.message}</div>`).join(''); openModal('newsLogModal'); }
-        function setVar(key, val, el) { game[key] = val; el.parentElement.querySelectorAll('.opt-box').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
-        
-        function nextStep(id, currentKey, errorDivId, message) {
-            const errorDiv = document.getElementById(errorDivId);
-            if (!game[currentKey]) { errorDiv.innerText = message; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; }
-            // Esconde o card atual e mostra o próximo (Correção v47)
-            el.closest('.setup-card').classList.remove('active');
-            document.getElementById(id).classList.add('active');
-        }
-        
-        // FIX v47: A função nextStep original estava com erro no 'el'. Corrigindo a chamada nos botões HTML.
-        // Função de wrapper para chamar no onclick
         function runNextStep(btn, id, currentKey, errorDivId, message) {
-             const errorDiv = document.getElementById(errorDivId);
+            const errorDiv = document.getElementById(errorDivId);
             if (!game[currentKey]) { errorDiv.innerText = message; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; }
             btn.closest('.setup-card').classList.remove('active');
             document.getElementById(id).classList.add('active');
@@ -333,19 +245,12 @@
         function startGame() { 
             const name = document.getElementById('nameIn').value.trim(); const errorDiv = document.getElementById('errorName');
             if (!name) { errorDiv.innerText = "Você precisa nomear sua criação para avançar"; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; }
-            game.name = name; 
-            game.started = true; // Marca que o jogo começou
-            clearInterval(newsInterval); // Para o ticker pré-jogo
-
+            game.name = name; game.started = true; clearInterval(newsInt);
             document.getElementById('bgOverlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('bgOverlay').style.display = 'none', 800);
-
             document.getElementById('selectionFlow').classList.remove('active'); 
             document.getElementById('mainGame').style.display = 'block'; 
-            const bar = document.getElementById('unifiedTopBar'); bar.classList.replace('glass-bar', 'highlight-bar'); 
-            
+            document.getElementById('unifiedTopBar').classList.replace('glass-bar', 'highlight-bar');
             const vMap = { 'Bactéria': 'BACTERIANO', 'Vírus': 'VIRAL', 'Fungo': 'FÚNGICO', 'Parasita': 'PARASITÁRIO', 'Príon': 'PRIÔNICO', 'Nano-Vírus': 'NANOTECNOLÓGICO', 'Bio-Arma': 'BIOLÓGICO' };
-            // Notícia inicial do jogo (agora vai para o log)
             registerNews(`SISTEMA DE ANIQUILAÇÃO BIO-TÁTICA ONLINE. VETOR ${vMap[game.type]} PRONTO. AGUARDANDO DISPERSÃO.`);
             setTimeout(() => { if(!map) initMap(); map.invalidateSize(); }, 100); 
         }
