@@ -21,27 +21,29 @@
         #startMenu { background: radial-gradient(circle at center, #ff1744 0%, #4a0000 60%, #000 100%); position: relative; overflow: hidden; }
         #startMenu::before {
             content: ""; position: absolute; inset: 0;
-            background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06) 0%, transparent 55%),
+            background-image: radial-gradient(circle at center, rgba(255,255,255,0.06) 0%, transparent 55%),
               url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20600'%3E%3Cpath%20d='M170%20355%20c45-55%20105-80%20165-82%2058-2%20103%2026%20140%2056%2038%2031%2075%2038%20106%2029%2023-7%2046-21%2068-35%2025-16%2055-26%2078-24%2018%202%2036%2012%2052%2023%2017%2011%2034%2026%2050%2042%2028%2029%2062%2058%2097%2072%2031%2012%2067%209%20101-5%2029-12%2055-34%2078-58%2010-11%2019-23%2030-34%2032-32%2066-42%20105-38%2045%205%2080%2033%20108%2064%2030%2032%2061%2054%20102%2060%2043%206%2084-8%20122-33%2027-18%2051-41%2071-67%2022-28%2042-58%2062-89%20z'%20fill='rgba(255,255,255,0.08)'/%3E%3C/svg%3E");
-            background-size: cover; background-position: center; opacity: 0.20; filter: blur(0.2px) saturate(0.8) contrast(1.15); transform: scale(1.03); pointer-events: none; z-index: 0;
+            background-size: cover; opacity: 0.20; filter: blur(0.2px); z-index: 0;
         }
         #startMenu > * { position: relative; z-index: 1; }
 
-        /* --- UI GERAL --- */
         .glass { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 12px; }
         .btn-main { background: #FFF; color: #800000; border: none; padding: 12px 25px; font-size: 1.3rem; font-weight: 800; border-radius: 6px; cursor: pointer; transition: 0.3s; margin: 8px; text-transform: uppercase; width: 260px; box-shadow: 0 4px 0 #CCC; }
         .btn-main:hover { background: var(--red); color: #FFF; transform: scale(1.03); box-shadow: 0 4px 0 #900; }
-        .btn-gear { background: none; border: none; color: #FFF; font-size: 2rem; cursor: pointer; transition: 0.3s; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
+        .btn-gear { background: none; border: none; color: #FFF; font-size: 2rem; cursor: pointer; transition: 0.3s; }
         .btn-gear:hover { transform: rotate(90deg); color: var(--red); }
 
         /* --- TOOLTIPS --- */
-        .dashed-info { position: relative; border-bottom: 1.5px dashed rgba(255, 255, 255, 0.6); cursor: help; color: #FFF; }
+        .dashed-info { position: relative; border-bottom: 1.5px dashed rgba(255, 255, 255, 0.6); cursor: help; }
         .dashed-info::after {
             content: attr(data-tooltip); position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
-            background: #000; border: 1px solid var(--border); color: #FFF; padding: 12px 18px; border-radius: 8px; font-size: 0.9rem; font-family: 'Rajdhani';
-            white-space: normal; width: 240px; text-align: center; opacity: 0; visibility: hidden; transition: 0.2s ease; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            background: #000; border: 1px solid var(--border); color: #FFF; padding: 12px 18px; border-radius: 8px; font-size: 0.9rem;
+            width: 240px; text-align: center; opacity: 0; visibility: hidden; transition: 0.2s ease; z-index: 10000;
         }
-        .dashed-info:hover::after { opacity: 1; visibility: visible; bottom: 145%; }
+        .dashed-info:hover::after { opacity: 1; visibility: visible; }
+
+        /* TOOLTIP INVERTIDO PARA NOTICIAS (v34) */
+        .tooltip-down::after { bottom: auto !important; top: 140% !important; }
 
         /* --- SETUP FLOW --- */
         #setupFlow { background: #000; overflow-y: auto; padding: 40px 0; }
@@ -53,7 +55,7 @@
         .opt-box { padding: 20px; border: 1px solid #333; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,0.03); transition: 0.2s; color: #DDD; text-align: center; }
         .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.2); color: #FFF; }
         .opt-box b { display: block; font-size: 1.2rem; margin-bottom: 3px; color: #FFF; }
-        .opt-box small { color: #AAA; line-height: 1.2; display: block; font-weight: 400; font-size: 0.95rem; }
+        .opt-box small { color: #AAA; line-height: 1.4; display: block; font-size: 0.95rem; }
 
         /* --- GAMEPLAY HUD --- */
         #mainGame { width: 100%; height: 100vh; display: none; position: relative; }
@@ -63,45 +65,41 @@
 
         .top-hud { top: 12px; width: 96%; left: 2%; height: 55px; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }
         .news-label { 
-            color: var(--red); font-weight: 800; font-size: 0.85rem; font-family: Orbitron; 
-            letter-spacing: 2px; white-space: nowrap; margin-right: 20px; 
+            color: var(--red); font-weight: 800; font-size: 0.85rem; font-family: Orbitron; letter-spacing: 2px; white-space: nowrap; margin-right: 20px; 
             border-bottom: 2px dashed rgba(255, 23, 68, 0.6); cursor: pointer;
         }
-        .news-label:hover { color: #FFF; border-color: #FFF; }
+
         .news-marquee-container { flex: 1; overflow: hidden; display: flex; align-items: center; }
         #ticker { color: #FFF; font-weight: 700; font-size: 1rem; width: 100%; }
 
         /* --- MODAIS --- */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.94); z-index: 9000; display: none; align-items: center; justify-content: center; }
         .modal-card { width: 600px; padding: 45px; position: relative; border: 1px solid var(--border); box-shadow: 0 0 100px #000; }
-        .btn-x { position: absolute; top: 20px; right: 25px; background: none; border: none; color: #777; font-size: 2.2rem; cursor: pointer; transition: 0.2s; }
-        .btn-x:hover { color: #FFF; transform: scale(1.1); }
-        .news-log-content { max-height: 400px; overflow-y: auto; text-align: left; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid #222; }
-        .news-entry { padding: 12px 0; border-bottom: 1px solid #333; color: #EEE; font-size: 1.1rem; display: flex; gap: 15px; }
-        .news-entry .news-date { color: var(--blue); font-weight: bold; min-width: 100px; }
+        .btn-x { position: absolute; top: 20px; right: 25px; background: none; border: none; color: #777; font-size: 2.2rem; cursor: pointer; }
+        .btn-x:hover { color: #FFF; }
 
+        /* CONFIGURAÇÕES SPACING */
         .config-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; width: 100%; padding: 0 15px; }
-        .btn-toggle { width: 140px; padding: 12px; border-radius: 8px; font-weight: 900; cursor: pointer; border: 2px solid rgba(255,255,255,0.15); font-size: 1rem; transition: 0.2s; }
+        .btn-toggle { width: 140px; padding: 12px; border-radius: 8px; font-weight: 900; cursor: pointer; border: 2px solid rgba(255,255,255,0.15); font-size: 1rem; }
         .btn-on { background: #1B5E20; color: #FFF; border-color: #4CAF50; }
         .btn-off { background: #B71C1C; color: #FFF; border-color: #EF5350; }
 
-        .tactical-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; padding: 35px; z-index: 8000; display: none; border: 2px solid var(--blue); background: rgba(0, 10, 20, 0.98); box-shadow: 0 0 50px rgba(0,229,255,0.2); }
+        .tactical-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; padding: 35px; z-index: 8000; display: none; border: 2px solid var(--blue); background: rgba(0, 10, 20, 0.98); }
     </style>
 </head>
 <body>
 
     <div id="startMenu" class="screen active">
-        <div style="position: absolute; top: 25px; right: 25px; z-index: 10;">
-            <button class="btn-gear" onclick="openSettings('menu')">⚙️</button>
-        </div>
+        <div style="position: absolute; top: 25px; right: 25px; z-index: 10;"><button class="btn-gear" onclick="openSettings('menu')">⚙️</button></div>
         <div class="bio-logo" style="font-family: Orbitron; font-size: 5.5rem; letter-spacing: 15px; text-shadow: 0 0 35px var(--red); margin-bottom: 55px;">PRAGA</div>
         <button class="btn-main" onclick="initSetup()">Iniciar</button>
         <button class="btn-main" onclick="openModal('tutorialModal')">Tutorial</button>
-        <button class="btn-main" onclick="alert('Histórico de Extinções indisponível')">Conquistas</button>
+        <button class="btn-main" onclick="alert('Histórico indisponível')">Conquistas</button>
     </div>
 
     <div id="selectionFlow" class="screen">
         <button class="btn-x" style="position: fixed; top:25px; right:25px; z-index:100;" onclick="location.reload()">✕</button>
+        
         <div id="setupType" class="glass setup-card active">
             <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 15px; font-size: 2.2rem; letter-spacing: 2px;">SELECIONAR AGENTE</h2>
             <div class="grid-select">
@@ -113,140 +111,94 @@
                 <div class="opt-box" onclick="setVar('type', 'Nano-Vírus', this)"><b>🤖 NANO-VÍRUS</b><small>Máquina fora de controle</small></div>
                 <div class="opt-box" onclick="setVar('type', 'Bio-Arma', this)"><b>☢️ BIO-ARMA</b><small>Criado para matar</small></div>
             </div>
-            <button class="btn-main" style="width: 100%;" onclick="nextStep('setupDiff')">Confirmar Agente</button>
+            <button class="btn-main" style="width: 100%;" onclick="nextStep('setupDiff', 'type')">Confirmar Agente</button>
         </div>
+
         <div id="setupDiff" class="glass setup-card">
             <h2 class="dashed-info" data-tooltip="O nível de dificuldade escolhido dita os avanços da contaminação, pesquisa e cura" style="color: var(--gold); font-family: Orbitron; margin-bottom: 15px; font-size: 2.2rem; letter-spacing: 2px; display: inline-block;">NÍVEL DE RESPOSTA</h2>
             <div class="grid-select">
-                <div class="opt-box" onclick="setVar('diff', 'Casual', this)"><b style="color: var(--green);">🟢 CASUAL</b><small>Mundo descuidado. Médicos de meio período.</small></div>
-                <div class="opt-box" onclick="setVar('diff', 'Normal', this)"><b style="color: var(--gold);">🟡 NORMAL</b><small>Resposta padrão. Pesquisa ativa.</small></div>
-                <div class="opt-box" onclick="setVar('diff', 'Brutal', this)"><b style="color: var(--red);">🔴 BRUTAL</b><small>Mundo em alerta. Pesquisa agressiva.</small></div>
+                <div class="opt-box" onclick="setVar('diff', 'Casual', this)"><b style="color: var(--green);">🟢 CASUAL</b><small>Mundo descuidado.<br>Médicos de meio período.</small></div>
+                <div class="opt-box" onclick="setVar('diff', 'Normal', this)"><b style="color: var(--gold);">🟡 NORMAL</b><small>Mundo reativo.<br>Higiene mediana.</small></div>
+                <div class="opt-box" onclick="setVar('diff', 'Brutal', this)"><b style="color: var(--red);">🔴 BRUTAL</b><small>Mundo em alerta.<br>Pesquisa agressiva.</small></div>
             </div>
-            <button class="btn-main" style="width: 100%;" onclick="nextStep('setupName')">Confirmar Resposta</button>
+            <button class="btn-main" style="width: 100%;" onclick="nextStep('setupName', 'diff')">Confirmar Resposta</button>
         </div>
+
         <div id="setupName" class="glass setup-card">
             <h2 style="color: var(--blue); font-family: Orbitron; font-size: 2.2rem; letter-spacing: 2px;">NOMEIE SUA CRIAÇÃO</h2>
             <p style="color: #AAA; margin-bottom: 10px; font-weight: 600;">Identifique o agente do fim da humanidade.</p>
-            <input type="text" id="nameIn" placeholder="NOME..." maxlength="18" style="width: 100%; padding: 25px; background: rgba(0,0,0,0.6); border: 2px solid #444; color: #FFF; text-align: center; font-size: 2.5rem; margin: 45px 0; font-family: Rajdhani; letter-spacing: 4px; border-radius: 10px;">
-            <button class="btn-main" style="width: 100%; background: var(--red); color: #FFF; box-shadow: 0 4px 0 #900;" onclick="startGame()">INICIAR ANIQUILAÇÃO</button>
+            <input type="text" id="nameIn" placeholder="NOME..." maxlength="18" style="width: 100%; padding: 25px; background: rgba(0,0,0,0.6); border: 2px solid #444; color: #FFF; text-align: center; font-size: 2.5rem; margin: 40px 0; font-family: Rajdhani; letter-spacing: 4px; border-radius: 10px;">
+            <button class="btn-main" style="width: 100%; background: var(--red); color: #FFF;" onclick="startGame()">INICIAR ANIQUILAÇÃO</button>
         </div>
     </div>
 
     <div id="mainGame">
         <div id="map"></div>
         <div class="hud glass top-hud">
-            <span class="news-label dashed-info" data-tooltip="Clique para consultar as manchetes anteriores" onclick="openNewsLog()">NOTÍCIAS</span>
+            <span class="news-label dashed-info tooltip-down" data-tooltip="Clique para consultar as manchetes anteriores" onclick="openNewsLog()">NOTÍCIAS</span>
             <div class="news-marquee-container">
-                <marquee id="ticker" scrollamount="6" direction="left" behavior="slide"></marquee>
+                <marquee id="ticker" scrollamount="8" direction="left" behavior="slide" loop="1"></marquee>
             </div>
             <button class="btn-gear" style="margin-left: 20px; color: #FFF;" onclick="openSettings('game')">⚙️</button>
         </div>
-
-        <div id="countryPopup" class="glass tactical-popup">
-            <button class="btn-x" style="top:10px; right:15px; font-size: 1.6rem;" onclick="this.parentElement.style.display='none'">✕</button>
-            <h2 id="popCountry" style="color: var(--blue); font-family: Orbitron; margin-bottom: 15px; letter-spacing: 1px;">IDENTIFICANDO...</h2>
-            <div id="popData" style="color: #FFF; margin-bottom: 30px; line-height: 1.6; font-size: 1.15rem; font-weight: 600;">Aguardando sinal orbital...</div>
-            <button id="btnInfect" class="btn-main" style="width: 100%; background: var(--red); color: #FFF;" onclick="confirmOutbreak()">EXECUTAR SURTO INICIAL</button>
-        </div>
     </div>
 
-    <div id="tutorialModal" class="overlay">
-        <div class="glass modal-card">
-            <button class="btn-x" onclick="closeModal()">✕</button>
-            <h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px; letter-spacing: 2px;">MANUAL TÁTICO</h2>
-            <div style="text-align: left; line-height: 1.8; color: #FFF; font-size: 1.15rem;">
-                <p>• <b>1. Inserção:</b> Clique em um país no mapa para liberar o Agente Patogênico.</p>
-                <p>• <b>2. Recurso Genético:</b> Ganhe 1 ponto de Mutagenicidade a cada 100.000 infectados.</p>
-                <p>• <b>3. Resposta Global:</b> A Cura foca nos infectados; a Vacina protege os saudáveis.</p>
-                <p>• <b>4. Adaptação:</b> Evoluir a praga força cientistas a reiniciar pesquisas, atrasando tanto a cura quanto a vacina.</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="newsLogModal" class="overlay">
-        <div class="glass modal-card">
-            <button class="btn-x" onclick="closeModal()">✕</button>
-            <h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px; letter-spacing: 2px;">HISTÓRICO DE MANCHETES</h2>
-            <div class="news-log-content" id="newsEntries"></div>
-        </div>
-    </div>
-
-    <div id="settingsModal" class="overlay">
-        <div class="glass modal-card" style="width: 500px; text-align: center;">
-            <button class="btn-x" onclick="closeModal()">✕</button>
-            <h2 style="margin-bottom: 45px; font-family: Orbitron; letter-spacing: 3px; font-size: 1.8rem;">COMANDO CENTRAL</h2>
-            <div class="config-row">
-                <span class="dashed-info" data-tooltip="Habilita ou desabilita a música de fundo">ÁUDIO GLOBAL</span>
-                <button id="s-sound" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button>
-            </div>
-            <div class="config-row">
-                <span class="dashed-info" data-tooltip="Habilita ou desabilita os efeitos sonoros de caos">EFEITOS DO CAOS INSTAURADO</span>
-                <button id="s-sfx" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button>
-            </div>
-            <div id="inGameControls" style="display: none; margin-top: 35px; border-top: 1px solid var(--border); padding-top: 35px;">
-                <button class="btn-main" style="width: 100%; background: #333; color: #AAA;" onclick="location.reload()">ABANDONAR</button>
-            </div>
-        </div>
-    </div>
+    <div id="tutorialModal" class="overlay"><div class="glass modal-card"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px;">MANUAL TÁTICO</h2><div style="text-align: left; line-height: 1.8; color: #FFF; font-size: 1.15rem;"><p>• <b>1. Inserção:</b> Clique em um país no mapa para liberar o Agente Patogênico.</p><p>• <b>2. Recurso Genético:</b> Ganhe 1 ponto de Mutagenicidade a cada 100.000 infectados.</p><p>• <b>3. Resposta Global:</b> A Cura foca nos infectados; a Vacina protege os saudáveis.</p><p>• <b>4. Adaptação:</b> Evoluir a praga força cientistas a reiniciar pesquisas, atrasando cura e vacina.</p></div></div></div>
+    <div id="newsLogModal" class="overlay"><div class="glass modal-card"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px;">HISTÓRICO DE MANCHETES</h2><div id="newsEntries" style="max-height: 400px; overflow-y: auto;"></div></div></div>
+    <div id="settingsModal" class="overlay"><div class="glass modal-card" style="width: 500px; text-align: center;"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="margin-bottom: 45px; font-family: Orbitron; font-size: 1.8rem;">COMANDO CENTRAL</h2><div class="config-row"><span class="dashed-info" data-tooltip="Habilita ou desabilita a música">ÁUDIO GLOBAL</span><button id="s-sound" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button></div><div class="config-row"><span class="dashed-info" data-tooltip="Habilita ou desabilita efeitos sonoros">EFEITOS DO CAOS INSTAURADO</span><button id="s-sfx" class="btn-toggle btn-on" onclick="toggleH(this)">LIGADO</button></div><div id="inGameControls" style="display: none; margin-top: 35px; border-top: 1px solid var(--border); padding-top: 35px;"><button class="btn-main" style="width: 100%; background: #333; color: #AAA;" onclick="location.reload()">ABANDONAR</button></div></div></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         let game = { started: false, name: '', type: '', diff: '', active: false, newsLog: [] };
 
-        // --- SISTEMA DE NOTÍCIAS CONTEXTUAL v33 ---
         function registerNews(text) {
-            const now = new Date();
-            const dateStr = `${now.getDate()} jan. 2026`;
-            game.newsLog.unshift({ date: dateStr, message: text });
-            document.getElementById('ticker').innerText = text.toUpperCase();
+            game.newsLog.unshift({ date: "20 jan. 2026", message: text });
+            const ticker = document.getElementById('ticker');
+            ticker.innerText = text.toUpperCase();
+            ticker.start();
         }
 
         function openNewsLog() {
             game.active = false;
-            const container = document.getElementById('newsEntries');
-            container.innerHTML = game.newsLog.map(e => `
-                <div class="news-entry">
-                    <span class="news-date">${e.date}</span>
-                    <span class="news-text">${e.message}</span>
-                </div>
-            `).join('');
+            document.getElementById('newsEntries').innerHTML = game.newsLog.map(e => `<div style="padding:10px; border-bottom:1px solid #333"><b style="color:var(--blue)">${e.date}</b>: ${e.message}</div>`).join('');
             openModal('newsLogModal');
         }
 
-        // --- CORE ---
         function initSetup() { document.getElementById('startMenu').classList.remove('active'); document.getElementById('selectionFlow').classList.add('active'); }
-        function setVar(key, val, el) { game[key] = val; el.parentElement.querySelectorAll('.opt-box').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
-        function nextStep(id) { document.querySelectorAll('.setup-card').forEach(c => c.classList.remove('active')); document.getElementById(id).classList.add('active'); }
         
+        function setVar(key, val, el) { 
+            game[key] = val; 
+            el.parentElement.querySelectorAll('.opt-box').forEach(i => i.classList.remove('selected'));
+            el.classList.add('selected'); 
+        }
+
+        // Validação de Fluxo v34
+        function nextStep(id, currentKey) {
+            if (!game[currentKey]) {
+                alert("ACESSO NEGADO: Selecione uma opção antes de prosseguir.");
+                return;
+            }
+            document.querySelectorAll('.setup-card').forEach(c => c.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
         function startGame() { 
-            game.name = document.getElementById('nameIn').value || "PRAGA-0"; 
-            document.getElementById('selectionFlow').classList.remove('active'); 
+            const name = document.getElementById('nameIn').value.trim();
+            if (!name) { alert("ACESSO NEGADO: Sua criação precisa de um identificador."); return; }
+            game.name = name;
+            document.getElementById('selectionFlow').classList.remove('active');
             document.getElementById('mainGame').style.display = 'block'; 
-
-            // MAPEAMENTO DE VETORES (LÉXICO PERVERSO)
-            const vetorMap = {
-                'Bactéria': 'BACTERIANO',
-                'Vírus': 'VIRAL',
-                'Fungo': 'FÚNGICO',
-                'Parasita': 'PARASITÁRIO',
-                'Príon': 'PRIÔNICO',
-                'Nano-Vírus': 'NANOTECNOLÓGICO',
-                'Bio-Arma': 'BIOLÓGICO'
-            };
-            const vetorTxt = vetorMap[game.type] || 'VIRULENTO';
-
-            registerNews(`SISTEMA DE ANIQUILAÇÃO BIO-TÁTICA ONLINE. VETOR ${vetorTxt} PRONTO. AGUARDANDO LOCALIZAÇÃO ALVO PARA DISPERSÃO E INÍCIO DA EXTINÇÃO HUMANA.`);
-            
+            const vetorMap = { 'Bactéria': 'BACTERIANO', 'Vírus': 'VIRAL', 'Fungo': 'FÚNGICO', 'Parasita': 'PARASITÁRIO', 'Príon': 'PRIÔNICO', 'Nano-Vírus': 'NANOTECNOLÓGICO', 'Bio-Arma': 'BIOLÓGICO' };
+            registerNews(`SISTEMA DE ANIQUILAÇÃO BIO-TÁTICA ONLINE. VETOR ${vetorMap[game.type]} PRONTO. AGUARDANDO DISPERSÃO.`);
             setTimeout(() => { initMap(); map.invalidateSize(); }, 100); 
         }
 
         let map;
-        function initMap() { if (map) return; map = L.map('map', { center: [20, 0], zoom: 2.5, zoomControl: false, attributionControl: false }); L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); map.on('click', async (e) => { if(game.started) return; const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${e.latlng.lat}&longitude=${e.latlng.lng}&localityLanguage=pt`); const data = await res.json(); document.getElementById('popCountry').innerText = (data.countryName || "TERRITÓRIO NEUTRO").toUpperCase(); document.getElementById('popData').innerHTML = `Continente: ${data.continent || 'N/A'}<br>Status: Saudável<br>Defesa: Alerta ${game.diff}`; document.getElementById('countryPopup').style.display = 'block'; }); }
-        function confirmOutbreak() { game.started = true; game.active = true; document.getElementById('countryPopup').style.display = 'none'; registerNews(`PACIENTE ZERO IDENTIFICADO EM TERRITÓRIO OPORTUNO. PROTOCOLO ${game.name.toUpperCase()} ATIVO. INICIANDO CICLO DE EXTINÇÃO.`); }
+        function initMap() { if (map) return; map = L.map('map', { center: [20, 0], zoom: 2.5, zoomControl: false, attributionControl: false }); L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); if(game.started) game.active = true; }
         function openSettings(context) { game.active = false; document.getElementById('inGameControls').style.display = (context === 'game') ? 'block' : 'none'; openModal('settingsModal'); }
-        function toggleH(btn) { const on = btn.classList.contains('btn-on'); btn.classList.toggle('btn-on', !on); btn.classList.toggle('off', on); btn.innerText = on ? "DESLIGADO" : "LIGADO"; }
+        function toggleH(btn) { const on = btn.classList.contains('btn-on'); btn.classList.toggle('btn-on', !on); btn.classList.toggle('btn-off', on); btn.innerText = on ? "DESLIGADO" : "LIGADO"; }
     </script>
 </body>
 </html>
