@@ -63,7 +63,6 @@
         .bio-blip { background: #800000; border-radius: 50%; width: 15px; height: 15px; border: 2px solid var(--red); box-shadow: 0 0 15px var(--red); position: relative; }
         .bio-blip::after { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--red); animation: pulse-blip 1.5s infinite; }
 
-        /* ✅ CUSTOM TOOLTIP: DISPERSÃO (v61) */
         .leaflet-popup-content-wrapper { background: rgba(5, 5, 5, 0.98) !important; color: #FFF !important; border: 1px solid var(--border) !important; border-radius: 8px !important; box-shadow: 0 10px 40px #000 !important; padding: 5px; }
         .leaflet-popup-tip { background: rgba(5, 5, 5, 0.98) !important; border: 1px solid var(--border) !important; }
         .dispersal-box { text-align: center; padding: 10px; min-width: 220px; }
@@ -83,14 +82,10 @@
         .btn-nav-arrow:disabled { opacity: 0.2; }
         #wPageIndicator { text-align: center; margin-top: 15px; color: #888; font-size: 0.9rem; font-family: Orbitron; }
 
-        /* Auxiliares */
         .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 25px 0; }
         .opt-box { padding: 18px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; background: rgba(20, 20, 20, 0.7); transition: 0.2s; color: #DDD; text-align: center; }
         .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.3); color: #FFF; }
-        
-        /* ✅ CORREÇÃO DO LAYOUT DOS BOTÕES DE SELEÇÃO (v63) */
         .opt-box b { display: block; font-size: 1.1rem; margin-bottom: 5px; color: #FFF; }
-        
         #nameIn { width: 100%; padding: 25px; background: rgba(10, 10, 10, 0.85); border: 2px solid #666; color: #FFF; text-align: center; font-size: 2.5rem; margin: 30px 0; font-family: Rajdhani; border-radius: 10px; }
         .news-marquee-container { overflow: hidden; position: relative; height: 30px; margin: 0 20px; display: flex; align-items: center; }
         #ticker { color: #FFF; font-weight: 700; font-size: 1rem; position: absolute; white-space: nowrap; right: -110%; width: fit-content; }
@@ -183,17 +178,11 @@
             <div id="welcomePages" style="flex-grow: 1;">
                 <div class="w-page active">
                     <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 20px;">PROTOCOLO INICIADO</h2>
-                    <p style="font-size: 1.1rem; line-height: 1.6; color: #EEE;">
-                        Bem-vindo(a) ao jogo <b>Praga</b>!<br><br>
-                        Você é um(a) cientista descontente com a humanidade e decide pôr fim à sua existência. Para isso, deverá espalhar seu agente pelo mundo inteiro, até eliminar todos os seres humanos da Terra. Sua mente brilhante será capaz de “consertar” o estado atual do mundo?
-                    </p>
+                    <p style="font-size: 1.1rem; line-height: 1.6; color: #EEE;">Bem-vindo(a) ao jogo <b>Praga</b>!<br><br>Você é um(a) cientista descontente com a humanidade e decide pôr fim à sua existência. Para isso, deverá espalhar seu agente pelo mundo inteiro, até eliminar todos os seres humanos da Terra. Sua mente brilhante será capaz de “consertar” o estado atual do mundo?</p>
                 </div>
                 <div class="w-page" style="display: none;">
                     <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 20px;">OBJETIVO INICIAL</h2>
-                    <p style="font-size: 1.1rem; line-height: 1.6; color: #EEE;">
-                        Toque no país que seu agente infectará primeiro!<br><br>
-                        Ao selecionar um país, você poderá ver suas informações no mesmo botão <b>"MUNDO"</b>. Clique no oceano para voltar a ver os dados globais.
-                    </p>
+                    <p style="font-size: 1.1rem; line-height: 1.6; color: #EEE;">Toque no país que seu agente infectará primeiro!<br><br>Ao selecionar um país, você poderá ver suas informações no mesmo botão <b>"MUNDO"</b>. Clique no oceano para voltar a ver os dados globais.</p>
                 </div>
             </div>
             <div>
@@ -224,12 +213,16 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        let game = { started: false, name: '', type: '', diff: '', active: false, newsLog: [], soundOn: false, infected: 0, dead: 0, cured: 0, vax: 0, dna: 0, popCap: 8200000000, selectedCountry: null, infectionStarted: false };
+        let game = { 
+            started: false, name: '', type: '', diff: '', active: false, newsLog: [], soundOn: false, 
+            infected: 0, dead: 0, cured: 0, vax: 0, dna: 0, popCap: 8200000000, 
+            selectedCountry: null, infectionStarted: false, 
+            internalInfection: 0, // Contador para o país inicial
+            lastDNAMilestone: 0 // Para controlar o ganho de DNA por infectados
+        };
         
-        // --- BASE DE HUBS ---
         const worldHubs = [{ country: "Brasil", type: "airport", city: "Brasília", lat: -15.8697, lng: -47.9208 }, { country: "Brasil", type: "port", city: "Salvador", lat: -12.9228, lng: -38.5122 }, { country: "México", type: "airport", city: "Cidade do México", lat: 19.4326, lng: -99.1332 }, { country: "México", type: "port", city: "Veracruz", lat: 19.1738, lng: -96.1342 }, { country: "Canadá", type: "airport", city: "Ottawa", lat: 45.4215, lng: -75.6972 }, { country: "Canadá", type: "port", city: "Vancouver", lat: 49.2827, lng: -123.1207 }, { country: "Argentina", type: "airport", city: "Buenos Aires", lat: -34.6037, lng: -58.3816 }, { country: "Argentina", type: "port", city: "Mar del Plata", lat: -38.0055, lng: -57.5426 }, { country: "Peru", type: "airport", city: "Lima", lat: -12.0464, lng: -77.0428 }, { country: "Peru", type: "port", city: "Callao", lat: -12.0566, lng: -77.1491 }, { country: "Colômbia", type: "airport", city: "Bogotá", lat: 4.7110, lng: -74.0721 }, { country: "Colômbia", type: "port", city: "Cartagena", lat: 10.3910, lng: -75.4794 }, { country: "África do Sul", type: "airport", city: "Joanesburgo", lat: -26.1367, lng: 28.2411 }, { country: "África do Sul", type: "port", city: "Cidade do Cabo", lat: -33.9189, lng: 18.4233 }, { country: "Marrocos", type: "airport", city: "Rabat", lat: 33.9716, lng: -6.8498 }, { country: "Marrocos", type: "port", city: "Casablanca", lat: 33.5731, lng: -7.5898 }, { country: "Egito", type: "airport", city: "Cairo", lat: 30.1219, lng: 31.4056 }, { country: "Egito", type: "port", city: "Alexandria", lat: 31.2001, lng: 29.9187 }, { country: "Espanha", type: "airport", city: "Madrid", lat: 40.4839, lng: -3.5680 }, { country: "Espanha", type: "port", city: "Barcelona", lat: 41.3851, lng: 2.1734 }, { country: "França", type: "airport", city: "Paris", lat: 49.0097, lng: 2.5479 }, { country: "França", type: "port", city: "Marselha", lat: 43.2965, lng: 5.3698 }, { country: "Arábia Saudita", type: "airport", city: "Riad", lat: 24.9576, lng: 46.6988 }, { country: "Arábia Saudita", type: "port", city: "Jidá", lat: 21.4858, lng: 39.1925 }, { country: "Índia", type: "airport", city: "Nova Deli", lat: 28.5562, lng: 77.1000 }, { country: "Índia", type: "port", city: "Bombaim", lat: 18.9220, lng: 72.8347 }, { country: "Finlândia", type: "airport", city: "Helsínquia", lat: 60.3172, lng: 24.9633 }, { country: "Finlândia", type: "port", city: "Helsínquia", lat: 60.1600, lng: 24.9600 }, { country: "Japão", type: "airport", city: "Tóquio", lat: 35.5494, lng: 139.7798 }, { country: "Japão", type: "port", city: "Yokohama", lat: 35.4437, lng: 139.6380 }, { country: "Austrália", type: "airport", city: "Canberra", lat: -35.3050, lng: 149.1934 }, { country: "Austrália", type: "port", city: "Sydney", lat: -33.8688, lng: 151.2093 }, { country: "Nova Zelândia", type: "airport", city: "Wellington", lat: -41.3276, lng: 174.8076 }, { country: "Nova Zelândia", type: "port", city: "Auckland", lat: -36.8485, lng: 174.7633 }, { country: "Turquia", type: "airport", city: "Ancara", lat: 40.1281, lng: 32.9951 }, { country: "Turquia", type: "port", city: "Istambul", lat: 41.0082, lng: 28.9784 }, { country: "Reino Unido", type: "airport", city: "Londres", lat: 51.4700, lng: -0.4543 }, { country: "Rússia", type: "airport", city: "Moscou", lat: 55.7558, lng: 37.6173 }, { country: "EUA", type: "airport", city: "Washington", lat: 38.8512, lng: -77.0402 }, { country: "Groenlândia", type: "port", city: "Nuuk", lat: 64.1750, lng: -51.7389 }, { country: "Madagascar", type: "port", city: "Toamasina", lat: -18.1492, lng: 49.4023 }, { country: "Suíça", type: "airport", city: "Berna", lat: 46.9128, lng: 7.4984 }];
 
-        // --- SISTEMA DE ÁUDIO ---
         const audioSystem = {
             tracks: [document.getElementById('bgMusic1'), document.getElementById('bgMusic2')],
             currentTrackIndex: 0, isMuted: true, fadeInterval: null,
@@ -238,6 +231,7 @@
             toggleMute() { this.isMuted = !this.isMuted; if (this.isMuted) { this.tracks.forEach(t => { t.volume = 0; t.pause(); }); } else { this.fadeIn(this.currentTrackIndex, 300); } return this.isMuted; }
         };
         audioSystem.init();
+
         function toggleSoundManual() {
             const muted = audioSystem.toggleMute();
             document.getElementById('soundBtnIcon').innerHTML = muted ? 
@@ -245,7 +239,6 @@
                 '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
         }
 
-        // --- LÓGICA DE JOGO ---
         let welcomePageIndex = 0; function navWelcome(dir) { const pages = document.querySelectorAll('.w-page'); const indicator = document.getElementById('wPageIndicator'); pages[welcomePageIndex].style.display = 'none'; welcomePageIndex += dir; pages[welcomePageIndex].style.display = 'block'; document.getElementById('btnWPrev').disabled = (welcomePageIndex === 0); document.getElementById('btnWNext').disabled = (welcomePageIndex === pages.length - 1); indicator.innerText = `${welcomePageIndex + 1}/${pages.length}`; if (welcomePageIndex === pages.length - 1) { document.getElementById('btnWClose').disabled = false; document.getElementById('btnWOk').disabled = false; } }
         const preGameNewsSource = ["\"Cansamos de salvar um futuro que insiste em se destruir.\"", "\"Quando o fato vira opinião, a ciência vira ruína.\"", "\"O descrédito é o ácido que corrói as fundações do amanhã.\"", "\"A ciência não vai cair. Ela vai simplesmente se calar.\"", "\"Onde a crença vence a prova, o cientista se torna um fantasma.\"", "\"Não há como curar um mundo que ama a própria ferida.\"", "\"O laboratório está vazio porque a verdade se tornou indesejada.\"", "\"A razão se retirou da sala. O colapso agora é livre.\"", "\"Não somos mais guias, somos apenas testemunhas da queda.\""];
         let newsQueue = []; let newsTimeout; function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
@@ -268,7 +261,6 @@
             map.on('click', async (e) => { updateCountrySelection(e.latlng); });
         }
 
-        // ✅ LÓGICA DE GÊNERO GRAMATICAL (v61)
         function getCountryArticle(name) {
             const femCountries = ["França", "Espanha", "Argentina", "Colômbia", "Arábia Saudita", "Índia", "Finlândia", "Austrália", "Nova Zelândia", "Turquia", "Rússia", "Groenlândia", "Madagascar", "Suíça", "Bolívia", "África do Sul", "Turquia"];
             const pluralCountries = ["Estados Unidos", "EUA", "Filipinas", "Bahamas", "Maldivas"];
@@ -279,59 +271,65 @@
         async function updateCountrySelection(latlng) {
             const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latlng.lat}&longitude=${latlng.lng}&localityLanguage=pt`;
             const res = await fetch(url); const data = await res.json(); const btn = document.getElementById('btnWorld');
-            
             if (data.countryName) {
-                game.selectedCountry = data.countryName; 
-                btn.innerText = data.countryName.toUpperCase();
-                
-                // Atualiza Blip Pulsante
-                if (blipMarker) map.removeLayer(blipMarker); 
-                const blipIcon = L.divIcon({ className: 'bio-blip', iconSize: [15, 15] }); 
-                blipMarker = L.marker(latlng, { icon: blipIcon }).addTo(map);
-
-                // ✅ Gatilho Paciente Zero (Caixa Suspensa) (v61)
+                game.selectedCountry = data.countryName; btn.innerText = data.countryName.toUpperCase();
+                if (blipMarker) map.removeLayer(blipMarker); const blipIcon = L.divIcon({ className: 'bio-blip', iconSize: [15, 15] }); blipMarker = L.marker(latlng, { icon: blipIcon }).addTo(map);
                 if (!game.infectionStarted) {
                     const article = getCountryArticle(data.countryName);
-                    const popupContent = `
-                        <div class="dispersal-box">
-                            <p>Deseja iniciar a dispersão do agente ${article} <b>${data.countryName}</b>?</p>
-                            <div class="dispersal-actions">
-                                <button class="btn-mini" onclick="confirmInfection()">SIM</button>
-                                <button class="btn-mini" onclick="map.closePopup()">NÃO</button>
-                            </div>
-                        </div>
-                    `;
-                    L.popup({ closeButton: false, offset: [0, -10] })
-                     .setLatLng(latlng)
-                     .setContent(popupContent)
-                     .openOn(map);
+                    const popupContent = `<div class="dispersal-box"><p>Deseja iniciar a dispersão do agente ${article} <b>${data.countryName}</b>?</p><div class="dispersal-actions"><button class="btn-mini" onclick="confirmInfection()">SIM</button><button class="btn-mini" onclick="map.closePopup()">NÃO</button></div></div>`;
+                    L.popup({ closeButton: false, offset: [0, -10] }).setLatLng(latlng).setContent(popupContent).openOn(map);
                 }
-            } else {
-                game.selectedCountry = null; 
-                btn.innerText = "MUNDO"; 
-                if (blipMarker) map.removeLayer(blipMarker);
-                map.closePopup();
-            }
+            } else { game.selectedCountry = null; btn.innerText = "MUNDO"; if (blipMarker) map.removeLayer(blipMarker); map.closePopup(); }
         }
 
-        // ✅ Confirmação de Início (v61)
+        // ✅ CONFIRMAÇÃO E INÍCIO DO LOOP (v64)
         function confirmInfection() {
             game.infectionStarted = true;
-            game.dna = 1; // 1º Ponto de DNA
-            document.getElementById('valDNA').innerText = game.dna;
+            game.dna = 1;
+            game.infected = 1; // Paciente Zero
+            game.internalInfection = 1;
+            updateHUD();
             map.closePopup();
             registerNews(`SURTO INICIADO. PACIENTE ZERO IDENTIFICADO ${getCountryArticle(game.selectedCountry).toUpperCase()} ${game.selectedCountry.toUpperCase()}.`);
+            
+            // Inicia o motor do jogo (1 seg = 1 tick)
+            setInterval(gameTick, 1000);
         }
 
-        function renderHubs() {
-            worldHubs.forEach(hub => {
-                const iconPath = (hub.type === 'airport') ? 'plane.svg' : 'anchor.svg';
-                const icon = L.divIcon({ className: 'hub-icon', html: `<img src="${iconPath}" class="hub-icon-img" width="22" height="22">`, iconSize: [24, 24] });
-                const marker = L.marker([hub.lat, hub.lng], { icon: icon }).addTo(hubLayer);
-                marker.on('click', (e) => { L.DomEvent.stopPropagation(e); updateCountrySelection({lat: hub.lat, lng: hub.lng}); });
-            });
+        // ✅ MOTOR DE PROPAGAÇÃO (v64)
+        function gameTick() {
+            if (!game.infectionStarted) return;
+
+            // 1. Crescimento Interno (Fórmula Logística Simples)
+            // Cresce baseado na quantidade atual. O fator 1.25 é a virulência base.
+            let growthFactor = 1.25;
+            let newInfections = Math.ceil(game.internalInfection * (growthFactor - 1));
+            
+            // Garante que não ultrapasse o limite global
+            if (game.infected + newInfections > game.popCap) {
+                newInfections = game.popCap - game.infected;
+            }
+
+            game.internalInfection += newInfections;
+            game.infected = game.internalInfection;
+
+            // 2. Lógica de DNA (1 ponto a cada 100.000 novos infectados)
+            let currentMilestone = Math.floor(game.infected / 100000);
+            if (currentMilestone > game.lastDNAMilestone) {
+                let pointsGained = currentMilestone - game.lastDNAMilestone;
+                game.dna += pointsGained;
+                game.lastDNAMilestone = currentMilestone;
+            }
+
+            updateHUD();
         }
 
+        function updateHUD() {
+            document.getElementById('valInfected').innerText = game.infected.toLocaleString('pt-BR');
+            document.getElementById('valDNA').innerText = game.dna;
+        }
+
+        function renderHubs() { worldHubs.forEach(hub => { const iconPath = (hub.type === 'airport') ? 'plane.svg' : 'anchor.svg'; const icon = L.divIcon({ className: 'hub-icon', html: `<img src="${iconPath}" class="hub-icon-img" width="22" height="22">`, iconSize: [24, 24] }); const marker = L.marker([hub.lat, hub.lng], { icon: icon }).addTo(hubLayer); marker.on('click', (e) => { L.DomEvent.stopPropagation(e); updateCountrySelection({lat: hub.lat, lng: hub.lng}); }); }); }
         function handleWorldClick() { if (game.selectedCountry) alert(`Relatório tático de ${game.selectedCountry} em processamento...`); else alert('Estatísticas globais em desenvolvimento.'); }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); if(game.started) game.active = true; }
