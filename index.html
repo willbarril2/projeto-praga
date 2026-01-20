@@ -53,13 +53,13 @@
         .stat-value.infected { color: var(--red); text-shadow: 0 0 10px rgba(255, 23, 68, 0.4); }
         .btn-world { min-width: 180px; width: auto; max-width: 300px; height: 50px; font-size: 1rem; letter-spacing: 2px; font-family: Orbitron; padding: 0 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* --- MAPA & SIMBOLOGIA TÁTICA (v58 FIX) --- */
+        /* --- MAPA & SIMBOLOGIA TÁTICA --- */
         #mainGame { width: 100%; height: 100vh; display: none; position: relative; z-index: 10; }
         #map { width: 100%; height: 100vh; z-index: 1; background: #0b0e14; cursor: crosshair !important; }
         
-        /* ✅ Estilo para os ícones externos SVG */
+        /* ✅ Estilo para os ícones externos SVG (v59) */
         .hub-icon-img { 
-            filter: brightness(0) invert(1); /* Torna qualquer SVG branco */
+            filter: brightness(0) invert(1); 
             transition: transform 0.2s, filter 0.2s;
             pointer-events: auto;
         }
@@ -104,7 +104,7 @@
         <span id="newsTag" class="news-label-pulse" onclick="openNewsLog()">NOTÍCIAS</span>
         <div class="news-marquee-container"><div id="ticker"></div></div>
         <button class="sound-btn" onclick="toggleSoundManual()" id="soundBtnIcon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51c.66-1.24 1.03-2.65 1.03-4.15 0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
         </button>
     </div>
 
@@ -192,70 +192,48 @@
         </div>
     </div>
 
-    <div id="tutorialModal" class="overlay"><div class="glass modal-card"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px;">MANUAL TÁTICO</h2><div style="text-align: left; line-height: 1.8; color: #FFF; font-size: 1.15rem;"><p>• <b>1. Inserção:</b> Clique em um país no mapa global para liberar o Agente Patogênico.</p><p>• <b>2. Recurso Genético:</b> Acumule 1 ponto de Mutagenicidade a cada <b>100.000</b> novos infectados.</p></div></div></div>
+    <div id="tutorialModal" class="overlay">
+        <div class="glass modal-card">
+            <button class="btn-x" onclick="closeModal()">✕</button>
+            <h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px; letter-spacing: 2px;">MANUAL TÁTICO</h2>
+            <div style="text-align: left; line-height: 1.8; color: #FFF; font-size: 1.15rem;">
+                <p>• <b>1. Inserção:</b> Clique em um país no mapa global para liberar o Agente Patogênico.</p>
+                <p>• <b>2. Recurso Genético:</b> Acumule 1 ponto de Mutagenicidade a cada <b>100.000</b> novos infectados.</p>
+                <p>• <b>3. Resposta Global:</b> A <b>Cura</b> foca nos infectados; a <b>Vacina</b> protege os saudáveis.</p>
+                <p>• <b>4. Adaptação:</b> Evoluir a praga força cientistas a reiniciar pesquisas, <b>atrasando cura e vacina</b>.</p>
+            </div>
+        </div>
+    </div>
+
     <div id="newsLogModal" class="overlay"><div class="glass modal-card"><button class="btn-x" onclick="closeModal()">✕</button><h2 style="color: var(--blue); font-family: Orbitron; margin-bottom: 25px;">HISTÓRICO DE MANCHETES</h2><div id="newsEntries" style="max-height: 400px; overflow-y: auto;"></div></div></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        let game = { started: false, name: '', type: '', diff: '', active: false, newsLog: [], soundOn: true, infected: 0, dead: 0, cured: 0, vax: 0, dna: 0, popCap: 8200000000, selectedCountry: null };
+        let game = { started: false, name: '', type: '', diff: '', active: false, newsLog: [], soundOn: false, infected: 0, dead: 0, cured: 0, vax: 0, dna: 0, popCap: 8200000000, selectedCountry: null };
         
-        // --- BASE DE HUBS (v56+) ---
-        const worldHubs = [
-            { country: "Brasil", type: "airport", city: "Brasília", lat: -15.8697, lng: -47.9208 },
-            { country: "Brasil", type: "port", city: "Salvador", lat: -12.9228, lng: -38.5122 },
-            { country: "México", type: "airport", city: "Cidade do México", lat: 19.4326, lng: -99.1332 },
-            { country: "México", type: "port", city: "Veracruz", lat: 19.1738, lng: -96.1342 },
-            { country: "Canadá", type: "airport", city: "Ottawa", lat: 45.4215, lng: -75.6972 },
-            { country: "Canadá", type: "port", city: "Vancouver", lat: 49.2827, lng: -123.1207 },
-            { country: "Argentina", type: "airport", city: "Buenos Aires", lat: -34.6037, lng: -58.3816 },
-            { country: "Argentina", type: "port", city: "Mar del Plata", lat: -38.0055, lng: -57.5426 },
-            { country: "Peru", type: "airport", city: "Lima", lat: -12.0464, lng: -77.0428 },
-            { country: "Peru", type: "port", city: "Callao", lat: -12.0566, lng: -77.1491 },
-            { country: "Colômbia", type: "airport", city: "Bogotá", lat: 4.7110, lng: -74.0721 },
-            { country: "Colômbia", type: "port", city: "Cartagena", lat: 10.3910, lng: -75.4794 },
-            { country: "África do Sul", type: "airport", city: "Joanesburgo", lat: -26.1367, lng: 28.2411 },
-            { country: "África do Sul", type: "port", city: "Cidade do Cabo", lat: -33.9189, lng: 18.4233 },
-            { country: "Marrocos", type: "airport", city: "Rabat", lat: 33.9716, lng: -6.8498 },
-            { country: "Marrocos", type: "port", city: "Casablanca", lat: 33.5731, lng: -7.5898 },
-            { country: "Egito", type: "airport", city: "Cairo", lat: 30.1219, lng: 31.4056 },
-            { country: "Egito", type: "port", city: "Alexandria", lat: 31.2001, lng: 29.9187 },
-            { country: "Espanha", type: "airport", city: "Madrid", lat: 40.4839, lng: -3.5680 },
-            { country: "Espanha", type: "port", city: "Barcelona", lat: 41.3851, lng: 2.1734 },
-            { country: "França", type: "airport", city: "Paris", lat: 49.0097, lng: 2.5479 },
-            { country: "França", type: "port", city: "Marselha", lat: 43.2965, lng: 5.3698 },
-            { country: "Arábia Saudita", type: "airport", city: "Riad", lat: 24.9576, lng: 46.6988 },
-            { country: "Arábia Saudita", type: "port", city: "Jidá", lat: 21.4858, lng: 39.1925 },
-            { country: "Índia", type: "airport", city: "Nova Deli", lat: 28.5562, lng: 77.1000 },
-            { country: "Índia", type: "port", city: "Bombaim", lat: 18.9220, lng: 72.8347 },
-            { country: "Finlândia", type: "airport", city: "Helsínquia", lat: 60.3172, lng: 24.9633 },
-            { country: "Finlândia", type: "port", city: "Porto de Helsínquia", lat: 60.1600, lng: 24.9600 },
-            { country: "Japão", type: "airport", city: "Tóquio", lat: 35.5494, lng: 139.7798 },
-            { country: "Japão", type: "port", city: "Yokohama", lat: 35.4437, lng: 139.6380 },
-            { country: "Austrália", type: "airport", city: "Canberra", lat: -35.3050, lng: 149.1934 },
-            { country: "Austrália", type: "port", city: "Sydney", lat: -33.8688, lng: 151.2093 },
-            { country: "Nova Zelândia", type: "airport", city: "Wellington", lat: -41.3276, lng: 174.8076 },
-            { country: "Nova Zelândia", type: "port", city: "Auckland", lat: -36.8485, lng: 174.7633 },
-            { country: "Turquia", type: "airport", city: "Ancara", lat: 40.1281, lng: 32.9951 },
-            { country: "Turquia", type: "port", city: "Istambul", lat: 41.0082, lng: 28.9784 },
-            { country: "Reino Unido", type: "airport", city: "Londres", lat: 51.4700, lng: -0.4543 },
-            { country: "Rússia", type: "airport", city: "Moscou", lat: 55.7558, lng: 37.6173 },
-            { country: "EUA", type: "airport", city: "Washington", lat: 38.8512, lng: -77.0402 },
-            { country: "Groenlândia", type: "port", city: "Nuuk", lat: 64.1750, lng: -51.7389 },
-            { country: "Madagascar", type: "port", city: "Toamasina", lat: -18.1492, lng: 49.4023 },
-            { country: "Suíça", type: "airport", city: "Berna", lat: 46.9128, lng: 7.4984 }
-        ];
+        // --- BASE DE HUBS ---
+        const worldHubs = [{ country: "Brasil", type: "airport", city: "Brasília", lat: -15.8697, lng: -47.9208 }, { country: "Brasil", type: "port", city: "Salvador", lat: -12.9228, lng: -38.5122 }, { country: "México", type: "airport", city: "Cidade do México", lat: 19.4326, lng: -99.1332 }, { country: "México", type: "port", city: "Veracruz", lat: 19.1738, lng: -96.1342 }, { country: "Canadá", type: "airport", city: "Ottawa", lat: 45.4215, lng: -75.6972 }, { country: "Canadá", type: "port", city: "Vancouver", lat: 49.2827, lng: -123.1207 }, { country: "Argentina", type: "airport", city: "Buenos Aires", lat: -34.6037, lng: -58.3816 }, { country: "Argentina", type: "port", city: "Mar del Plata", lat: -38.0055, lng: -57.5426 }, { country: "Peru", type: "airport", city: "Lima", lat: -12.0464, lng: -77.0428 }, { country: "Peru", type: "port", city: "Callao", lat: -12.0566, lng: -77.1491 }, { country: "Colômbia", type: "airport", city: "Bogotá", lat: 4.7110, lng: -74.0721 }, { country: "Colômbia", type: "port", city: "Cartagena", lat: 10.3910, lng: -75.4794 }, { country: "África do Sul", type: "airport", city: "Joanesburgo", lat: -26.1367, lng: 28.2411 }, { country: "África do Sul", type: "port", city: "Cidade do Cabo", lat: -33.9189, lng: 18.4233 }, { country: "Marrocos", type: "airport", city: "Rabat", lat: 33.9716, lng: -6.8498 }, { country: "Marrocos", type: "port", city: "Casablanca", lat: 33.5731, lng: -7.5898 }, { country: "Egito", type: "airport", city: "Cairo", lat: 30.1219, lng: 31.4056 }, { country: "Egito", type: "port", city: "Alexandria", lat: 31.2001, lng: 29.9187 }, { country: "Espanha", type: "airport", city: "Madrid", lat: 40.4839, lng: -3.5680 }, { country: "Espanha", type: "port", city: "Barcelona", lat: 41.3851, lng: 2.1734 }, { country: "França", type: "airport", city: "Paris", lat: 49.0097, lng: 2.5479 }, { country: "França", type: "port", city: "Marselha", lat: 43.2965, lng: 5.3698 }, { country: "Arábia Saudita", type: "airport", city: "Riad", lat: 24.9576, lng: 46.6988 }, { country: "Arábia Saudita", type: "port", city: "Jidá", lat: 21.4858, lng: 39.1925 }, { country: "Índia", type: "airport", city: "Nova Deli", lat: 28.5562, lng: 77.1000 }, { country: "Índia", type: "port", city: "Bombaim", lat: 18.9220, lng: 72.8347 }, { country: "Finlândia", type: "airport", city: "Helsínquia", lat: 60.3172, lng: 24.9633 }, { country: "Finlândia", type: "port", city: "Helsínquia", lat: 60.1600, lng: 24.9600 }, { country: "Japão", type: "airport", city: "Tóquio", lat: 35.5494, lng: 139.7798 }, { country: "Japão", type: "port", city: "Yokohama", lat: 35.4437, lng: 139.6380 }, { country: "Austrália", type: "airport", city: "Canberra", lat: -35.3050, lng: 149.1934 }, { country: "Austrália", type: "port", city: "Sydney", lat: -33.8688, lng: 151.2093 }, { country: "Nova Zelândia", type: "airport", city: "Wellington", lat: -41.3276, lng: 174.8076 }, { country: "Nova Zelândia", type: "port", city: "Auckland", lat: -36.8485, lng: 174.7633 }, { country: "Turquia", type: "airport", city: "Ancara", lat: 40.1281, lng: 32.9951 }, { country: "Turquia", type: "port", city: "Istambul", lat: 41.0082, lng: 28.9784 }, { country: "Reino Unido", type: "airport", city: "Londres", lat: 51.4700, lng: -0.4543 }, { country: "Rússia", type: "airport", city: "Moscou", lat: 55.7558, lng: 37.6173 }, { country: "EUA", type: "airport", city: "Washington", lat: 38.8512, lng: -77.0402 }, { country: "Groenlândia", type: "port", city: "Nuuk", lat: 64.1750, lng: -51.7389 }, { country: "Madagascar", type: "port", city: "Toamasina", lat: -18.1492, lng: 49.4023 }, { country: "Suíça", type: "airport", city: "Berna", lat: 46.9128, lng: 7.4984 }];
 
-        // --- SISTEMA DE ÁUDIO ---
+        // --- SISTEMA DE ÁUDIO REFINADO (v59 - INÍCIO MUDO + FADE 0.3S) ---
         const audioSystem = {
             tracks: [document.getElementById('bgMusic1'), document.getElementById('bgMusic2')],
-            currentTrackIndex: 0, isMuted: false, fadeInterval: null,
-            init() { this.tracks[0].volume = 0; this.tracks[1].volume = 0; this.tracks[0].addEventListener('ended', () => this.crossfadeTo(1)); this.tracks[1].addEventListener('ended', () => this.crossfadeTo(0)); },
-            startPlayback() { if (this.isMuted) return; this.fadeIn(0); },
-            crossfadeTo(nextIndex) { if (this.isMuted) return; const nextTrack = this.tracks[nextIndex]; const currentTrack = this.tracks[nextIndex === 0 ? 1 : 0]; nextTrack.play(); clearInterval(this.fadeInterval); let step = 0; const steps = 50; this.fadeInterval = setInterval(() => { step++; currentTrack.volume = Math.max(0, 1 - (step / steps)); nextTrack.volume = Math.min(1, step / steps); if (step >= steps) { clearInterval(this.fadeInterval); currentTrack.pause(); currentTrack.currentTime = 0; this.currentTrackIndex = nextIndex; } }, 100); },
-            fadeIn(index) { const track = this.tracks[index]; track.play(); let vol = 0; const int = setInterval(() => { vol = Math.min(1, vol + 0.05); track.volume = vol; if (vol >= 1) clearInterval(int); }, 200); },
-            toggleMute() { this.isMuted = !this.isMuted; clearInterval(this.fadeInterval); if (this.isMuted) { this.tracks.forEach(t => { t.volume = 0; t.pause(); }); } else { this.tracks[this.currentTrackIndex].volume = 1; this.tracks[this.currentTrackIndex].play(); } return this.isMuted; }
+            currentTrackIndex: 0, isMuted: true, fadeInterval: null,
+            init() { this.tracks.forEach(t => t.volume = 0); this.tracks[0].addEventListener('ended', () => this.crossfadeTo(1)); this.tracks[1].addEventListener('ended', () => this.crossfadeTo(0)); },
+            startPlayback() { /* Agora não inicia som automaticamente */ },
+            fadeIn(index, duration = 300) { 
+                const track = this.tracks[index]; track.play(); 
+                let vol = 0; const steps = 10; const interval = duration / steps;
+                const fInt = setInterval(() => { vol = Math.min(1, vol + 0.1); track.volume = vol; if (vol >= 1) clearInterval(fInt); }, interval);
+            },
+            toggleMute() {
+                this.isMuted = !this.isMuted;
+                if (this.isMuted) { this.tracks.forEach(t => { t.volume = 0; t.pause(); }); }
+                else { this.fadeIn(this.currentTrackIndex, 300); }
+                return this.isMuted;
+            }
         };
         audioSystem.init();
+
         function toggleSoundManual() {
             const muted = audioSystem.toggleMute();
             document.getElementById('soundBtnIcon').innerHTML = muted ? 
@@ -263,63 +241,41 @@
                 '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
         }
 
+        // --- LÓGICA DE JOGO ---
         let welcomePageIndex = 0; function navWelcome(dir) { const pages = document.querySelectorAll('.w-page'); const indicator = document.getElementById('wPageIndicator'); pages[welcomePageIndex].style.display = 'none'; welcomePageIndex += dir; pages[welcomePageIndex].style.display = 'block'; document.getElementById('btnWPrev').disabled = (welcomePageIndex === 0); document.getElementById('btnWNext').disabled = (welcomePageIndex === pages.length - 1); indicator.innerText = `${welcomePageIndex + 1}/${pages.length}`; if (welcomePageIndex === pages.length - 1) { document.getElementById('btnWClose').disabled = false; document.getElementById('btnWOk').disabled = false; } }
         const preGameNewsSource = ["\"Cansamos de salvar um futuro que insiste em se destruir.\"", "\"Quando o fato vira opinião, a ciência vira ruína.\"", "\"O descrédito é o ácido que corrói as fundações do amanhã.\"", "\"A ciência não vai cair. Ela vai simplesmente se calar.\"", "\"Onde a crença vence a prova, o cientista se torna um fantasma.\"", "\"Não há como curar um mundo que ama a própria ferida.\"", "\"O laboratório está vazio porque a verdade se tornou indesejada.\"", "\"A razão se retirou da sala. O colapso agora é livre.\"", "\"Não somos mais guias, somos apenas testemunhas da queda.\""];
-        let newsQueue = []; let newsTimeout;
-        function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
-        function scheduleNextNews() { if (game.started) return; if (newsQueue.length === 0) { newsQueue = [...preGameNewsSource]; shuffleArray(newsQueue); }
-            registerNews(newsQueue.pop()); const randomDelay = Math.floor(Math.random() * 10001) + 10000; newsTimeout = setTimeout(scheduleNextNews, 20000 + randomDelay);
-        }
+        let newsQueue = []; let newsTimeout; function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
+        function scheduleNextNews() { if (game.started) return; if (newsQueue.length === 0) { newsQueue = [...preGameNewsSource]; shuffleArray(newsQueue); } registerNews(newsQueue.pop()); const randomDelay = Math.floor(Math.random() * 10001) + 10000; newsTimeout = setTimeout(scheduleNextNews, 20000 + randomDelay); }
         window.onload = () => { registerNews("O descrédito à ciência tem levado muitos cientistas a se manifestarem contra essa tendência. Será que a ciência se revoltará em breve?"); setTimeout(scheduleNextNews, 22000); };
         function goToOptimization() { document.getElementById('startMenu').classList.remove('active'); document.getElementById('optiScreen').classList.add('active'); }
-        function initSetup() { audioSystem.startPlayback(); document.getElementById('optiScreen').classList.remove('active'); document.getElementById('selectionFlow').classList.add('active'); }
+        function initSetup() { document.getElementById('optiScreen').classList.remove('active'); document.getElementById('selectionFlow').classList.add('active'); }
         function openNewsLog() { game.active = false; document.getElementById('newsEntries').innerHTML = game.newsLog.map(e => `<div style="padding:10px; border-bottom:1px solid #333"><b style="color:var(--blue)">${e.date}</b>: ${e.message}</div>`).join(''); openModal('newsLogModal'); }
         function setVar(key, val, el) { game[key] = val; el.parentElement.querySelectorAll('.opt-box').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
         function registerNews(text) { if (game.started) game.newsLog.unshift({ date: "20 jan. 2026", message: text }); const ticker = document.getElementById('ticker'); ticker.innerText = text.toUpperCase(); ticker.style.transition = 'none'; ticker.style.right = '-110%'; setTimeout(() => { ticker.style.transition = 'right 20s linear'; ticker.style.right = '125%'; }, 100); }
         function runNextStep(btn, id, currentKey, errorDivId, message) { const errorDiv = document.getElementById(errorDivId); if (!game[currentKey]) { errorDiv.innerText = message; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; } btn.closest('.setup-card').classList.remove('active'); document.getElementById(id).classList.add('active'); }
-        
-        function startGame() { 
-            const name = document.getElementById('nameIn').value.trim(); const errorDiv = document.getElementById('errorName'); 
-            if (!name) { errorDiv.innerText = "Você precisa nomear sua criação para avançar"; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; } 
-            game.name = name; game.started = true; clearTimeout(newsTimeout); document.getElementById('bgOverlay').style.opacity = '0'; document.getElementById('selectionFlow').classList.remove('active'); 
-            document.getElementById('mainGame').style.display = 'block'; document.getElementById('unifiedTopBar').classList.replace('glass-bar', 'highlight-bar'); 
-            const vMap = { 'Bactéria': 'BACTERIANO', 'Vírus': 'VIRAL', 'Fungo': 'FÚNGICO', 'Parasita': 'PARASITÁRIO', 'Príon': 'PRIÔNICO', 'Nano-Vírus': 'NANOTECNOLÓGICO', 'Bio-Arma': 'BIOLÓGICO' }; 
-            registerNews(`SISTEMA DE ANIQUILAÇÃO BIO-TÁTICA ONLINE. VETOR ${vMap[game.type]} PRONTO. AGUARDANDO DISPERSÃO.`); 
-            setTimeout(() => { if(!map) initMap(); map.invalidateSize(); openModal('welcomeGameModal'); }, 100); 
-        }
+        function startGame() { const name = document.getElementById('nameIn').value.trim(); const errorDiv = document.getElementById('errorName'); if (!name) { errorDiv.innerText = "Você precisa nomear sua criação para avançar"; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; } game.name = name; game.started = true; clearTimeout(newsTimeout); document.getElementById('bgOverlay').style.opacity = '0'; document.getElementById('selectionFlow').classList.remove('active'); document.getElementById('mainGame').style.display = 'block'; document.getElementById('unifiedTopBar').classList.replace('glass-bar', 'highlight-bar'); const vMap = { 'Bactéria': 'BACTERIANO', 'Vírus': 'VIRAL', 'Fungo': 'FÚNGICO', 'Parasita': 'PARASITÁRIO', 'Príon': 'PRIÔNICO', 'Nano-Vírus': 'NANOTECNOLÓGICO', 'Bio-Arma': 'BIOLÓGICO' }; registerNews(`SISTEMA DE ANIQUILAÇÃO BIO-TÁTICA ONLINE. VETOR ${vMap[game.type]} PRONTO. AGUARDANDO DISPERSÃO.`); setTimeout(() => { if(!map) initMap(); map.invalidateSize(); openModal('welcomeGameModal'); }, 100); }
 
-        let map; let blipMarker; 
-        const hubLayer = L.layerGroup();
-
+        let map; let blipMarker; const hubLayer = L.layerGroup();
         function initMap() { 
             map = L.map('map', { center: [20, 0], zoom: 2.5, minZoom: 2.5, zoomControl: false, attributionControl: false, worldCopyJump: true }); 
             L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { noWrap: false }).addTo(map); 
-            hubLayer.addTo(map);
+            hubLayer.addTo(map); renderHubs();
             map.on('zoomend', () => { if (map.getZoom() < 3) map.removeLayer(hubLayer); else hubLayer.addTo(map); });
-            renderHubs();
             map.on('click', async (e) => { updateCountrySelection(e.latlng); });
         }
 
         async function updateCountrySelection(latlng) {
             const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latlng.lat}&longitude=${latlng.lng}&localityLanguage=pt`;
             const res = await fetch(url); const data = await res.json(); const btn = document.getElementById('btnWorld');
-            if (data.countryName) {
-                game.selectedCountry = data.countryName; btn.innerText = data.countryName.toUpperCase();
-                if (blipMarker) map.removeLayer(blipMarker); const blipIcon = L.divIcon({ className: 'bio-blip', iconSize: [15, 15] }); blipMarker = L.marker(latlng, { icon: blipIcon }).addTo(map);
-            } else {
-                game.selectedCountry = null; btn.innerText = "MUNDO"; if (blipMarker) map.removeLayer(blipMarker);
-            }
+            if (data.countryName) { game.selectedCountry = data.countryName; btn.innerText = data.countryName.toUpperCase(); if (blipMarker) map.removeLayer(blipMarker); const blipIcon = L.divIcon({ className: 'bio-blip', iconSize: [15, 15] }); blipMarker = L.marker(latlng, { icon: blipIcon }).addTo(map); }
+            else { game.selectedCountry = null; btn.innerText = "MUNDO"; if (blipMarker) map.removeLayer(blipMarker); }
         }
 
-        // ✅ RENDERIZAÇÃO DE HUBS (v58 - CORREÇÃO DEFINITIVA COM ÍCONES EXTERNOS)
+        // ✅ RENDERIZAÇÃO DE HUBS COM ÍCONES EXTERNOS (v59)
         function renderHubs() {
             worldHubs.forEach(hub => {
                 const iconPath = (hub.type === 'airport') ? 'plane.svg' : 'anchor.svg';
-                const icon = L.divIcon({ 
-                    className: 'hub-icon', 
-                    html: `<img src="${iconPath}" class="hub-icon-img" width="22" height="22">`, 
-                    iconSize: [24, 24] 
-                });
+                const icon = L.divIcon({ className: 'hub-icon', html: `<img src="${iconPath}" class="hub-icon-img" width="22" height="22">`, iconSize: [24, 24] });
                 const marker = L.marker([hub.lat, hub.lng], { icon: icon }).addTo(hubLayer);
                 marker.on('click', (e) => { L.DomEvent.stopPropagation(e); updateCountrySelection({lat: hub.lat, lng: hub.lng}); });
             });
