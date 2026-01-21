@@ -86,8 +86,6 @@
     .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 25px 0; }
     .opt-box { padding: 18px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; background: rgba(20, 20, 20, 0.7); transition: 0.2s; color: #DDD; text-align: center; }
     .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.3); color: #FFF; }
-
-    /* ✅ PRESERVAÇÃO: display block para as quebras de linha (v63) */
     .opt-box b { display: block; font-size: 1.1rem; margin-bottom: 5px; color: #FFF; }
 
     #nameIn { width: 100%; padding: 25px; background: rgba(10, 10, 10, 0.85); border: 2px solid #666; color: #FFF; text-align: center; font-size: 2.5rem; margin: 30px 0; font-family: Rajdhani; border-radius: 10px; }
@@ -256,17 +254,22 @@
       infectionStarted: false,
       patientZeroCountry: null,
 
-      // Motor
+      // Motor / tempo (melhoria)
       tickHandle: null,
-      day: 0,
+      simDay: 0,            // dia simulado (float)
+      dayInt: 0,            // dia inteiro (para eventos pontuais)
+      lastRealTs: null,     // timestamp real do último tick
+      time: {
+        tickMs: 250,        // tick real (ms) -> mais suave, sem “pulos”
+        daysPerSecond: 0.20 // 0.20 = 1 dia a cada 5s (ajuste aqui se quiser mais lento/rápido)
+      },
 
       // Países (simulação)
-      countries: {} // { [name]: { pop, infected, dead, cured, vax, hubs:{airport,port}, seededLandTo:Set, firstInfectedDay, lastMilestoneDNA } }
+      countries: {} // { [name]: { pop, infected, dead, cured, vax, hubs:{airport,port}, seededLandTo:Set, firstInfectedDay, lastMilestoneDNA, growthCarry } }
     };
 
     /* =========================
        HUBS (AEROPORTOS/PORTOS)
-       - usados para "background transmission" (micro-aleatoriedade)
     ========================== */
     const worldHubs = [
       { country: "Brasil", type: "airport", city: "Brasília", lat: -15.8697, lng: -47.9208 },
@@ -337,8 +340,6 @@
 
     /* =========================
        ADJACÊNCIAS TERRESTRES (DEMO)
-       - determinístico: quando o país “amadurece”, vaza para vizinhos
-       - focado nos países do seu dataset atual, sem quebrar a UI
     ========================== */
     const LAND_NEIGHBORS = {
       "Brasil": ["Argentina", "Peru", "Colômbia"],
@@ -354,7 +355,6 @@
       "Espanha": ["França"],
       "Suíça": ["França"],
 
-      // estes abaixo são “ilustrativos” (sem rede completa)
       "Rússia": ["Finlândia"],
       "Finlândia": ["Rússia"],
 
@@ -374,7 +374,6 @@
 
     /* =========================
        POPULAÇÕES (aprox. / balanceamento)
-       - só para gameplay; você pode trocar depois por fonte real
     ========================== */
     const POP_BY_COUNTRY = {
       "Brasil": 214000000,
@@ -421,7 +420,6 @@
         this.tracks[1].addEventListener('ended', () => this.crossfadeTo(0));
       },
       crossfadeTo(nextIndex) {
-        // simples: troca seca (você pode sofisticar depois)
         this.tracks[this.currentTrackIndex].pause();
         this.tracks[this.currentTrackIndex].currentTime = 0;
         this.currentTrackIndex = nextIndex;
@@ -674,13 +672,14 @@
     }
 
     /* =========================
-       MOTOR DE PROPAGAÇÃO (IMPLEMENTAÇÃO)
-       Baseado na sua pesquisa:
-       - início determinístico no país do Paciente Zero
-       - crescimento intra-país (logístico simplificado)
-       - vazamento terrestre: determinístico ao atingir fração de infectados
-       - ar/mar: micro-aleatoriedade (“background transmission”) via hubs
+       MOTOR DE PROPAGAÇÃO (MELHORIAS)
+       - Tempo contínuo (simDay float) + ticks curtos
+       - Crescimento logístico com "carry" fracionário -> início pode ficar dias com 1 infectado
+       - Probabilidades ar/mar convertidas para "por dia" e integradas por dtDays
+       - Vazamento terrestre determinístico ao atingir fração (com seed mínimo)
     ========================== */
+
+    function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
     function ensureCountry(name) {
       if (!name) return null;
@@ -699,46 +698,45 @@
           hubs: { airport: hasAirport, port: hasPort },
           seededLandTo: new Set(),
           firstInfectedDay: null,
-          lastMilestoneDNA: 0
+          lastMilestoneDNA: 0,
+
+          // melhoria-chave: acumula crescimento fracionário (permite dias “sem nada acontecer”)
+          growthCarry: 0
         };
       }
       return game.countries[name];
     }
 
     function getDifficultyParams() {
-      // “resposta do mundo”: quanto maior, mais difícil crescer
-      // (por enquanto, só ajusta taxa de crescimento)
+      // Valores “por dia” (não por tick). Ajuste fino aqui.
       const diff = game.diff;
-      if (diff === "Casual") return { growth: 0.32, landThreshold: 0.22, airBase: 0.00030, seaBase: 0.00018 };
-      if (diff === "Brutal") return { growth: 0.22, landThreshold: 0.28, airBase: 0.00018, seaBase: 0.00010 };
-      return { growth: 0.27, landThreshold: 0.25, airBase: 0.00024, seaBase: 0.00014 }; // Normal
+
+      // growth: taxa base logística diária
+      // landThreshold: fração para vazamento terrestre
+      // airBase/seaBase: chance base diária (background) antes de converter para dtDays
+      if (diff === "Casual") return { growth: 0.18, landThreshold: 0.22, airBase: 0.00035, seaBase: 0.00022 };
+      if (diff === "Brutal") return { growth: 0.12, landThreshold: 0.28, airBase: 0.00020, seaBase: 0.00012 };
+      return { growth: 0.145, landThreshold: 0.25, airBase: 0.00027, seaBase: 0.00016 }; // Normal
     }
 
     function getAgentParams() {
-      // Ajuste leve por “tipo de agente” (sem upgrades ainda)
       const t = game.type;
-      // transmissões base (background) e crescimento
-      if (t === "Vírus") return { growthMul: 1.08, airMul: 1.10, seaMul: 0.95, landMul: 1.00 };
+      if (t === "Vírus") return { growthMul: 1.10, airMul: 1.12, seaMul: 0.95, landMul: 1.00 };
       if (t === "Bactéria") return { growthMul: 1.00, airMul: 1.00, seaMul: 1.00, landMul: 1.00 };
-      if (t === "Fungo") return { growthMul: 0.92, airMul: 0.85, seaMul: 0.95, landMul: 0.90 };
-      if (t === "Parasita") return { growthMul: 0.88, airMul: 0.80, seaMul: 0.85, landMul: 1.05 };
-      if (t === "Príon") return { growthMul: 0.75, airMul: 0.65, seaMul: 0.65, landMul: 0.85 };
-      if (t === "Nano-Vírus") return { growthMul: 1.05, airMul: 1.15, seaMul: 1.05, landMul: 1.00 };
+      if (t === "Fungo") return { growthMul: 0.90, airMul: 0.85, seaMul: 0.95, landMul: 0.90 };
+      if (t === "Parasita") return { growthMul: 0.86, airMul: 0.80, seaMul: 0.85, landMul: 1.05 };
+      if (t === "Príon") return { growthMul: 0.70, airMul: 0.65, seaMul: 0.65, landMul: 0.85 };
+      if (t === "Nano-Vírus") return { growthMul: 1.06, airMul: 1.18, seaMul: 1.05, landMul: 1.00 };
       if (t === "Bio-Arma") return { growthMul: 1.12, airMul: 1.05, seaMul: 1.05, landMul: 1.00 };
       return { growthMul: 1.00, airMul: 1.00, seaMul: 1.00, landMul: 1.00 };
     }
 
-    function logisticGrowth(country, baseGrowth) {
-      // Modelo simples: dI = r*I*(1 - I/Pop)
-      // (mantém o “feeling” de começo lento e aceleração até saturar)
-      if (country.infected <= 0) return 0;
-
-      const r = baseGrowth;
-      const I = country.infected;
-      const P = country.pop;
-
-      const delta = Math.max(0, Math.floor(r * I * (1 - (I / P))));
-      return delta;
+    function logisticExpectedDeltaPerDay(I, P, r) {
+      // dI = r*I*(1 - I/P) por dia (expectativa)
+      if (I <= 0) return 0;
+      const frac = I / P;
+      const val = r * I * (1 - frac);
+      return Math.max(0, val);
     }
 
     function seedInfection(countryName, amount, reason) {
@@ -746,10 +744,9 @@
       if (!c) return false;
 
       if (c.infected <= 0 && amount > 0) {
-        c.firstInfectedDay = (c.firstInfectedDay === null) ? game.day : c.firstInfectedDay;
+        c.firstInfectedDay = (c.firstInfectedDay === null) ? Math.floor(game.simDay) : c.firstInfectedDay;
 
-        // Recompensa estilo Plague: infectar país novo é “evento grande”
-        // (DNA por país novo, baixo, mas tangível)
+        // DNA por país novo (feedback)
         game.dna += 1;
         registerNews(`VETOR CONFIRMADO ${getCountryArticle(countryName).toUpperCase()} ${countryName.toUpperCase()}. PROPAGAÇÃO ${reason.toUpperCase()} DETECTADA.`);
       }
@@ -764,13 +761,15 @@
 
       const frac = country.infected / country.pop;
 
-      // determinístico: quando “amadurece”, vaza para vizinhos
-      if (frac >= (landThreshold)) {
+      // determinístico: ao “amadurecer”
+      if (frac >= landThreshold) {
         neighbors.forEach(n => {
           if (country.seededLandTo.has(n)) return;
 
-          // Ainda “sem upgrades”: seed mínimo (1-8) depende de quão avançado está
-          const seedAmt = Math.max(1, Math.floor(2 + 10 * (frac - landThreshold) * landMul));
+          // seed mínimo controlado, cresce com a fração acima do threshold
+          const excess = Math.max(0, frac - landThreshold);
+          const seedAmt = Math.max(1, Math.floor(1 + 12 * excess * landMul));
+
           seedInfection(n, seedAmt, "terrestre");
           country.seededLandTo.add(n);
         });
@@ -781,29 +780,35 @@
       return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    function backgroundTravelSpread(country, params, agent) {
-      // Micro-aleatoriedade: chance baixíssima por tick, mas existe.
-      // Fica “mais provável” em países com hubs + mais infectados.
+    function probDayToProbDt(pDay, dtDays) {
+      // converte probabilidade "por dia" para probabilidade no intervalo dtDays
+      // 1 - (1-p)^dt
+      pDay = clamp(pDay, 0, 1);
+      dtDays = Math.max(0, dtDays);
+      return 1 - Math.pow(1 - pDay, dtDays);
+    }
+
+    function backgroundTravelSpread(country, params, agent, dtDays) {
+      // Micro-aleatoriedade controlada (background transmission)
       const frac = country.infected / country.pop;
       if (frac <= 0) return;
 
-      // “tráfego”: quantos hubs o país tem no seu dataset
       const hubsCount = worldHubs.filter(h => h.country === country.name).length;
       const trafficFactor = Math.min(2.0, 1.0 + (hubsCount * 0.35)); // 1.0 a 2.0
 
       const allCountries = Object.keys(game.countries);
       if (allCountries.length === 0) return;
 
-      // destinos possíveis: apenas países que existem no “mundo simulado”
-      // (se quiser, depois expandimos para criar países sob demanda)
       const airportDests = allCountries.filter(n => ensureCountry(n).hubs.airport && n !== country.name);
       const portDests = allCountries.filter(n => ensureCountry(n).hubs.port && n !== country.name);
 
-      // Probabilidades base por tick (ajustadas por dificuldade + tipo)
-      const pAir = params.airBase * agent.airMul * trafficFactor * Math.min(1, frac * 1.8);
-      const pSea = params.seaBase * agent.seaMul * trafficFactor * Math.min(1, frac * 1.4);
+      // pDay cresce um pouco com frac, mas satura (início: muito baixo)
+      const airPday = params.airBase * agent.airMul * trafficFactor * clamp(frac * 1.8, 0, 1);
+      const seaPday = params.seaBase * agent.seaMul * trafficFactor * clamp(frac * 1.4, 0, 1);
 
-      // Se o país não tem hub, “quase não rola” (fiel ao feeling)
+      const pAir = probDayToProbDt(airPday, dtDays);
+      const pSea = probDayToProbDt(seaPday, dtDays);
+
       if (country.hubs.airport && airportDests.length > 0) {
         if (Math.random() < pAir) {
           const dest = pickRandom(airportDests);
@@ -834,7 +839,7 @@
       game.cured = cured;
       game.vax = vax;
 
-      // DNA por marcos globais: 1 a cada 100.000 novos infectados (como você já tinha)
+      // DNA por marcos globais: 1 a cada 100.000
       const milestone = Math.floor(game.infected / 100000);
       if (milestone > game.lastDNAMilestone) {
         game.dna += (milestone - game.lastDNAMilestone);
@@ -860,54 +865,86 @@
       document.getElementById('valThreat').innerText = calcThreat();
     }
 
-    function gameTick() {
+    function simulateStep(dtDays) {
       if (!game.infectionStarted) return;
-
-      game.day += 1;
 
       const params = getDifficultyParams();
       const agent = getAgentParams();
 
-      // 1) Crescimento intra-país (não aleatório; determinístico por tick)
+      // 1) Crescimento intra-país com carry fracionário
       Object.values(game.countries).forEach(c => {
         if (c.infected <= 0) return;
 
-        const baseGrowth = params.growth * agent.growthMul;
+        const baseGrowthPerDay = params.growth * agent.growthMul;
 
-        // crescimento logístico
-        let newInf = logisticGrowth(c, baseGrowth);
+        // expectativa diária -> escala por dtDays
+        const expected = logisticExpectedDeltaPerDay(c.infected, c.pop, baseGrowthPerDay) * dtDays;
 
-        // Ajuste mínimo para “não travar” com 1 infectado (início bem lento, mas anda)
-        if (c.infected > 0 && c.infected < 20) newInf = Math.max(newInf, 1);
+        // acumula fração (isso cria "dias parados" com 1 infectado, e depois sobe)
+        c.growthCarry += expected;
 
-        c.infected = Math.min(c.pop, c.infected + newInf);
+        // limita carry para evitar explosões por lag/aba inativa
+        c.growthCarry = Math.min(c.growthCarry, c.pop);
 
-        // 2) Vazamento terrestre (determinístico ao atingir fração)
+        const deltaInt = Math.floor(c.growthCarry);
+        if (deltaInt > 0) {
+          c.growthCarry -= deltaInt;
+          c.infected = Math.min(c.pop, c.infected + deltaInt);
+        }
+
+        // 2) Vazamento terrestre (determinístico por estado, não por sorte)
         landSpread(c, params.landThreshold, agent.landMul);
 
-        // 3) “Background transmission” por hubs (micro-aleatoriedade)
-        backgroundTravelSpread(c, params, agent);
+        // 3) Ar/mar (micro-aleatoriedade) usando prob convertida por dtDays
+        backgroundTravelSpread(c, params, agent, dtDays);
       });
 
-      // consolida totais + DNA
       updateGlobalTotalsAndDNA();
       updateHUD();
+    }
 
-      // News ocasional para dar “feedback” sem spam
-      if (game.day === 5) {
-        registerNews("OBSERVAÇÃO: NO INÍCIO, A PROPAGAÇÃO GLOBAL É BAIXA. O FOCO PRIMÁRIO É A CONSOLIDAÇÃO LOCAL.");
+    function gameTick() {
+      if (!game.infectionStarted) return;
+
+      const now = performance.now();
+      if (game.lastRealTs === null) game.lastRealTs = now;
+
+      // dt real em segundos (clamp para estabilidade)
+      let dtSec = (now - game.lastRealTs) / 1000;
+      game.lastRealTs = now;
+      dtSec = clamp(dtSec, 0, 0.5); // evita explosões se travar
+
+      // avança tempo simulado
+      const dtDays = dtSec * game.time.daysPerSecond;
+      game.simDay += dtDays;
+
+      // dispara eventos por "dia inteiro" quando cruzar o próximo inteiro
+      const newDayInt = Math.floor(game.simDay);
+      if (newDayInt > game.dayInt) {
+        const crossed = newDayInt - game.dayInt;
+        game.dayInt = newDayInt;
+
+        // notícia pontual (sem spam)
+        if (game.dayInt === 5) {
+          registerNews("OBSERVAÇÃO: NO INÍCIO, A PROPAGAÇÃO GLOBAL É BAIXA. O FOCO PRIMÁRIO É A CONSOLIDAÇÃO LOCAL.");
+        }
+
+        // você pode colocar aqui eventos que acontecem "por dia" (cura/vacina etc.)
+        // crossed indica quantos dias inteiros passaram desde o último tick
       }
+
+      // simula a dinâmica para o dtDays do tick
+      simulateStep(dtDays);
     }
 
     function startTickLoop() {
-      // evita criar múltiplos intervals
       if (game.tickHandle) clearInterval(game.tickHandle);
-      game.tickHandle = setInterval(gameTick, 1000);
+      game.lastRealTs = null;
+      game.tickHandle = setInterval(gameTick, game.time.tickMs);
     }
 
     /* =========================
        SELEÇÃO DE PAÍS / DISPERSÃO
-       (preserva menus e adiciona motor)
     ========================== */
     async function updateCountrySelection(latlng) {
       const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latlng.lat}&longitude=${latlng.lng}&localityLanguage=pt`;
@@ -924,7 +961,6 @@
         const blipIcon = L.divIcon({ className: 'bio-blip', iconSize: [15, 15] });
         blipMarker = L.marker(latlng, { icon: blipIcon }).addTo(map);
 
-        // garante que o país exista no mundo simulado (mesmo sem infectar)
         ensureCountry(data.countryName);
 
         if (!game.infectionStarted) {
@@ -957,13 +993,17 @@
       game.infectionStarted = true;
       game.patientZeroCountry = game.selectedCountry;
 
-      // garante a existência do país e “Paciente Zero”
+      // reset tempo (para ficar consistente)
+      game.simDay = 0;
+      game.dayInt = 0;
+      game.lastRealTs = null;
+
       ensureCountry(game.patientZeroCountry);
 
-      // Paciente Zero determinístico: 1 infectado exato
+      // Paciente Zero determinístico: exatamente 1 infectado
       seedInfection(game.patientZeroCountry, 1, "inicial");
 
-      // DNA inicial (como você já fazia)
+      // DNA inicial
       game.dna = Math.max(1, game.dna);
 
       updateGlobalTotalsAndDNA();
@@ -974,15 +1014,14 @@
       const adj = getCountryAdjective(game.patientZeroCountry);
       const msg =
         `O agente <b>${game.name}</b> foi liberado em solo <b>${adj}</b> e já contaminou sua primeira vítima.<br><br>
-         <b>Dinâmica inicial:</b> a expansão é majoritariamente local e lenta. Vazamentos terrestres ocorrem quando o surto amadurece, enquanto rotas aéreas e marítimas têm chance <b>baixíssima</b> no começo (micro-aleatoriedade controlada).`;
+         <b>Tempo e ritmo:</b> o relógio avança continuamente, mas o crescimento é logístico e pode permanecer lento no início, com dias sem aumento visível. Vazamentos terrestres só ocorrem quando o surto amadurece, enquanto rotas aéreas e marítimas têm chance <b>baixíssima</b> no começo (micro-aleatoriedade controlada).`;
 
       document.getElementById('dispersedText').innerHTML = msg;
       openModal('dispersedModal');
 
       registerNews(`SURTO INICIADO. PACIENTE ZERO IDENTIFICADO ${getCountryArticle(game.patientZeroCountry).toUpperCase()} ${game.patientZeroCountry.toUpperCase()}.`);
 
-      // Inicializa também os países do seu "mundo tático" (para permitir saltos ar/mar)
-      // Assim, o background transmission consegue escolher destinos sem ficar “vazio”.
+      // Inicializa o “mundo tático”
       const seedWorld = new Set(worldHubs.map(h => h.country));
       Object.keys(LAND_NEIGHBORS).forEach(k => seedWorld.add(k));
       seedWorld.forEach(cn => ensureCountry(cn));
@@ -1002,6 +1041,7 @@
           `População: ${c.pop.toLocaleString('pt-BR')}\n` +
           `Infectados: ${c.infected.toLocaleString('pt-BR')} (${pct.toFixed(4)}%)\n` +
           `Hubs: ${c.hubs.airport ? "✈️" : "—"} ${c.hubs.port ? "⚓" : "—"}\n\n` +
+          `Dia (simulado): ${game.simDay.toFixed(2)}\n` +
           `Rotas terrestres mapeadas (demo): ${(LAND_NEIGHBORS[game.selectedCountry] || []).join(", ") || "—"}`
         );
       } else {
