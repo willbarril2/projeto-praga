@@ -85,7 +85,10 @@
         .grid-select { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 25px 0; }
         .opt-box { padding: 18px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; background: rgba(20, 20, 20, 0.7); transition: 0.2s; color: #DDD; text-align: center; }
         .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.3); color: #FFF; }
+        
+        /* ✅ PRESERVAÇÃO: display block para as quebras de linha (v63) */
         .opt-box b { display: block; font-size: 1.1rem; margin-bottom: 5px; color: #FFF; }
+        
         #nameIn { width: 100%; padding: 25px; background: rgba(10, 10, 10, 0.85); border: 2px solid #666; color: #FFF; text-align: center; font-size: 2.5rem; margin: 30px 0; font-family: Rajdhani; border-radius: 10px; }
         .news-marquee-container { overflow: hidden; position: relative; height: 30px; margin: 0 20px; display: flex; align-items: center; }
         #ticker { color: #FFF; font-weight: 700; font-size: 1rem; position: absolute; white-space: nowrap; right: -110%; width: fit-content; }
@@ -196,6 +199,16 @@
         </div>
     </div>
 
+    <div id="dispersedModal" class="overlay" style="background: rgba(0,0,0,0.5);">
+        <div class="glass modal-card" style="max-width: 500px;">
+            <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 20px;">AGENTE DISPERSADO</h2>
+            <p id="dispersedText" style="font-size: 1.1rem; line-height: 1.6; color: #EEE;"></p>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn-main" style="width: auto; padding: 10px 30px;" onclick="closeModal()">ENTENDIDO</button>
+            </div>
+        </div>
+    </div>
+
     <div id="tutorialModal" class="overlay">
         <div class="glass modal-card">
             <button class="btn-x" onclick="closeModal()">✕</button>
@@ -217,8 +230,7 @@
             started: false, name: '', type: '', diff: '', active: false, newsLog: [], soundOn: false, 
             infected: 0, dead: 0, cured: 0, vax: 0, dna: 0, popCap: 8200000000, 
             selectedCountry: null, infectionStarted: false, 
-            internalInfection: 0, // Contador para o país inicial
-            lastDNAMilestone: 0 // Para controlar o ganho de DNA por infectados
+            internalInfection: 0, lastDNAMilestone: 0 
         };
         
         const worldHubs = [{ country: "Brasil", type: "airport", city: "Brasília", lat: -15.8697, lng: -47.9208 }, { country: "Brasil", type: "port", city: "Salvador", lat: -12.9228, lng: -38.5122 }, { country: "México", type: "airport", city: "Cidade do México", lat: 19.4326, lng: -99.1332 }, { country: "México", type: "port", city: "Veracruz", lat: 19.1738, lng: -96.1342 }, { country: "Canadá", type: "airport", city: "Ottawa", lat: 45.4215, lng: -75.6972 }, { country: "Canadá", type: "port", city: "Vancouver", lat: 49.2827, lng: -123.1207 }, { country: "Argentina", type: "airport", city: "Buenos Aires", lat: -34.6037, lng: -58.3816 }, { country: "Argentina", type: "port", city: "Mar del Plata", lat: -38.0055, lng: -57.5426 }, { country: "Peru", type: "airport", city: "Lima", lat: -12.0464, lng: -77.0428 }, { country: "Peru", type: "port", city: "Callao", lat: -12.0566, lng: -77.1491 }, { country: "Colômbia", type: "airport", city: "Bogotá", lat: 4.7110, lng: -74.0721 }, { country: "Colômbia", type: "port", city: "Cartagena", lat: 10.3910, lng: -75.4794 }, { country: "África do Sul", type: "airport", city: "Joanesburgo", lat: -26.1367, lng: 28.2411 }, { country: "África do Sul", type: "port", city: "Cidade do Cabo", lat: -33.9189, lng: 18.4233 }, { country: "Marrocos", type: "airport", city: "Rabat", lat: 33.9716, lng: -6.8498 }, { country: "Marrocos", type: "port", city: "Casablanca", lat: 33.5731, lng: -7.5898 }, { country: "Egito", type: "airport", city: "Cairo", lat: 30.1219, lng: 31.4056 }, { country: "Egito", type: "port", city: "Alexandria", lat: 31.2001, lng: 29.9187 }, { country: "Espanha", type: "airport", city: "Madrid", lat: 40.4839, lng: -3.5680 }, { country: "Espanha", type: "port", city: "Barcelona", lat: 41.3851, lng: 2.1734 }, { country: "França", type: "airport", city: "Paris", lat: 49.0097, lng: 2.5479 }, { country: "França", type: "port", city: "Marselha", lat: 43.2965, lng: 5.3698 }, { country: "Arábia Saudita", type: "airport", city: "Riad", lat: 24.9576, lng: 46.6988 }, { country: "Arábia Saudita", type: "port", city: "Jidá", lat: 21.4858, lng: 39.1925 }, { country: "Índia", type: "airport", city: "Nova Deli", lat: 28.5562, lng: 77.1000 }, { country: "Índia", type: "port", city: "Bombaim", lat: 18.9220, lng: 72.8347 }, { country: "Finlândia", type: "airport", city: "Helsínquia", lat: 60.3172, lng: 24.9633 }, { country: "Finlândia", type: "port", city: "Helsínquia", lat: 60.1600, lng: 24.9600 }, { country: "Japão", type: "airport", city: "Tóquio", lat: 35.5494, lng: 139.7798 }, { country: "Japão", type: "port", city: "Yokohama", lat: 35.4437, lng: 139.6380 }, { country: "Austrália", type: "airport", city: "Canberra", lat: -35.3050, lng: 149.1934 }, { country: "Austrália", type: "port", city: "Sydney", lat: -33.8688, lng: 151.2093 }, { country: "Nova Zelândia", type: "airport", city: "Wellington", lat: -41.3276, lng: 174.8076 }, { country: "Nova Zelândia", type: "port", city: "Auckland", lat: -36.8485, lng: 174.7633 }, { country: "Turquia", type: "airport", city: "Ancara", lat: 40.1281, lng: 32.9951 }, { country: "Turquia", type: "port", city: "Istambul", lat: 41.0082, lng: 28.9784 }, { country: "Reino Unido", type: "airport", city: "Londres", lat: 51.4700, lng: -0.4543 }, { country: "Rússia", type: "airport", city: "Moscou", lat: 55.7558, lng: 37.6173 }, { country: "EUA", type: "airport", city: "Washington", lat: 38.8512, lng: -77.0402 }, { country: "Groenlândia", type: "port", city: "Nuuk", lat: 64.1750, lng: -51.7389 }, { country: "Madagascar", type: "port", city: "Toamasina", lat: -18.1492, lng: 49.4023 }, { country: "Suíça", type: "airport", city: "Berna", lat: 46.9128, lng: 7.4984 }];
@@ -250,7 +262,7 @@
         function setVar(key, val, el) { game[key] = val; el.parentElement.querySelectorAll('.opt-box').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
         function registerNews(text) { if (game.started) game.newsLog.unshift({ date: "20 jan. 2026", message: text }); const ticker = document.getElementById('ticker'); ticker.innerText = text.toUpperCase(); ticker.style.transition = 'none'; ticker.style.right = '-110%'; setTimeout(() => { ticker.style.transition = 'right 20s linear'; ticker.style.right = '125%'; }, 100); }
         function runNextStep(btn, id, currentKey, errorDivId, message) { const errorDiv = document.getElementById(errorDivId); if (!game[currentKey]) { errorDiv.innerText = message; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; } btn.closest('.setup-card').classList.remove('active'); document.getElementById(id).classList.add('active'); }
-        function startGame() { const name = document.getElementById('nameIn').value.trim(); const errorDiv = document.getElementById('errorName'); if (!name) { errorDiv.innerText = "Você precisa nomear sua criação para avançar"; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; } game.name = name; game.started = true; clearTimeout(newsTimeout); document.getElementById('bgOverlay').style.opacity = '0'; document.getElementById('selectionFlow').classList.remove('active'); document.getElementById('mainGame').style.display = 'block'; document.getElementById('unifiedTopBar').classList.replace('glass-bar', 'highlight-bar'); const vMap = { 'Bactéria': 'BACTERIANO', 'Vírus': 'VIRAL', 'Fungo': 'FÚNGICO', 'Parasita': 'PARASITÁRIO', 'Príon': 'PRIÔNICO', 'Nano-Vírus': 'NANOTECNOLÓGICO', 'Bio-Arma': 'BIOLÓGICO' }; registerNews(`SISTEMA DE ANIQUILAÇÃO BIO-TÁTICA ONLINE. VETOR ${vMap[game.type]} PRONTO. AGUARDANDO DISPERSÃO.`); setTimeout(() => { if(!map) initMap(); map.invalidateSize(); openModal('welcomeGameModal'); }, 100); }
+        function startGame() { game.name = document.getElementById('nameIn').value.trim(); const errorDiv = document.getElementById('errorName'); if (!game.name) { errorDiv.innerText = "Você precisa nomear sua criação para avançar"; errorDiv.style.opacity = '1'; setTimeout(() => errorDiv.style.opacity = '0', 3000); return; } game.started = true; clearTimeout(newsTimeout); document.getElementById('bgOverlay').style.opacity = '0'; document.getElementById('selectionFlow').classList.remove('active'); document.getElementById('mainGame').style.display = 'block'; document.getElementById('unifiedTopBar').classList.replace('glass-bar', 'highlight-bar'); const vMap = { 'Bactéria': 'BACTERIANO', 'Vírus': 'VIRAL', 'Fungo': 'FÚNGICO', 'Parasita': 'PARASITÁRIO', 'Príon': 'PRIÔNICO', 'Nano-Vírus': 'NANOTECNOLÓGICO', 'Bio-Arma': 'BIOLÓGICO' }; registerNews(`SISTEMA DE ANIQUILAÇÃO BIO-TÁTICA ONLINE. VETOR ${vMap[game.type]} PRONTO. AGUARDANDO DISPERSÃO.`); setTimeout(() => { if(!map) initMap(); map.invalidateSize(); openModal('welcomeGameModal'); }, 100); }
 
         let map; let blipMarker; const hubLayer = L.layerGroup();
         function initMap() { 
@@ -268,6 +280,14 @@
             return femCountries.includes(name) ? "na" : "no";
         }
 
+        // ✅ LÓGICA DE ADJETIVO PÁTRIO (v65)
+        function getCountryAdjective(name) {
+            const map = {
+                "Brasil": "brasileiro", "México": "mexicano", "Canadá": "canadense", "Argentina": "argentino", "Peru": "peruano", "Colômbia": "colombiano", "África do Sul": "sul-africano", "Marrocos": "marroquino", "Egito": "egípcio", "Espanha": "espanhol", "França": "francês", "Arábia Saudita": "saudita", "Índia": "indiano", "Finlândia": "finlandês", "Japão": "japonês", "Austrália": "australiano", "Nova Zelândia": "neozelandês", "Turquia": "turco", "Reino Unido": "britânico", "Rússia": "russo", "Estados Unidos": "estadunidense", "EUA": "estadunidense", "Groenlândia": "groenlandês", "Madagascar": "malgaxe", "Suíça": "suíço"
+            };
+            return map[name] || "local";
+        }
+
         async function updateCountrySelection(latlng) {
             const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latlng.lat}&longitude=${latlng.lng}&localityLanguage=pt`;
             const res = await fetch(url); const data = await res.json(); const btn = document.getElementById('btnWorld');
@@ -282,53 +302,34 @@
             } else { game.selectedCountry = null; btn.innerText = "MUNDO"; if (blipMarker) map.removeLayer(blipMarker); map.closePopup(); }
         }
 
-        // ✅ CONFIRMAÇÃO E INÍCIO DO LOOP (v64)
+        // ✅ CONFIRMAÇÃO NARRATIVA REFINADA (v65)
         function confirmInfection() {
             game.infectionStarted = true;
-            game.dna = 1;
-            game.infected = 1; // Paciente Zero
-            game.internalInfection = 1;
-            updateHUD();
-            map.closePopup();
+            game.dna = 1; game.infected = 1; game.internalInfection = 1;
+            updateHUD(); map.closePopup();
+
+            // Popula e abre a nova tela de Agente Dispersado
+            const adj = getCountryAdjective(game.selectedCountry);
+            const msg = `O agente <b>${game.name}</b> foi liberado em solo <b>${adj}</b> e já contaminou sua primeira vítima. À medida que o agente infecta novas pessoas, você acumulará pontos de DNA, que poderão ser utilizados para o aprimoramento remoto do agente.`;
+            document.getElementById('dispersedText').innerHTML = msg;
+            openModal('dispersedModal');
+
             registerNews(`SURTO INICIADO. PACIENTE ZERO IDENTIFICADO ${getCountryArticle(game.selectedCountry).toUpperCase()} ${game.selectedCountry.toUpperCase()}.`);
-            
-            // Inicia o motor do jogo (1 seg = 1 tick)
             setInterval(gameTick, 1000);
         }
 
-        // ✅ MOTOR DE PROPAGAÇÃO (v64)
         function gameTick() {
             if (!game.infectionStarted) return;
-
-            // 1. Crescimento Interno (Fórmula Logística Simples)
-            // Cresce baseado na quantidade atual. O fator 1.25 é a virulência base.
             let growthFactor = 1.25;
             let newInfections = Math.ceil(game.internalInfection * (growthFactor - 1));
-            
-            // Garante que não ultrapasse o limite global
-            if (game.infected + newInfections > game.popCap) {
-                newInfections = game.popCap - game.infected;
-            }
-
-            game.internalInfection += newInfections;
-            game.infected = game.internalInfection;
-
-            // 2. Lógica de DNA (1 ponto a cada 100.000 novos infectados)
+            if (game.infected + newInfections > game.popCap) newInfections = game.popCap - game.infected;
+            game.internalInfection += newInfections; game.infected = game.internalInfection;
             let currentMilestone = Math.floor(game.infected / 100000);
-            if (currentMilestone > game.lastDNAMilestone) {
-                let pointsGained = currentMilestone - game.lastDNAMilestone;
-                game.dna += pointsGained;
-                game.lastDNAMilestone = currentMilestone;
-            }
-
+            if (currentMilestone > game.lastDNAMilestone) { game.dna += (currentMilestone - game.lastDNAMilestone); game.lastDNAMilestone = currentMilestone; }
             updateHUD();
         }
 
-        function updateHUD() {
-            document.getElementById('valInfected').innerText = game.infected.toLocaleString('pt-BR');
-            document.getElementById('valDNA').innerText = game.dna;
-        }
-
+        function updateHUD() { document.getElementById('valInfected').innerText = game.infected.toLocaleString('pt-BR'); document.getElementById('valDNA').innerText = game.dna; }
         function renderHubs() { worldHubs.forEach(hub => { const iconPath = (hub.type === 'airport') ? 'plane.svg' : 'anchor.svg'; const icon = L.divIcon({ className: 'hub-icon', html: `<img src="${iconPath}" class="hub-icon-img" width="22" height="22">`, iconSize: [24, 24] }); const marker = L.marker([hub.lat, hub.lng], { icon: icon }).addTo(hubLayer); marker.on('click', (e) => { L.DomEvent.stopPropagation(e); updateCountrySelection({lat: hub.lat, lng: hub.lng}); }); }); }
         function handleWorldClick() { if (game.selectedCountry) alert(`Relatório tático de ${game.selectedCountry} em processamento...`); else alert('Estatísticas globais em desenvolvimento.'); }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
