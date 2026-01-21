@@ -86,13 +86,19 @@
         .opt-box { padding: 18px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; background: rgba(20, 20, 20, 0.7); transition: 0.2s; color: #DDD; text-align: center; }
         .opt-box:hover, .opt-box.selected { border-color: var(--red); background: rgba(255,23,68,0.3); color: #FFF; }
         
-        /* ✅ PRESERVAÇÃO: display block para as quebras de linha (v63) */
+        /* ✅ PRESERVAÇÃO: display block (v63) */
         .opt-box b { display: block; font-size: 1.1rem; margin-bottom: 5px; color: #FFF; }
         
         #nameIn { width: 100%; padding: 25px; background: rgba(10, 10, 10, 0.85); border: 2px solid #666; color: #FFF; text-align: center; font-size: 2.5rem; margin: 30px 0; font-family: Rajdhani; border-radius: 10px; }
         .news-marquee-container { overflow: hidden; position: relative; height: 30px; margin: 0 20px; display: flex; align-items: center; }
         #ticker { color: #FFF; font-weight: 700; font-size: 1rem; position: absolute; white-space: nowrap; right: -110%; width: fit-content; }
         .error-msg-box { color: var(--red); font-weight: 700; font-size: 1rem; margin: 10px 0; min-height: 24px; opacity: 0; transition: 0.3s; }
+
+        /* ESTILO PAINEL NACIONAL (v70) */
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .data-item { border: 1px solid #333; padding: 12px; border-radius: 6px; background: rgba(255,255,255,0.02); }
+        .data-item label { display: block; font-family: Orbitron; font-size: 0.6rem; color: #777; margin-bottom: 4px; }
+        .data-item span { font-size: 1.2rem; font-weight: 700; color: #FFF; }
     </style>
 </head>
 <body>
@@ -179,21 +185,11 @@
         <div class="glass modal-card" style="max-width: 500px; min-height: 480px; display: flex; flex-direction: column; justify-content: space-between;">
             <button class="btn-x" id="btnWClose" onclick="closeModal()" disabled>✕</button>
             <div id="welcomePages" style="flex-grow: 1;">
-                <div class="w-page active">
-                    <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 20px;">PROTOCOLO INICIADO</h2>
-                    <p style="font-size: 1.1rem; line-height: 1.6; color: #EEE;">Bem-vindo(a) ao jogo <b>Praga</b>!<br><br>Você é um(a) cientista descontente com a humanidade e decide pôr fim à sua existência. Para isso, deverá espalhar seu agente pelo mundo inteiro, até eliminar todos os seres humanos da Terra. Sua mente brilhante será capaz de “consertar” o estado atual do mundo?</p>
-                </div>
-                <div class="w-page" style="display: none;">
-                    <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 20px;">OBJETIVO INICIAL</h2>
-                    <p style="font-size: 1.1rem; line-height: 1.6; color: #EEE;">Toque no país que seu agente infectará primeiro!<br><br>Ao selecionar um país, você poderá ver suas informações no mesmo botão <b>"MUNDO"</b>. Clique no oceano para voltar a ver os dados globais.</p>
-                </div>
+                <div class="w-page active"><h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 20px;">PROTOCOLO INICIADO</h2><p style="font-size: 1.1rem; line-height: 1.6; color: #EEE;">Bem-vindo(a) ao jogo <b>Praga</b>!<br><br>Você é um(a) cientista descontente com a humanidade e decide pôr fim à sua existência. Para isso, deverá espalhar seu agente pelo mundo inteiro, até eliminar todos os seres humanos da Terra. Sua mente brilhante será capaz de “consertar” o estado atual do mundo?</p></div>
+                <div class="w-page" style="display: none;"><h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 20px;">OBJETIVO INICIAL</h2><p style="font-size: 1.1rem; line-height: 1.6; color: #EEE;">Toque no país que seu agente infectará primeiro!<br><br>Ao selecionar um país, você poderá ver suas informações no mesmo botão <b>"MUNDO"</b>. Clique no oceano para voltar a ver os dados globais.</p></div>
             </div>
             <div>
-                <div class="welcome-nav">
-                    <button class="btn-nav-arrow" id="btnWPrev" onclick="navWelcome(-1)" disabled>←</button>
-                    <button class="btn-main" id="btnWOk" style="width: auto; padding: 10px 30px;" onclick="closeModal()" disabled>OK</button>
-                    <button class="btn-nav-arrow" id="btnWNext" onclick="navWelcome(1)">→</button>
-                </div>
+                <div class="welcome-nav"><button class="btn-nav-arrow" id="btnWPrev" onclick="navWelcome(-1)" disabled>←</button><button class="btn-main" id="btnWOk" style="width: auto; padding: 10px 30px;" onclick="closeModal()" disabled>OK</button><button class="btn-nav-arrow" id="btnWNext" onclick="navWelcome(1)">→</button></div>
                 <div id="wPageIndicator">1/2</div>
             </div>
         </div>
@@ -203,8 +199,20 @@
         <div class="glass modal-card" style="max-width: 500px;">
             <h2 style="color: var(--red); font-family: Orbitron; margin-bottom: 20px;">AGENTE DISPERSADO</h2>
             <p id="dispersedText" style="font-size: 1.1rem; line-height: 1.6; color: #EEE;"></p>
-            <div style="text-align: center; margin-top: 30px;">
-                <button class="btn-main" style="width: auto; padding: 10px 30px;" onclick="closeModal()">ENTENDIDO</button>
+            <div style="text-align: center; margin-top: 30px;"><button class="btn-main" style="width: auto; padding: 10px 30px;" onclick="closeModal()">ENTENDIDO</button></div>
+        </div>
+    </div>
+
+    <div id="dataPanelModal" class="overlay">
+        <div class="glass modal-card" style="width: 600px;">
+            <button class="btn-x" onclick="closeModal()">✕</button>
+            <h2 id="panelTitle" style="color: var(--blue); font-family: Orbitron;">RELATÓRIO</h2>
+            <p id="panelSubtitle" style="color: #888; font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px;"></p>
+            <div class="data-grid">
+                <div class="data-item"><label>POPULAÇÃO TOTAL</label><span id="statPop">0</span></div>
+                <div class="data-item"><label>SAUDÁVEIS</label><span id="statHealthy">0</span></div>
+                <div class="data-item"><label>INFECTADOS</label><span id="statInfected" style="color: var(--red);">0</span></div>
+                <div class="data-item"><label>MORTOS</label><span id="statDead">0</span></div>
             </div>
         </div>
     </div>
@@ -226,24 +234,33 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // ✅ MOTOR DE DADOS GEOPOLÍTICOS (v70)
         let game = { 
             started: false, name: '', type: '', diff: '', active: false, newsLog: [], soundOn: false, 
             infected: 0, dead: 0, cured: 0, vax: 0, dna: 0, popCap: 8200000000, 
-            selectedCountry: null, infectionStarted: false, 
-            internalInfection: 0, lastDNAMilestone: 0 
+            selectedCountry: null, infectionStarted: false, lastDNAMilestone: 0,
+            countries: {} 
         };
         
+        const popDB = { "Brasil": 214300000, "México": 126700000, "Canadá": 38200000, "Argentina": 45800000, "Peru": 33700000, "Colômbia": 51500000, "África do Sul": 60000000, "Egito": 109000000, "China": 1412000000, "EUA": 331900000, "Reino Unido": 67300000, "França": 67700000, "Rússia": 143400000, "Índia": 1408000000, "Japão": 125700000, "Austrália": 25700000, "Turquia": 84700000 };
+        
+        // Mapeamento de Fronteiras Terrestres Adjacentes (Regra 2 da Pesquisa)
+        const borders = {
+            "Brasil": ["Argentina", "Peru", "Colômbia"], "China": ["Rússia", "Índia"], "EUA": ["Canadá", "México"], "França": ["Espanha", "Reino Unido"], // Chunnel
+            "Espanha": ["França"], "Rússia": ["China", "Finlândia", "Turquia"], "Índia": ["China"]
+        };
+
         const worldHubs = [{ country: "Brasil", type: "airport", city: "Brasília", lat: -15.8697, lng: -47.9208 }, { country: "Brasil", type: "port", city: "Salvador", lat: -12.9228, lng: -38.5122 }, { country: "México", type: "airport", city: "Cidade do México", lat: 19.4326, lng: -99.1332 }, { country: "México", type: "port", city: "Veracruz", lat: 19.1738, lng: -96.1342 }, { country: "Canadá", type: "airport", city: "Ottawa", lat: 45.4215, lng: -75.6972 }, { country: "Canadá", type: "port", city: "Vancouver", lat: 49.2827, lng: -123.1207 }, { country: "Argentina", type: "airport", city: "Buenos Aires", lat: -34.6037, lng: -58.3816 }, { country: "Argentina", type: "port", city: "Mar del Plata", lat: -38.0055, lng: -57.5426 }, { country: "Peru", type: "airport", city: "Lima", lat: -12.0464, lng: -77.0428 }, { country: "Peru", type: "port", city: "Callao", lat: -12.0566, lng: -77.1491 }, { country: "Colômbia", type: "airport", city: "Bogotá", lat: 4.7110, lng: -74.0721 }, { country: "Colômbia", type: "port", city: "Cartagena", lat: 10.3910, lng: -75.4794 }, { country: "África do Sul", type: "airport", city: "Joanesburgo", lat: -26.1367, lng: 28.2411 }, { country: "África do Sul", type: "port", city: "Cidade do Cabo", lat: -33.9189, lng: 18.4233 }, { country: "Marrocos", type: "airport", city: "Rabat", lat: 33.9716, lng: -6.8498 }, { country: "Marrocos", type: "port", city: "Casablanca", lat: 33.5731, lng: -7.5898 }, { country: "Egito", type: "airport", city: "Cairo", lat: 30.1219, lng: 31.4056 }, { country: "Egito", type: "port", city: "Alexandria", lat: 31.2001, lng: 29.9187 }, { country: "Espanha", type: "airport", city: "Madrid", lat: 40.4839, lng: -3.5680 }, { country: "Espanha", type: "port", city: "Barcelona", lat: 41.3851, lng: 2.1734 }, { country: "França", type: "airport", city: "Paris", lat: 49.0097, lng: 2.5479 }, { country: "França", type: "port", city: "Marselha", lat: 43.2965, lng: 5.3698 }, { country: "Arábia Saudita", type: "airport", city: "Riad", lat: 24.9576, lng: 46.6988 }, { country: "Arábia Saudita", type: "port", city: "Jidá", lat: 21.4858, lng: 39.1925 }, { country: "Índia", type: "airport", city: "Nova Deli", lat: 28.5562, lng: 77.1000 }, { country: "Índia", type: "port", city: "Bombaim", lat: 18.9220, lng: 72.8347 }, { country: "Finlândia", type: "airport", city: "Helsínquia", lat: 60.3172, lng: 24.9633 }, { country: "Finlândia", type: "port", city: "Helsínquia", lat: 60.1600, lng: 24.9600 }, { country: "Japão", type: "airport", city: "Tóquio", lat: 35.5494, lng: 139.7798 }, { country: "Japão", type: "port", city: "Yokohama", lat: 35.4437, lng: 139.6380 }, { country: "Austrália", type: "airport", city: "Canberra", lat: -35.3050, lng: 149.1934 }, { country: "Austrália", type: "port", city: "Sydney", lat: -33.8688, lng: 151.2093 }, { country: "Nova Zelândia", type: "airport", city: "Wellington", lat: -41.3276, lng: 174.8076 }, { country: "Nova Zelândia", type: "port", city: "Auckland", lat: -36.8485, lng: 174.7633 }, { country: "Turquia", type: "airport", city: "Ancara", lat: 40.1281, lng: 32.9951 }, { country: "Turquia", type: "port", city: "Istambul", lat: 41.0082, lng: 28.9784 }, { country: "Reino Unido", type: "airport", city: "Londres", lat: 51.4700, lng: -0.4543 }, { country: "Rússia", type: "airport", city: "Moscou", lat: 55.7558, lng: 37.6173 }, { country: "EUA", type: "airport", city: "Washington", lat: 38.8512, lng: -77.0402 }, { country: "Groenlândia", type: "port", city: "Nuuk", lat: 64.1750, lng: -51.7389 }, { country: "Madagascar", type: "port", city: "Toamasina", lat: -18.1492, lng: 49.4023 }, { country: "Suíça", type: "airport", city: "Berna", lat: 46.9128, lng: 7.4984 }];
 
+        // SISTEMA DE ÁUDIO
         const audioSystem = {
             tracks: [document.getElementById('bgMusic1'), document.getElementById('bgMusic2')],
-            currentTrackIndex: 0, isMuted: true, fadeInterval: null,
+            currentTrackIndex: 0, isMuted: true,
             init() { this.tracks.forEach(t => t.volume = 0); this.tracks[0].addEventListener('ended', () => this.crossfadeTo(1)); this.tracks[1].addEventListener('ended', () => this.crossfadeTo(0)); },
-            fadeIn(index, duration = 300) { const track = this.tracks[index]; track.play(); let vol = 0; const steps = 10; const interval = duration / steps; const fInt = setInterval(() => { vol = Math.min(1, vol + 0.1); track.volume = vol; if (vol >= 1) clearInterval(fInt); }, interval); },
-            toggleMute() { this.isMuted = !this.isMuted; if (this.isMuted) { this.tracks.forEach(t => { t.volume = 0; t.pause(); }); } else { this.fadeIn(this.currentTrackIndex, 300); } return this.isMuted; }
+            fadeIn(index) { const track = this.tracks[index]; track.play(); let vol = 0; const fInt = setInterval(() => { vol = Math.min(1, vol + 0.1); track.volume = vol; if (vol >= 1) clearInterval(fInt); }, 30); },
+            toggleMute() { this.isMuted = !this.isMuted; if (this.isMuted) { this.tracks.forEach(t => { t.volume = 0; t.pause(); }); } else { this.fadeIn(this.currentTrackIndex); } return this.isMuted; }
         };
         audioSystem.init();
-
         function toggleSoundManual() {
             const muted = audioSystem.toggleMute();
             document.getElementById('soundBtnIcon').innerHTML = muted ? 
@@ -252,7 +269,7 @@
         }
 
         let welcomePageIndex = 0; function navWelcome(dir) { const pages = document.querySelectorAll('.w-page'); const indicator = document.getElementById('wPageIndicator'); pages[welcomePageIndex].style.display = 'none'; welcomePageIndex += dir; pages[welcomePageIndex].style.display = 'block'; document.getElementById('btnWPrev').disabled = (welcomePageIndex === 0); document.getElementById('btnWNext').disabled = (welcomePageIndex === pages.length - 1); indicator.innerText = `${welcomePageIndex + 1}/${pages.length}`; if (welcomePageIndex === pages.length - 1) { document.getElementById('btnWClose').disabled = false; document.getElementById('btnWOk').disabled = false; } }
-        const preGameNewsSource = ["\"Cansamos de salvar um futuro que insiste em se destruir.\"", "\"Quando o fato vira opinião, a ciência vira ruína.\"", "\"O descrédito é o ácido que corrói as fundações do amanhã.\"", "\"A ciência não vai cair. Ela vai simplesmente se calar.\"", "\"Onde a crença vence a prova, o cientista se torna um fantasma.\"", "\"Não há como curar um mundo que ama a própria ferida.\"", "\"O laboratory está vazio porque a verdade se tornou indesejada.\"", "\"A razão se retirou da sala. O colapso agora é livre.\"", "\"Não somos mais guias, somos apenas testemunhas da queda.\""];
+        const preGameNewsSource = ["\"Cansamos de salvar um futuro que insiste em se destruir.\"", "\"Quando o fato vira opinião, a ciência vira ruína.\"", "\"O descrédito é o ácido que corrói as fundações do amanhã.\"", "\"A ciência não vai cair. Ela vai simplesmente se calar.\"", "\"O laboratório está vazio porque a verdade se tornou indesejada.\"", "\"A razão se retirou da sala. O colapso agora é livre.\"", "\"Não somos mais guias, somos apenas testemunhas da queda.\""];
         let newsQueue = []; let newsTimeout; function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
         function scheduleNextNews() { if (game.started) return; if (newsQueue.length === 0) { newsQueue = [...preGameNewsSource]; shuffleArray(newsQueue); } registerNews(newsQueue.pop()); const randomDelay = Math.floor(Math.random() * 10001) + 10000; newsTimeout = setTimeout(scheduleNextNews, 20000 + randomDelay); }
         window.onload = () => { registerNews("O descrédito à ciência tem levado muitos cientistas a se manifestarem contra essa tendência. Será que a ciência se revoltará em breve?"); setTimeout(scheduleNextNews, 22000); };
@@ -273,20 +290,16 @@
             map.on('click', async (e) => { updateCountrySelection(e.latlng); });
         }
 
-        // ✅ LÓGICA DE GÊNERO GRAMATICAL REFINADA (v67)
         function getCountryArticle(name) {
-            const femCountries = ["França", "Espanha", "Argentina", "Colômbia", "Arábia Saudita", "Índia", "Finlândia", "Austrália", "Nova Zelândia", "Turquia", "Rússia", "Groenlândia", "Madagascar", "Suíça", "Bolívia", "África do Sul", "Nigéria", "Itália", "Alemanha", "Ucrânia", "China"];
+            const femCountries = ["França", "Espanha", "Argentina", "Colômbia", "Arábia Saudita", "Índia", "Finlândia", "Austrália", "Nova Zelândia", "Turquia", "Rússia", "Groenlândia", "Madagascar", "Suíça", "Bolívia", "África do Sul", "Nigéria", "China", "Itália", "Alemanha", "Ucrânia"];
             const pluralCountries = ["Estados Unidos", "EUA", "Filipinas", "Bahamas", "Maldivas", "Países Baixos"];
             if (pluralCountries.includes(name)) return "nos";
             return femCountries.includes(name) ? "na" : "no";
         }
 
-        // ✅ LÓGICA DE ADJETIVO PÁTRIO AMPLIADA (v67)
         function getCountryAdjective(name) {
-            const map = {
-                "Brasil": "brasileiro", "México": "mexicano", "Canadá": "canadense", "Argentina": "argentino", "Peru": "peruano", "Colômbia": "colombiano", "África do Sul": "sul-africano", "Marrocos": "marroquino", "Egito": "egípcio", "Espanha": "espanhol", "França": "francês", "Arábia Saudita": "saudita", "Índia": "indiano", "Finlândia": "finlandês", "Japão": "japonês", "Austrália": "australiano", "Nova Zelândia": "neozelandês", "Turquia": "turco", "Reino Unido": "britânico", "Rússia": "russo", "Estados Unidos": "estadunidense", "EUA": "estadunidense", "Groenlândia": "groenlandês", "Madagascar": "malgaxe", "Suíça": "suíço", "Nigéria": "nigeriano", "China": "chinês", "Itália": "italiano", "Alemanha": "alemão", "Ucrânia": "ucraniano"
-            };
-            return map[name] || "local";
+            const map = { "Brasil": "brasileiro", "México": "mexicano", "Canadá": "canadense", "Argentina": "argentino", "Peru": "peruano", "Colômbia": "colombiano", "África do Sul": "sul-africano", "Marrocos": "marroquino", "Egito": "egípcio", "Espanha": "espanhol", "França": "francês", "Arábia Saudita": "saudita", "Índia": "indiano", "Finlândia": "finlandês", "Japão": "japonês", "Austrália": "australiano", "Nova Zelândia": "neozelandês", "Turquia": "turco", "Reino Unido": "britânico", "Rússia": "russo", "Estados Unidos": "estadunidense", "EUA": "estadunidense", "Groenlândia": "groenlandês", "Madagascar": "malgaxe", "Suíça": "suíço" };
+            return map[name] || "territorial";
         }
 
         async function updateCountrySelection(latlng) {
@@ -304,31 +317,85 @@
         }
 
         function confirmInfection() {
-            game.infectionStarted = true;
-            game.dna = 1; game.infected = 1; game.internalInfection = 1;
+            game.infectionStarted = true; game.dna = 1; 
+            const cName = game.selectedCountry;
+            const pop = popDB[cName] || 50000000;
+            game.countries[cName] = { total: pop, infected: 1, healthy: pop - 1, dead: 0 };
             updateHUD(); map.closePopup();
-            const adj = getCountryAdjective(game.selectedCountry);
+            const adj = getCountryAdjective(cName);
             const msg = `O agente <b>${game.name}</b> foi liberado em solo <b>${adj}</b> e já contaminou sua primeira vítima. À medida que o agente infecta novas pessoas, você acumulará pontos de DNA, que poderão ser utilizados para o aprimoramento remoto do agente.`;
-            document.getElementById('dispersedText').innerHTML = msg;
-            openModal('dispersedModal');
-            registerNews(`SURTO INICIADO. PACIENTE ZERO IDENTIFICADO ${getCountryArticle(game.selectedCountry).toUpperCase()} ${game.selectedCountry.toUpperCase()}.`);
+            document.getElementById('dispersedText').innerHTML = msg; openModal('dispersedModal');
+            registerNews(`SURTO INICIADO. PACIENTE ZERO IDENTIFICADO ${getCountryArticle(cName).toUpperCase()} ${cName.toUpperCase()}.`);
             setInterval(gameTick, 1000);
         }
 
+        // ✅ MOTOR DE PROPAGAÇÃO (v70)
         function gameTick() {
             if (!game.infectionStarted) return;
-            let growthFactor = 1.25;
-            let newInfections = Math.ceil(game.internalInfection * (growthFactor - 1));
-            if (game.infected + newInfections > game.popCap) newInfections = game.popCap - game.infected;
-            game.internalInfection += newInfections; game.infected = game.internalInfection;
+            let totalInfected = 0;
+
+            for (let cName in game.countries) {
+                let country = game.countries[cName];
+                
+                // 1. Crescimento Interno (Curva Logística)
+                let growthFactor = 1.35; 
+                let newInfected = Math.ceil(country.infected * (growthFactor - 1));
+                if (country.infected + newInfected > country.total) newInfected = country.total - country.infected;
+                country.infected += newInfected;
+                country.healthy = country.total - country.infected;
+                totalInfected += country.infected;
+
+                // 2. Regra Terrestre (Determinística - 15%)
+                if ((country.infected / country.total) > 0.15 && borders[cName]) {
+                    borders[cName].forEach(neighbor => {
+                        if (!game.countries[neighbor]) {
+                            const nPop = popDB[neighbor] || 50000000;
+                            game.countries[neighbor] = { total: nPop, infected: 1, healthy: nPop - 1, dead: 0 };
+                            registerNews(`A PRAGA CRUZOU A FRONTEIRA TERRESTRE PARA ${neighbor.toUpperCase()}.`);
+                        }
+                    });
+                }
+
+                // 3. Regra de Hubs (Background Transmission - RNG)
+                if (country.infected > 1000 && Math.random() < 0.001) { // 0,1% de chance
+                    const target = worldHubs[Math.floor(Math.random() * worldHubs.length)];
+                    if (!game.countries[target.country]) {
+                        const tPop = popDB[target.country] || 50000000;
+                        game.countries[target.country] = { total: tPop, infected: 1, healthy: tPop - 1, dead: 0 };
+                        registerNews(`TRANSMISSÃO POR HUB DETECTADA EM ${target.country.toUpperCase()}.`);
+                    }
+                }
+            }
+
+            game.infected = totalInfected;
             let currentMilestone = Math.floor(game.infected / 100000);
             if (currentMilestone > game.lastDNAMilestone) { game.dna += (currentMilestone - game.lastDNAMilestone); game.lastDNAMilestone = currentMilestone; }
             updateHUD();
         }
 
         function updateHUD() { document.getElementById('valInfected').innerText = game.infected.toLocaleString('pt-BR'); document.getElementById('valDNA').innerText = game.dna; }
+        
+        function handleWorldClick() {
+            if (game.selectedCountry) {
+                const c = game.countries[game.selectedCountry] || { total: popDB[game.selectedCountry] || 50000000, infected: 0, dead: 0, healthy: popDB[game.selectedCountry] || 50000000 };
+                document.getElementById('panelTitle').innerText = "RELATÓRIO NACIONAL";
+                document.getElementById('panelSubtitle').innerText = game.selectedCountry.toUpperCase();
+                document.getElementById('statPop').innerText = c.total.toLocaleString('pt-BR');
+                document.getElementById('statHealthy').innerText = c.healthy.toLocaleString('pt-BR');
+                document.getElementById('statInfected').innerText = c.infected.toLocaleString('pt-BR');
+                document.getElementById('statDead').innerText = c.dead.toLocaleString('pt-BR');
+            } else {
+                document.getElementById('panelTitle').innerText = "ESTATÍSTICAS GLOBAIS";
+                document.getElementById('panelSubtitle').innerText = "PLANETA TERRA";
+                document.getElementById('statPop').innerText = game.popCap.toLocaleString('pt-BR');
+                document.getElementById('statHealthy').innerText = (game.popCap - game.infected).toLocaleString('pt-BR');
+                document.getElementById('statInfected').innerText = game.infected.toLocaleString('pt-BR');
+                document.getElementById('statDead').innerText = game.dead.toLocaleString('pt-BR');
+            }
+            openModal('dataPanelModal');
+        }
+
         function renderHubs() { worldHubs.forEach(hub => { const iconPath = (hub.type === 'airport') ? 'plane.svg' : 'anchor.svg'; const icon = L.divIcon({ className: 'hub-icon', html: `<img src="${iconPath}" class="hub-icon-img" width="22" height="22">`, iconSize: [24, 24] }); const marker = L.marker([hub.lat, hub.lng], { icon: icon }).addTo(hubLayer); marker.on('click', (e) => { L.DomEvent.stopPropagation(e); updateCountrySelection({lat: hub.lat, lng: hub.lng}); }); }); }
-        function handleWorldClick() { if (game.selectedCountry) alert(`Relatório tático de ${game.selectedCountry} em processamento...`); else alert('Estatísticas globais em desenvolvimento.'); }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); if(game.started) game.active = true; }
     </script>
